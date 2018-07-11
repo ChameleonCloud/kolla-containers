@@ -2,8 +2,14 @@
   "command": "/usr/sbin/httpd -DFOREGROUND",
   "config_files": [
     {
-      "source": "/var/lib/kolla/horizon.conf",
+      "source": "/var/lib/kolla/horizon/horizon.conf",
       "dest": "/etc/httpd/conf.d/horizon.conf",
+      "owner": "horizon",
+      "perm": "0600"
+    },
+    {
+      "source": "/var/lib/kolla/horizon/local_settings.py",
+      "dest": "/etc/openstack-dashboard/local_settings",
       "owner": "horizon",
       "perm": "0600"
     },
@@ -40,12 +46,6 @@
     {
       "source": "/var/lib/kolla/policies/nova_policy.json",
       "dest": "/etc/openstack-dashboard/conf/nova_policy.json",
-      "owner": "horizon",
-      "perm": "0600"
-    },
-    {
-      "source": "/var/lib/kolla/local_settings.py",
-      "dest": "/etc/openstack-dashboard/local_settings",
       "owner": "horizon",
       "perm": "0600"
     }
