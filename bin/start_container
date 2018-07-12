@@ -1,8 +1,25 @@
 #!/usr/bin/env bash
 set -e -u -o pipefail
 
-service="$1"
+service="${1:-}"
 tag="${2:-stable}"
+
+if [[ -z "$service" || "$service" == "-h" || $service == "--help" ]]; then
+  cat <<USAGE
+Usage: $0 <service> [tag]
+
+Runs a service container, optionally at a given tag (uses "stable" by default.)
+
+Examples:
+  # Run Horizon service
+  $0 horizon
+
+  # Run Nova Compute service at tag "ocata"
+  $0 nova-compute ocata
+USAGE
+  exit 1
+fi
+
 base="centos"
 install_type="source"
 registry="192.5.87.124:5000"
