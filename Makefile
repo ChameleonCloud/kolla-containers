@@ -7,6 +7,7 @@ KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
 KOLLA_REGISTRY ?=
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
 	--config-file=$(KOLLA_CONFIG)
+KOLLA_TEMPLATE_OVERRIDE = $(shell find $* -name template-overrides.j2 -exec echo "--template-override=$$(realpath {})" \;)
 
 SERVICES := horizon
 
@@ -16,10 +17,14 @@ kolla: $(STAMPS)/kolla
 	touch $@
 
 $(SERVICES:%=build-%): build-%: kolla
-	$(KOLLA_BUILD) --squash --nopush $*
+	$(KOLLA_BUILD) --skip-existing --nopush \
+		$(KOLLA_TEMPLATE_OVERRIDE) \
+		$*
 
 $(SERVICES:%=push-%): push-%: kolla
-	$(KOLLA_BUILD) --push --registry=$(KOLLA_REGISTRY) $*
+	$(KOLLA_BUILD) --push \
+		--registry=$(KOLLA_REGISTRY) \
+		$*
 
 # Kolla build dependencies
 

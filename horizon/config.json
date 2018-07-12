@@ -2,13 +2,13 @@
   "command": "/usr/sbin/httpd -DFOREGROUND",
   "config_files": [
     {
-      "source": "/var/lib/kolla/horizon/horizon.conf",
+      "source": "/var/lib/kolla/config_files/horizon.conf",
       "dest": "/etc/httpd/conf.d/horizon.conf",
       "owner": "horizon",
       "perm": "0600"
     },
     {
-      "source": "/var/lib/kolla/horizon/local_settings.py",
+      "source": "/var/lib/kolla/config_files/local_settings.py",
       "dest": "/etc/openstack-dashboard/local_settings",
       "owner": "horizon",
       "perm": "0600"
