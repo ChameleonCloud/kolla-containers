@@ -2,31 +2,30 @@ OPENSTACK_RELEASE := stable/ocata
 
 PYTHON_VERSION := py27
 
-KOLLA_CONFIG := $(abspath kolla-build.conf)
 KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
-KOLLA_REGISTRY ?=
+KOLLA_REGISTRY ?= 192.5.87.124:5000
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
-	--config-file=$(KOLLA_CONFIG)
-KOLLA_TEMPLATE_OVERRIDE = $(shell find $* -name template-overrides.j2 -exec echo "--template-override=$$(realpath {})" \;)
+	--config-file=$(abspath kolla-build.conf) \
+	--template-override=$(abspath kolla-template-overrides.j2) \
+	--push --registry=$(KOLLA_REGISTRY)
 
 SERVICES := horizon
 
 STAMPS := .stamps
 
-kolla: $(STAMPS)/kolla
-	touch $@
-
+.PHONY: $(SERVICES:%=build-%)
 $(SERVICES:%=build-%): build-%: kolla
-	$(KOLLA_BUILD) --skip-existing --nopush \
-		$(KOLLA_TEMPLATE_OVERRIDE) \
-		$*
+	$(KOLLA_BUILD) $*
 
-$(SERVICES:%=push-%): push-%: kolla
-	$(KOLLA_BUILD) --push \
-		--registry=$(KOLLA_REGISTRY) \
-		$*
+.PHONY: $(SERVICES:%=run-%)
+$(SERVICES:%=run-%): run-%:
+	bin/start_container $*
 
 # Kolla build dependencies
+
+.PHONY: kolla
+kolla: $(STAMPS)/kolla
+	touch $@
 
 $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 	mkdir -p $(dir $@)

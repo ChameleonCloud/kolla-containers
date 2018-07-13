@@ -25,9 +25,19 @@ install_type="source"
 registry="192.5.87.124:5000"
 image="kolla/$base-$install_type-$service"
 
-exec docker run --rm \
-  -v "/etc/kolla/$service:/var/lib/kolla/config_files" \
-  -v "/etc/kolla/policies:/var/lib/kolla/policies" \
-  -v "/var/log/$service:/var/log/$service" \
-  -e KOLLA_CONFIG_STRATEGY="COPY_ALWAYS" \
-  "$registry/$image:$tag"
+declare -a flags=()
+flags+=(--rm)
+flags+=(--net=host)
+flags+=(-v "/etc/kolla/$service:/var/lib/kolla/config_files")
+flags+=(-v "/etc/kolla/policies:/var/lib/kolla/policies")
+flags+=(-v "/var/log/$service:/var/log/kolla/$service")
+flags+=(-e KOLLA_CONFIG_STRATEGY="COPY_ALWAYS")
+if [[ -n "${INTERACTIVE:-}" ]]; then
+  flags+=(--entrypoint=/bin/bash)
+  flags+=(--interactive)
+  flags+=(--tty)
+else
+  flags+=(--detach)
+fi
+
+exec docker run "${flags[@]}" "$registry/$image:$tag"

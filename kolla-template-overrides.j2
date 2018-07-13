@@ -1,0 +1,21 @@
+{% extends parent_template %}
+
+# TODO: remove this when we add blazarclient to the base packages
+# on kolla upstream. There is no reason not to have it there.
+{% set openstack_base_packages_append = ['python-blazarclient'] %}
+{% set openstack_base_pip_packages_append = ['python-blazarclient'] %}
+
+#########
+# Horizon
+#########
+
+{% set horizon_pip_packages_append = ['sass'] %}
+
+# Add chameleoncloud theme via additions
+# See "horizon-additions-themes-chameleoncloud" section in kolla-build.conf
+{% block horizon_footer %}
+ADD additions-archive /
+RUN mkdir -p /etc/openstack_dashboard/themes \
+  && find /additions -name "*themes-chameleoncloud*" -maxdepth 1 -type d -print0 \
+    | xargs -0 -I% mv % /etc/openstack_dashboard/themes/chameleoncloud
+{% endblock %}
