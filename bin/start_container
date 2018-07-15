@@ -23,14 +23,17 @@ fi
 base="centos"
 install_type="source"
 registry="192.5.87.124:5000"
+log_dir="/var/log/$service"
+config_dir="/etc/kolla/$service"
+policy_dir="/etc/kolla/policies"
 image="kolla/$base-$install_type-$service"
 
 declare -a flags=()
 flags+=(--rm)
 flags+=(--net=host)
-flags+=(-v "/etc/kolla/$service:/var/lib/kolla/config_files")
-flags+=(-v "/etc/kolla/policies:/var/lib/kolla/policies")
-flags+=(-v "/var/log/$service:/var/log/kolla/$service")
+flags+=(-v "$config_dir:/var/lib/kolla/config_files")
+flags+=(-v "$policy_dir:/var/lib/kolla/policies")
+flags+=(-v "$log_dir:/var/log/kolla/$service")
 flags+=(-e KOLLA_CONFIG_STRATEGY="COPY_ALWAYS")
 if [[ -n "${INTERACTIVE:-}" ]]; then
   flags+=(--entrypoint=/bin/bash)
