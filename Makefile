@@ -44,6 +44,6 @@ venv: $(STAMPS)/venv
 
 $(STAMPS)/venv: requirements.txt
 	mkdir -p $(dir $@)
-	virtualenv $@
+	virtualenv $(notdir $@)
 	$(VENV) pip install -r $<
 	touch $@
