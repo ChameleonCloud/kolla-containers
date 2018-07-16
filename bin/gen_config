@@ -15,7 +15,7 @@ dir = 'runtime_configs'
 policy_dir = os.path.join(dir, 'policies')
 config_dir = os.path.join(dir, service_name)
 
-vars = yaml.load(open(os.path.join(dir, 'vars.yaml')))
+vars = yaml.load(open(os.path.join(dir, 'globals.yaml')))
 env = Environment(
   loader=FileSystemLoader(config_dir),
   trim_blocks=True,
