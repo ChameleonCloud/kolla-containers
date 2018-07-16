@@ -4,16 +4,16 @@ ServerSignature Off
 ServerTokens Prod
 TraceEnable off
 
-<VirtualHost *:80>
+<VirtualHost *:{{ horizon_port }}>
     LogLevel warn
     ErrorLog /var/log/kolla/horizon/horizon.log
     LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"" logformat
     CustomLog /var/log/kolla/horizon/horizon-access.log logformat
 
     WSGIScriptReloading On
-    WSGIDaemonProcess horizon-http processes=1 threads=1 user=horizon group=horizon display-name=%{GROUP} python-path=/var/lib/kolla/venv/lib/python2.7/site-packages
+    WSGIDaemonProcess horizon-http processes=1 threads=1 user=horizon group=horizon display-name=%{GROUP} python-path={{ container_python_path }}
     WSGIProcessGroup horizon-http
-    WSGIScriptAlias / /var/lib/kolla/venv/lib/python2.7/site-packages/openstack_dashboard/wsgi/django.wsgi
+    WSGIScriptAlias / {{ container_python_path }}/openstack_dashboard/wsgi/django.wsgi
     WSGIPassAuthorization On
     WSGIApplicationGroup %{GLOBAL}
 
@@ -21,7 +21,7 @@ TraceEnable off
         Require all granted
     </Location>
 
-    Alias /static /var/lib/kolla/venv/lib/python2.7/site-packages/static
+    Alias /static {{ container_python_path }}/static
     <Location "/static">
         SetHandler None
     </Location>
@@ -29,9 +29,11 @@ TraceEnable off
 
 Header edit Location ^http://(.*)$ https://$1
 
+{% if horizon_webroot %}
 # Transparently pass-through WEBROOT
 RewriteEngine on
-RewriteRule "^/dashboard/(.+)" "/$1" [PT]
+RewriteRule "^{{ horizon_webroot }}(.+)" "/$1" [PT]
+{% endif %}
 
 <IfModule mod_expires.c>
     <Filesmatch "\.(jpg|jpeg|png|gif|js|css|swf|ico|woff)$">

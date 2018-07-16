@@ -12,7 +12,7 @@ TEMPLATE_DEBUG = DEBUG
 
 # WEBROOT is the location relative to Webserver root
 # should end with a slash.
-WEBROOT = '/dashboard/'
+WEBROOT = '{{ horizon_webroot }}'
 LOGIN_URL = WEBROOT + 'auth/login/'
 LOGOUT_URL = WEBROOT + 'auth/logout/'
 
@@ -424,7 +424,7 @@ TIME_ZONE = "UTC"
 AVAILABLE_THEMES = [
   ('default', 'OpenStack Default', 'themes/default'),
   ('material', 'Material', 'themes/material'),
-  #('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
+  #('chameleoncloud', 'ChameleonCloud', '{{ horizon_conf_dir }}/themes/chameleoncloud'),
 ]
 
 # TODO: bring back chameleoncloud theme
@@ -448,7 +448,7 @@ DEFAULT_THEME = 'default'
 # target installation.
 
 # Path to directory containing policy.json files
-POLICY_FILES_PATH = '/etc/openstack-dashboard'
+POLICY_FILES_PATH = '{{ horizon_conf_dir }}'
 
 # Map of local copy of service policy files.
 # Please insure that your identity policy file matches the one being used on

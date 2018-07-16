@@ -1,2 +1,3 @@
-.openstack/
-.stamps/
+/.stamps/
+/venv/
+/*.tar

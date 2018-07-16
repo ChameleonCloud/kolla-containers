@@ -31,6 +31,7 @@ image="kolla/$base-$install_type-$service"
 declare -a flags=()
 flags+=(--rm)
 flags+=(--net=host)
+flags+=("--name=$service")
 flags+=(-v "$config_dir:/var/lib/kolla/config_files")
 flags+=(-v "$policy_dir:/var/lib/kolla/policies")
 flags+=(-v "$log_dir:/var/log/kolla/$service")
