@@ -22,7 +22,7 @@ fi
 
 base="centos"
 install_type="source"
-registry="192.5.87.124:5000"
+registry="$REGISTRY"
 log_dir="/var/log/$service"
 config_dir="/etc/kolla/$service"
 policy_dir="/etc/kolla/policies"

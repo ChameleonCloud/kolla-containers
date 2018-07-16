@@ -18,7 +18,7 @@ STAMPS := .stamps
 	$(VENV) bin/gen_config $*
 
 %-run:
-	bin/start_container $*
+	REGISTRY=$(KOLLA_REGISTRY) bin/start_container $*
 
 # Kolla build dependencies
 
