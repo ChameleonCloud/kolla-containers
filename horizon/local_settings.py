@@ -133,9 +133,8 @@ LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 # (usually behind a load-balancer). Either you have to make sure that a session
 # gets all requests routed to the same dashboard instance or you set the same
 # SECRET_KEY for all of them.
-#SECRET_KEY = secret_key.generate_or_read_from_file(
-#    os.path.join(LOCAL_PATH, '.secret_key_store'))
-SECRET_KEY = 'foobar'
+SECRET_KEY = secret_key.generate_or_read_from_file(
+    os.path.join(LOCAL_PATH, '.secret_key_store'))
 
 # We recommend you use memcached for development; otherwise after every reload
 # of the django development server, you will have to login again. To use
@@ -435,7 +434,7 @@ TIME_ZONE = "UTC"
 AVAILABLE_THEMES = [
   ('default', 'OpenStack Default', 'themes/default'),
   ('material', 'Material', 'themes/material'),
-  ('chameleoncloud', 'ChameleonCloud', 'themes/chameleoncloud'),
+  ('chameleoncloud', 'ChameleonCloud', '/etc/openstack-dashboard/themes/chameleoncloud'),
 ]
 
 DEFAULT_THEME = 'chameleoncloud'
