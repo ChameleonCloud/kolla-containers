@@ -1,7 +1,8 @@
 PYTHON_VERSION := py27
 
-KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
+# TODO: point to production registry
 KOLLA_REGISTRY ?= 192.5.87.68:5000
+KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
 	--config-file=$(abspath kolla-build.conf) \
 	--template-override=$(abspath kolla-template-overrides.j2) \
@@ -17,8 +18,12 @@ STAMPS := .stamps
 %-genconfig: venv
 	$(VENV) bin/gen_config $*
 
-%-run:
-	REGISTRY=$(KOLLA_REGISTRY) bin/start_container $*
+%-run: %-genconfig
+	tar -xvf $*.tar
+	REGISTRY=$(KOLLA_REGISTRY) \
+		CONF_PATH=$(abspath etc/kolla) \
+		LOG_PATH=$(abspath log) \
+		bin/start_container $*
 
 # Kolla build dependencies
 

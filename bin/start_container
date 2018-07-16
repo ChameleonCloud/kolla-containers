@@ -22,11 +22,15 @@ fi
 
 base="centos"
 install_type="source"
+
 registry="$REGISTRY"
-log_dir="/var/log/$service"
-config_dir="/etc/kolla/$service"
-policy_dir="/etc/kolla/policies"
-image="kolla/$base-$install_type-$service"
+log_dir="$LOG_PATH/$service"
+config_dir="$CONF_PATH/$service"
+policy_dir="$CONF_PATH/policies"
+
+image="$registry/kolla/$base-$install_type-$service:$tag"
+
+docker pull "$image"
 
 declare -a flags=()
 flags+=(--rm)
@@ -45,4 +49,4 @@ else
   flags+=(--detach)
 fi
 
-exec docker run "${flags[@]}" "$registry/$image:$tag"
+exec docker run "${flags[@]}" "$image"

@@ -4,6 +4,7 @@
 from jinja2 import Environment, FileSystemLoader
 from io import BytesIO
 import re
+import os
 import sys
 import tarfile
 import yaml
@@ -11,10 +12,12 @@ import yaml
 service_name = sys.argv[1]
 jinja_extension_re = r'.j2$'
 dir = 'runtime_configs'
+policy_dir = os.path.join(dir, 'policies')
+config_dir = os.path.join(dir, service_name)
 
-vars = yaml.load(open("%s/vars.yaml" % dir))
+vars = yaml.load(open(os.path.join(dir, 'vars.yaml')))
 env = Environment(
-  loader=FileSystemLoader("%s/%s" % (dir, service_name))
+  loader=FileSystemLoader(config_dir)
 )
 
 with tarfile.open("%s.tar" % service_name, 'w') as tar:
@@ -25,3 +28,6 @@ with tarfile.open("%s.tar" % service_name, 'w') as tar:
         info.name = "/etc/kolla/%s/%s" % (service_name, re.sub(jinja_extension_re, '', name))
         info.size = len(rendered)
         tar.addfile(info, fileobj=BytesIO(rendered.encode('utf-8')))
+    # Also add in all policies
+    for file in os.listdir(policy_dir):
+        tar.add(os.path.join(policy_dir, file), arcname="/etc/kolla/policies/%s" % file)
