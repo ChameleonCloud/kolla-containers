@@ -507,7 +507,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/kolla/horizon/horizon.log',
+            'filename': '{{ container_log_dir }}/horizon/horizon.log',
             'formatter': 'verbose',
         },
     },
