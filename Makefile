@@ -3,7 +3,7 @@ OPENSTACK_RELEASE := stable/ocata
 PYTHON_VERSION := py27
 
 KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
-KOLLA_REGISTRY ?= 192.5.87.124:5000
+KOLLA_REGISTRY ?= 192.5.87.68:5000
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
 	--config-file=$(abspath kolla-build.conf) \
 	--template-override=$(abspath kolla-template-overrides.j2) \
