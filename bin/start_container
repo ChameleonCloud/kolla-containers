@@ -34,6 +34,7 @@ flags+=(--net=host)
 flags+=(-v "$config_dir:/var/lib/kolla/config_files")
 flags+=(-v "$policy_dir:/var/lib/kolla/policies")
 flags+=(-v "$log_dir:/var/log/kolla/$service")
+flags+=(-v "/tmp:/tmp")
 flags+=(-e KOLLA_CONFIG_STRATEGY="COPY_ALWAYS")
 if [[ -n "${INTERACTIVE:-}" ]]; then
   flags+=(--entrypoint=/bin/bash)

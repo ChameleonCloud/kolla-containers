@@ -13,13 +13,13 @@ TEMPLATE_DEBUG = DEBUG
 # WEBROOT is the location relative to Webserver root
 # should end with a slash.
 WEBROOT = '/dashboard/'
-#LOGIN_URL = WEBROOT + 'auth/login/'
-#LOGOUT_URL = WEBROOT + 'auth/logout/
+LOGIN_URL = WEBROOT + 'auth/login/'
+LOGOUT_URL = WEBROOT + 'auth/logout/
 
 # LOGIN_REDIRECT_URL can be used as an alternative for
 # HORIZON_CONFIG.user_home, if user_home is not set.
 # Do not set it to '/home/', as this will cause circular redirect loop
-#LOGIN_REDIRECT_URL = WEBROOT
+LOGIN_REDIRECT_URL = WEBROOT
 
 # Required for Django 1.5.
 # If horizon is running in production (DEBUG is False), set this
@@ -34,12 +34,14 @@ ALLOWED_HOSTS = ['*']
 # and don't forget to strip it from the client's request.
 # For more information see:
 # https://docs.djangoproject.com/en/1.8/ref/settings/#secure-proxy-ssl-header
+# TODO: re-enable this
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # If Horizon is being served through SSL, then uncomment the following two
 # settings to better secure the cookies from security exploits
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# TODO: re-enable this
+#CSRF_COOKIE_SECURE = True
+#SESSION_COOKIE_SECURE = True
 
 # Overrides for OpenStack API versions. Use this setting to force the
 # OpenStack dashboard to use a specific API version for a given service API.
@@ -72,8 +74,6 @@ OPENSTACK_API_VERSIONS = {
 
 # Default OpenStack Dashboard configuration.
 HORIZON_CONFIG = {
-    'dashboards': ('project', 'admin', 'settings',),
-    'default_dashboard': 'project',
     'user_home': 'openstack_dashboard.views.get_user_home',
     'ajax_queue_limit': 10,
     'auto_fade_alerts': {
@@ -145,18 +145,18 @@ SECRET_KEY = secret_key.generate_or_read_from_file(
 #        'LOCATION': '127.0.0.1:11211',
 #    }
 #}
-#
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#    }
-#}
+# TODO: re-enable memcached
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '10.140.80.98:11211',
-    }
+   'default': {
+       'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+   }
 }
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': '10.140.80.98:11211',
+#     }
+# }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
@@ -179,7 +179,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 OPENSTACK_HOST = "chi.uc.chameleoncloud.org"
 OPENSTACK_KEYSTONE_URL = "https://%s:5000/v3" % OPENSTACK_HOST
-#OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
 
 # For setting the default service region on a per-endpoint basis. Note that the
 # default value for this setting is {}, and below is just an example of how it
@@ -396,8 +396,6 @@ OPENSTACK_NEUTRON_NETWORK = {
 # The number of objects (Swift containers/objects or images) to display
 # on a single page before providing a paging element (a "more" link)
 # to paginate results.
-#API_RESULT_LIMIT = 1000
-#API_RESULT_PAGE_SIZE = 20
 API_RESULT_LIMIT = 2000
 API_RESULT_PAGE_SIZE = 20
 
@@ -430,6 +428,7 @@ TIME_ZONE = "UTC"
 # to an accessible location on the file system.
 # If not specified, the default CUSTOM_THEME_PATH is
 # static/themes/default.
+CUSTOM_THEME_PATH = '/etc/openstack-dashboard/themes/chameleoncloud'
 
 AVAILABLE_THEMES = [
   ('default', 'OpenStack Default', 'themes/default'),
@@ -457,7 +456,7 @@ DEFAULT_THEME = 'chameleoncloud'
 # target installation.
 
 # Path to directory containing policy.json files
-#POLICY_FILES_PATH = os.path.join(ROOT_PATH, "conf")
+POLICY_FILES_PATH = '/etc/openstack-dashboard'
 
 # Map of local copy of service policy files.
 # Please insure that your identity policy file matches the one being used on
@@ -487,10 +486,6 @@ POLICY_FILES = {
 # unusable such as ["!"].
 #TROVE_ADD_USER_PERMS = []
 #TROVE_ADD_DATABASE_PERMS = []
-
-# Change this patch to the appropriate static directory containing
-# two files: _variables.scss and _styles.scss
-#CUSTOM_THEME_PATH = 'themes/default'
 
 LOGGING = {
     'version': 1,

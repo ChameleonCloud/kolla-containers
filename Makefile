@@ -27,6 +27,8 @@ $(SERVICES:%=run-%): run-%:
 kolla: $(STAMPS)/kolla
 	touch $@
 
+# TODO: this only rebuilds if the tox venv is not found.
+# Should make this dependent on other contents of the kolla directory.
 $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 	mkdir -p $(dir $@)
 	touch $@

@@ -8,44 +8,44 @@
       "perm": "0600"
     },
     {
-      "source": "/var/lib/kolla/config_files/local_settings.py",
+      "source": "/var/lib/kolla/config_files/local_settings",
       "dest": "/etc/openstack-dashboard/local_settings",
       "owner": "horizon",
       "perm": "0600"
     },
     {
       "source": "/var/lib/kolla/policies/cinder_policy.json",
-      "dest": "/etc/openstack-dashboard/conf/cinder_policy.json",
+      "dest": "/etc/openstack-dashboard/cinder_policy.json",
       "owner": "horizon",
       "perm": "0600"
     },
     {
       "source": "/var/lib/kolla/policies/glance_policy.json",
-      "dest": "/etc/openstack-dashboard/conf/glance_policy.json",
+      "dest": "/etc/openstack-dashboard/glance_policy.json",
       "owner": "horizon",
       "perm": "0600"
     },
     {
       "source": "/var/lib/kolla/policies/heat_policy.json",
-      "dest": "/etc/openstack-dashboard/conf/heat_policy.json",
+      "dest": "/etc/openstack-dashboard/heat_policy.json",
       "owner": "horizon",
       "perm": "0600"
     },
     {
       "source": "/var/lib/kolla/policies/keystone_policy.json",
-      "dest": "/etc/openstack-dashboard/conf/keystone_policy.json",
+      "dest": "/etc/openstack-dashboard/keystone_policy.json",
       "owner": "horizon",
       "perm": "0600"
     },
     {
       "source": "/var/lib/kolla/policies/neutron_policy.json",
-      "dest": "/etc/openstack-dashboard/conf/neutron_policy.json",
+      "dest": "/etc/openstack-dashboard/neutron_policy.json",
       "owner": "horizon",
       "perm": "0600"
     },
     {
       "source": "/var/lib/kolla/policies/nova_policy.json",
-      "dest": "/etc/openstack-dashboard/conf/nova_policy.json",
+      "dest": "/etc/openstack-dashboard/nova_policy.json",
       "owner": "horizon",
       "perm": "0600"
     }
