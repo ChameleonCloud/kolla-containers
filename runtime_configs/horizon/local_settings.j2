@@ -424,11 +424,10 @@ TIME_ZONE = "UTC"
 AVAILABLE_THEMES = [
   ('default', 'OpenStack Default', 'themes/default'),
   ('material', 'Material', 'themes/material'),
-  #('chameleoncloud', 'ChameleonCloud', '{{ horizon_conf_dir }}/themes/chameleoncloud'),
+  ('chameleoncloud', 'ChameleonCloud', '{{ horizon_conf_dir }}/themes/chameleoncloud'),
 ]
 
-# TODO: bring back chameleoncloud theme
-DEFAULT_THEME = 'default'
+DEFAULT_THEME = 'chameleoncloud'
 
 # Set this to True to display an 'Admin Password' field on the Change Password
 # form to verify that it is indeed the admin logged-in who wants to change
