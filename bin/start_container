@@ -45,6 +45,10 @@ if [[ -n "${INTERACTIVE:-}" ]]; then
   flags+=(--entrypoint=/bin/bash)
   flags+=(--interactive)
   flags+=(--tty)
+  # Force terminal size to match host
+  # See https://github.com/moby/moby/issues/33794
+  flags+=(-e COLUMNS="$(tput cols)")
+  flags+=(-e LINES="$(tput lines)")
 else
   flags+=(--detach)
 fi
