@@ -1,12 +1,11 @@
 PYTHON_VERSION := py27
 
-# TODO: point to production registry
-KOLLA_REGISTRY ?= 192.5.87.68:5000
+KOLLA_REGISTRY ?= docker.chameleoncloud.org
 KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
 	--config-file=$(abspath kolla-build.conf) \
 	--template-override=$(abspath kolla-template-overrides.j2) \
-	--push --registry=$(KOLLA_REGISTRY)
+	#--push --registry=$(KOLLA_REGISTRY)
 
 VENV := source venv/bin/activate &&
 
