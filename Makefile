@@ -19,10 +19,9 @@ STAMPS := .stamps
 
 %-run: %-genconfig
 	tar -xvf $*.tar
-	REGISTRY=$(KOLLA_REGISTRY) \
-		CONF_PATH=$(abspath etc/kolla) \
+	CONF_PATH=$(abspath etc/kolla) \
 		LOG_PATH=$(abspath log) \
-		bin/start_container $*
+		bin/start_container $* $(KOLLA_TAG)
 
 # Kolla build dependencies
 

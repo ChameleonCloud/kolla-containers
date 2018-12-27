@@ -23,18 +23,28 @@ fi
 base="centos"
 install_type="source"
 
-registry="$REGISTRY"
 log_dir="$LOG_PATH/$service"
 config_dir="$CONF_PATH/$service"
 policy_dir="$CONF_PATH/policies"
 
-image="$registry/kolla/$base-$install_type-$service:$tag"
+image="kolla/$base-$install_type-$service:$tag"
 
-docker pull "$image"
+if [[ -n "${REGISTRY:-}" ]]; then
+  image="$REGISTRY/$image"
+  docker pull "$image"
+fi
 
 declare -a flags=()
 flags+=(--rm)
-flags+=(--net=host)
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  # Docker For Mac does not support --net=host
+  # https://github.com/docker/for-mac/issues/2716
+  flags+=(--publish-all)
+else
+  flags+=(--net=host)
+fi
+
 flags+=("--name=$service")
 flags+=(-v "$config_dir:/var/lib/kolla/config_files")
 flags+=(-v "$policy_dir:/var/lib/kolla/policies")
