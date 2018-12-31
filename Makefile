@@ -5,7 +5,7 @@ KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
 	--config-file=$(abspath kolla-build.conf) \
 	--template-override=$(abspath kolla-template-overrides.j2) \
-	#--push --registry=$(KOLLA_REGISTRY)
+	--push --registry=$(KOLLA_REGISTRY)
 
 VENV := source venv/bin/activate &&
 
@@ -33,7 +33,7 @@ $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 	touch $@
 
 kolla/.tox/$(PYTHON_VERSION)/bin/activate: kolla/tox.ini
-	cd kolla && tox -e $(PYTHON_VERSION)
+	cd kolla && tox -e $(PYTHON_VERSION) --notest
 
 # Virtualenv
 
