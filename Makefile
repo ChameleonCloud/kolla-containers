@@ -5,7 +5,8 @@ KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
 KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
 	--config-file=$(abspath kolla-build.conf) \
 	--template-override=$(abspath kolla-template-overrides.j2) \
-	--push --registry=$(KOLLA_REGISTRY)
+	--push --registry=$(KOLLA_REGISTRY) \
+	--skip-parents
 
 VENV := source venv/bin/activate &&
 
