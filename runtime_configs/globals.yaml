@@ -1,8 +1,0 @@
-container_config_dir: /var/lib/kolla/config_files
-container_log_dir: /var/log/kolla
-container_policy_dir: /var/lib/kolla/policies
-container_python_path: /var/lib/kolla/venv/lib/python2.7/site-packages
-
-horizon_conf_dir: /etc/openstack-dashboard
-horizon_port: 80
-horizon_webroot: /dashboard/
