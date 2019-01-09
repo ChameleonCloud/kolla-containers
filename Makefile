@@ -1,20 +1,10 @@
 include .env
 
-KOLLA_VENV := cd kolla && source .tox/$(PYTHON_VERSION)/bin/activate
-KOLLA_BUILD := $(KOLLA_VENV) && python tools/build.py \
-	--config-file=$(abspath kolla-build.conf) \
-	--template-override=$(abspath kolla-template-overrides.j2) \
-	--type=$(KOLLA_INSTALL_TYPE) \
-	--base=$(KOLLA_BASE) --base-tag=$(KOLLA_BASE_TAG) --base-arch=$(KOLLA_BASE_ARCH) \
-	--registry=$(DOCKER_REGISTRY) --namespace=$(KOLLA_NAMESPACE) \
-	--skip-existing \
-	--tag=$(VERSION)
-
 VENV := source venv/bin/activate &&
 STAMPS := .stamps
 
 %-build: kolla
-	$(KOLLA_BUILD) $*
+	./kolla-build $*
 
 # Kolla doesn't have a way to publish via kolla-build as a separate step,
 # so we have to replicate the way it constructs image names.

@@ -1,5 +1,6 @@
 /.stamps/
 /etc/
+/kolla_work/docker/
 /log/
 /venv/
 /*.tar
