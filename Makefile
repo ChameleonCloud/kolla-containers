@@ -12,15 +12,6 @@ KOLLA_IMAGE_NAME = $(DOCKER_REGISTRY)/$(KOLLA_NAMESPACE)/$(KOLLA_BASE)-$(KOLLA_I
 %-publish: kolla
 	docker push $(KOLLA_IMAGE_NAME)
 
-%-genconfig: venv
-	$(VENV) bin/gen_config $*
-
-%-run: %-genconfig
-	tar -xvf $*.tar
-	CONF_PATH=$(abspath etc/kolla) \
-		LOG_PATH=$(abspath log) \
-		bin/start_container $* $(KOLLA_TAG)
-
 # Kolla build dependencies
 
 .PHONY: kolla
