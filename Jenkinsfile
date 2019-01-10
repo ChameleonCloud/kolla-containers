@@ -30,7 +30,7 @@ pipeline {
         copyArtifacts(projectName: "${params.JOB_NAME}",
                       target: "${env.WORKSPACE}/sdist",
                       selector: upstream(fallbackToLastSuccessful: true))
-        sh "make ${env.SERVICE_NAME}-build"
+        sh "make ${env.SERVICE_NAME}-build-ci"
       }
     }
 
