@@ -28,7 +28,7 @@ pipeline {
 
     stage('build') {
       steps {
-        copyArtifacts(projectName: "${env.SERVICE_NAME}",
+        copyArtifacts(projectName: "${params.JOB_NAME}",
                       target: "${env.WORKSPACE}/sdist",
                       selector: upstream(fallbackToLastSuccessful: true))
         sh "make ${env.SERVICE_NAME}-build"
