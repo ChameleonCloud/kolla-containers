@@ -44,7 +44,7 @@ pipeline {
 
       steps {
         copyArtifacts(projectName: "${params.JOB_NAME}",
-                      target: "${env.WORKSPACE}/sdist",
+                      target: "${env.WORKSPACE}/sources",
                       selector: upstream(fallbackToLastSuccessful: true))
         sh "make ${env.SERVICE_NAME}-build-locals"
       }
