@@ -21,7 +21,6 @@ pipeline {
   stages {
     stage('docker-setup') {
       steps {
-        sh 'env'
         sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
       }
     }
