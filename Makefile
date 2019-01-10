@@ -6,8 +6,8 @@ STAMPS := .stamps
 %-build: kolla
 	./kolla-build $*
 
-%-build-ci: kolla
-	./kolla-build --config-file=$(abspath kolla-build-ci-overrides.conf) $*
+%-build-locals: kolla
+	./kolla-build --config-file=$(abspath kolla-build-locals-overrides.conf) $*
 
 # Kolla doesn't have a way to publish via kolla-build as a separate step,
 # so we have to replicate the way it constructs image names.

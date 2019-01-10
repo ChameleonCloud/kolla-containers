@@ -2,20 +2,15 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'JOB_NAME', defaultValue: '', description: 'The upstream job name', trim: true)
+    string(name: 'SERVICE_NAME', defaultValue: '', trim: true,
+           description: 'The OpenStack service name')
+    string(name: 'JOB_NAME', defaultValue: '', trim: true,
+           description: 'If building from upstream Jenkins job, the upstream job name')
   }
 
   environment {
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
-    SERVICE_NAME = """${sh(
-      returnStdout: true,
-      script: "echo '${params.JOB_NAME}' | cut -d/ -f1 | tr -d '\n'"
-    )}"""
-    SERVICE_BRANCH_NAME = """${sh(
-      returnStdout: true,
-      script: "echo '${params.JOB_NAME}' | cut -d/ -f2 | tr -d '\n'"
-    )}"""
   }
 
   stages {
@@ -26,11 +21,32 @@ pipeline {
     }
 
     stage('build') {
+      when {
+        expression { params.JOB_NAME == '' }
+      }
+
+      steps {
+        sh "make ${env.SERVICE_NAME}-build"
+      }
+    }
+
+    stage('build-from-upstream') {
+      when {
+        expression { params.JOB_NAME != '' }
+      }
+
+      environment {
+        SERVICE_NAME = """${sh(
+          returnStdout: true,
+          script: "echo '${params.JOB_NAME}' | cut -d/ -f1 | tr -d '\n'"
+        )}"""
+      }
+
       steps {
         copyArtifacts(projectName: "${params.JOB_NAME}",
                       target: "${env.WORKSPACE}/sdist",
                       selector: upstream(fallbackToLastSuccessful: true))
-        sh "make ${env.SERVICE_NAME}-build-ci"
+        sh "make ${env.SERVICE_NAME}-build-locals"
       }
     }
 
