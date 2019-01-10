@@ -1,14 +1,21 @@
 pipeline {
   agent any
 
+  parameters {
+    string(name: 'JOB_NAME', defaultValue: '', description: 'The upstream job name', trim: true)
+  }
+
   environment {
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
-  }
-
-  parameters {
-    string(name: 'PROJECT_NAME', defaultValue: '', description: 'The upstream project name', trim: true)
-    string(name: 'BRANCH_NAME', defaultValue: '', description: 'The upstream branch name', trim: true)
+    SERVICE_NAME = """${sh(
+      returnStdout: true,
+      script: "echo -n '${params.JOB_NAME}' | cut -d/ -f1"
+    )}"""
+    SERVICE_BRANCH_NAME = """${sh(
+      returnStdout: true,
+      script: "echo -n '${params.JOB_NAME}' | cut -d/ -f2"
+    )}"""
   }
 
   stages {
@@ -19,26 +26,24 @@ pipeline {
     }
 
     stage('build') {
-      environment {
-        ESCAPED_BRANCH_NAME = """${sh(
-          returnStdout: true,
-          script: "echo -n '${params.BRANCH_NAME}' | sed 's/\\//%2F/g'"
-        )}"""
-      }
-
       steps {
-        copyArtifacts(projectName: "${params.PROJECT_NAME}/${env.ESCAPED_BRANCH_NAME}",
-                      target: "${env.WORKSPACE}/sdist/${params.PROJECT_NAME}",
+        copyArtifacts(projectName: "${env.SERVICE_NAME}",
+                      target: "${env.WORKSPACE}/sdist",
                       selector: upstream(fallbackToLastSuccessful: true))
-        sh "make ${params.PROJECT_NAME}-build"
+        sh "make ${env.SERVICE_NAME}-build"
       }
     }
 
     stage('publish') {
       steps {
-        sh "make ${params.PROJECT_NAME}-publish"
-        sh 'docker logout $DOCKER_REGISTRY'
+        sh "make ${env.SERVICE_NAME}-publish"
       }
+    }
+  }
+
+  post {
+    always {
+      sh 'docker logout $DOCKER_REGISTRY'
     }
   }
 }
