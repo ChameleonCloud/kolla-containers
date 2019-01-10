@@ -6,6 +6,9 @@ STAMPS := .stamps
 %-build: kolla
 	./kolla-build $*
 
+%-build-ci: kolla
+	./kolla-build --config-file=$(abspath kolla-build-ci-overrides.conf) $*
+
 # Kolla doesn't have a way to publish via kolla-build as a separate step,
 # so we have to replicate the way it constructs image names.
 KOLLA_IMAGE_NAME = $(DOCKER_REGISTRY)/$(KOLLA_NAMESPACE)/$(KOLLA_BASE)-$(KOLLA_INSTALL_TYPE)-$*:$(VERSION)

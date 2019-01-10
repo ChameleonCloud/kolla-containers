@@ -1,7 +1,3 @@
 /.stamps/
-/etc/
-/kolla_work/docker/
-/log/
+/sources/
 /venv/
-/*.tar
-/*.log
