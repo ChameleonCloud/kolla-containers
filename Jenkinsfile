@@ -10,11 +10,11 @@ pipeline {
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
     SERVICE_NAME = """${sh(
       returnStdout: true,
-      script: "echo -n '${params.JOB_NAME}' | cut -d/ -f1"
+      script: "echo '${params.JOB_NAME}' | cut -d/ -f1 | tr -d '\n'"
     )}"""
     SERVICE_BRANCH_NAME = """${sh(
       returnStdout: true,
-      script: "echo -n '${params.JOB_NAME}' | cut -d/ -f2"
+      script: "echo '${params.JOB_NAME}' | cut -d/ -f2 | tr -d '\n'"
     )}"""
   }
 
