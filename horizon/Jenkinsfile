@@ -1,6 +1,12 @@
 pipeline {
+  // Run on any agent; currently there are no restrictions on which
+  // Jenkins build agents can or should run this job.
   agent any
 
+  // Parameterize build based on all of its upstream dependencies, including:
+  // - horizon (the fork of the Horizon source code)
+  // - horizon-theme (the custom Horizon theme for Chameleon)
+  // - blazar-dashboard (the fork of the plugin that adds Blazar UI to Horizon)
   parameters {
     string(name: 'HORIZON_JOB_NAME', defaultValue: 'horizon/chameleoncloud%2F11.0.4',
            description: 'Jenkins job name for horizon')
@@ -10,25 +16,38 @@ pipeline {
            description: 'Jenkins job name for blazar-dashboard dependency')
   }
 
+  // Each upstream dependency also is added as a trigger. This means that if any
+  // of the upstream builds complete, a new build of this build is triggered.
   triggers {
     upstream(upstreamProjects: params.HORIZON_JOB_NAME + ',' + params.HORIZON_THEME_JOB_NAME + ',' + params.BLAZAR_DASHBOARD_JOB_NAME,
              threshold: hudson.model.Result.SUCCESS)
   }
 
+  // The Docker registry requires authentication; there is a Credentials item
+  // in Jenkins for a special `kolla` user.
   environment {
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
   }
 
+  // Each build consists of several _stages_...
   stages {
+    // ... the first stage being a 'setup' stage, which we use to authenticate
+    // against the Docker registry (which we need both during 'build' and during
+    // 'publish'.)
     stage('docker-setup') {
       steps {
         sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
       }
     }
 
+    // The build stage actually builds the container using Kolla. The output
+    // of this stage is a Docker image locally on disk.
     stage('build') {
       steps {
+        // All the upstream artifacts are copied from their respective pipelines
+        // to a special 'sources' directory. This directory is defined as
+        // $locals_base in Kolla.
         copyArtifacts(projectName: "${params.HORIZON_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         copyArtifacts(projectName: "${params.HORIZON_THEME_JOB_NAME}",
@@ -39,6 +58,7 @@ pipeline {
       }
     }
 
+    // The publish stage pushes the built Docker image up to the registry.
     stage('publish') {
       steps {
         sh "make horizon-publish"
@@ -46,6 +66,8 @@ pipeline {
     }
   }
 
+  // The post section contains tasks to run after the pipeline succeeds or fails.
+  // We log out of the Docker registry to clean up credentials cached on disk.
   post {
     always {
       sh 'docker logout $DOCKER_REGISTRY'
