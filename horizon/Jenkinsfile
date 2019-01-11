@@ -1,0 +1,54 @@
+pipeline {
+  agent any
+
+  parameters {
+    string(name: 'HORIZON_JOB_NAME', defaultValue: 'horizon/chameleoncloud%2F11.0.4',
+           description: 'Jenkins job name for horizon')
+    string(name: 'HORIZON_THEME_JOB_NAME', defaultValue: 'horizon-theme/master',
+           description: 'Jenkins job name for horizon-theme dependency')
+    string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Fstable%2Focata',
+           description: 'Jenkins job name for blazar-dashboard dependency')
+  }
+
+  triggers {
+    upstream(upstreamProjects: params.HORIZON_JOB_NAME + ',' + params.HORIZON_THEME_JOB_NAME + ',' + params.BLAZAR_DASHBOARD_JOB_NAME,
+             threshold: hudson.model.Result.SUCCESS)
+  }
+
+  environment {
+    DOCKER_REGISTRY = 'docker.chameleoncloud.org'
+    DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
+  }
+
+  stages {
+    stage('docker-setup') {
+      steps {
+        sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
+      }
+    }
+
+    stage('build') {
+      steps {
+        copyArtifacts(projectName: "${params.HORIZON_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        copyArtifacts(projectName: "${params.HORIZON_THEME_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        copyArtifacts(projectName: "${params.BLAZAR_DASHBOARD_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        sh "make horizon-build-with-locals"
+      }
+    }
+
+    stage('publish') {
+      steps {
+        sh "make horizon-publish"
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'docker logout $DOCKER_REGISTRY'
+    }
+  }
+}

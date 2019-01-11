@@ -1,0 +1,10 @@
+#########
+# Horizon
+#########
+
+# Add chameleoncloud theme via additions
+# See "horizon-additions-themes-chameleoncloud" section in kolla-build.conf
+{% block horizon_footer %}
+COPY additions/horizon-additions-themes-chameleoncloud-archive-master /etc/openstack-dashboard/themes/chameleoncloud
+RUN chown -R horizon: /etc/openstack-dashboard/themes
+{% endblock %}

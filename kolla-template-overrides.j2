@@ -3,14 +3,3 @@
 # TODO: remove this when we add blazarclient to the base packages
 # on kolla upstream. There is no reason not to have it there.
 {% set openstack_base_pip_packages_append = ['python-blazarclient'] %}
-
-#########
-# Horizon
-#########
-
-# Add chameleoncloud theme via additions
-# See "horizon-additions-themes-chameleoncloud" section in kolla-build.conf
-{% block horizon_footer %}
-COPY additions/horizon-additions-themes-chameleoncloud-archive-master /etc/openstack-dashboard/themes/chameleoncloud
-RUN chown -R horizon: /etc/openstack-dashboard/themes
-{% endblock %}
