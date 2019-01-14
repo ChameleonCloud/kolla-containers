@@ -3,6 +3,9 @@ include .env
 VENV := source venv/bin/activate &&
 STAMPS := .stamps
 
+base-release: kolla
+	./kolla-build --profile base --push
+
 %-build: kolla
 	./kolla-build $*
 
