@@ -75,7 +75,7 @@ pipeline {
 
     success {
       // Trigger deploy to development environments
-      build job: 'kolla-deploy', wait: false, parameters: [
+      build job: 'kolla-ansible-deploy', wait: false, parameters: [
         string(name: 'KOLLA_SERVICE_NAME', value: 'horizon'),
         string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
       ]
