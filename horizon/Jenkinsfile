@@ -72,5 +72,13 @@ pipeline {
     always {
       sh 'docker logout $DOCKER_REGISTRY'
     }
+
+    success {
+      // Trigger deploy to development environments
+      build job: 'kolla-deploy', wait: false, parameters: [
+        string(name: 'KOLLA_SERVICE_NAME', value: 'horizon'),
+        string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
+      ]
+    }
   }
 }
