@@ -1,0 +1,55 @@
+pipeline {
+  agent any
+
+  parameters {
+    string(name: 'NOVA_JOB_NAME', defaultValue: 'nova/chameleoncloud%2F15.1.3',
+           description: 'Jenkins job name for nova')
+    string(name: 'BLAZAR_NOVA_JOB_NAME', defaultValue: 'blazar-nova/chameleoncloud%2Focata',
+           description: 'Jenkins job name for blazar-nova dependency')
+  }
+
+  triggers {
+    upstream(upstreamProjects: "base-kolla/master,${params.NOVA_JOB_NAME},${params.BLAZAR_NOVA_JOB_NAME}",
+             threshold: hudson.model.Result.SUCCESS)
+  }
+
+  environment {
+    DOCKER_REGISTRY = 'docker.chameleoncloud.org'
+    DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
+  }
+
+  stages {
+    stage('docker-setup') {
+      steps {
+        sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
+      }
+    }
+
+    stage('build-and-publish') {
+      environment {
+        KOLLA_PUSH = 'yes'
+      }
+
+      steps {
+        copyArtifacts(projectName: "${params.NOVA_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        copyArtifacts(projectName: "${params.BLAZAR_NOVA_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        sh "make nova-build-with-locals"
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'docker logout $DOCKER_REGISTRY'
+    }
+
+    // success {
+    //   build job: 'kolla-ansible-deploy', wait: false, parameters: [
+    //     string(name: 'KOLLA_SERVICE_NAME', value: 'nova'),
+    //     string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
+    //   ]
+    // }
+  }
+}
