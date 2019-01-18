@@ -42,8 +42,13 @@ pipeline {
     }
 
     // The build stage actually builds the container using Kolla. The output
-    // of this stage is a Docker image locally on disk.
+    // of this stage is a Docker image locally on disk. KOLLA_PUSH instructs
+    // this step to also push the image up to the remote registry.
     stage('build') {
+      environment {
+        KOLLA_PUSH = 'yes'
+      }
+
       steps {
         // All the upstream artifacts are copied from their respective pipelines
         // to a special 'sources' directory. This directory is defined as
@@ -55,13 +60,6 @@ pipeline {
         copyArtifacts(projectName: "${params.BLAZAR_DASHBOARD_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         sh "make horizon-build-with-locals"
-      }
-    }
-
-    // The publish stage pushes the built Docker image up to the registry.
-    stage('publish') {
-      steps {
-        sh "make horizon-publish"
       }
     }
   }
