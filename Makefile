@@ -9,25 +9,15 @@ else
 	KOLLA_FLAGS :=
 endif
 
-base-release: kolla
-	./kolla-build --profile base $(KOLLA_FLAGS)
+build: kolla
+	./kolla-build $(KOLLA_FLAGS)
 
-%-build: kolla
-	./kolla-build --profile "$*" $(KOLLA_FLAGS)
-
-%-build-with-locals: kolla
+build-with-locals: kolla
 	./kolla-build \
 		--work-dir=$(abspath build) \
 		--config-file=$(abspath $*/kolla-build.local-sources.conf) \
 		--locals-base=$(abspath sources) \
-		--profile "$*" \
 		$(KOLLA_FLAGS)
-
-# Kolla doesn't have a way to publish via kolla-build as a separate step,
-# so we have to replicate the way it constructs image names.
-KOLLA_IMAGE_NAME = $(DOCKER_REGISTRY)/$(KOLLA_NAMESPACE)/$(KOLLA_BASE)-$(KOLLA_INSTALL_TYPE)-$*:$(VERSION)
-%-publish: kolla
-	docker push $(KOLLA_IMAGE_NAME)
 
 # Kolla build dependencies
 

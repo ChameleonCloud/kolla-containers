@@ -28,6 +28,7 @@ pipeline {
     stage('build-and-publish') {
       environment {
         KOLLA_PUSH = 'yes'
+        KOLLA_BUILD_PROFILE = 'nova'
       }
 
       steps {
@@ -35,7 +36,7 @@ pipeline {
                       target: "${env.WORKSPACE}/sources")
         copyArtifacts(projectName: "${params.BLAZAR_NOVA_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
-        sh "make nova-build-with-locals"
+        sh "make build-with-locals"
       }
     }
   }

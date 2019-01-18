@@ -1,26 +1,18 @@
 #!/usr/bin/env bash
-set -u 
+set -u
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" >/dev/null 2>&1)" && pwd)"
 source <(sed -e '/^$/d' -e 's/^/export /g' "$DIR/.env")
 
 mkdir -p "$DIR/build"
 
-all_services="$(git ls-files | xargs -n1 dirname | sort | uniq | sed '/\./d')"
-service_name="${@: -1}"
-
-if [[ "$all_services" != *"$service_name"* ]]; then
-    echo "Could not parse service name from arguments."
-    service_name="missing"
-fi
-
 build_dir="$DIR/build"
 python_bin="$DIR/kolla/.tox/$PYTHON_VERSION/bin/python"
 
 # Create build directory with configuration specific to service
 mkdir -p "$build_dir"
-cat "$DIR/kolla-build.conf" "$DIR/$service_name/kolla-build.conf" 2>/dev/null >"$build_dir/kolla-build.conf"
-cat "$DIR/kolla-template-overrides.j2" "$DIR/$service_name/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
+cat "$DIR/kolla-build.conf" "$DIR/$KOLLA_BUILD_PROFILE/kolla-build.conf" 2>/dev/null >"$build_dir/kolla-build.conf"
+cat "$DIR/kolla-template-overrides.j2" "$DIR/$KOLLA_BUILD_PROFILE/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
 
 pushd "$DIR/kolla" >/dev/null
 cleanup() {
@@ -36,4 +28,4 @@ $python_bin tools/build.py \
 	--registry="$DOCKER_REGISTRY" --namespace="$KOLLA_NAMESPACE" \
 	--skip-existing \
 	--tag="$VERSION" \
-	"$@"
+	--profile="$KOLLA_BUILD_PROFILE"
