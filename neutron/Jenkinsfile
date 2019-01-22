@@ -1,8 +1,14 @@
 pipeline {
   agent any
 
+  parameters {
+    string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/master',
+           description: 'Jenkins job name for networking-generic-switch dependency')
+  }
+
   triggers {
-    upstream(upstreamProjects: 'base-kolla/master', threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: "base-kolla,${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
+             threshold: hudson.model.Result.SUCCESS)
 
     GenericTrigger(
       genericVariables: [
@@ -36,6 +42,8 @@ pipeline {
       }
 
       steps {
+        copyArtifacts(projectName: "${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
         sh 'make build-with-locals'
       }
     }
