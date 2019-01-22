@@ -16,11 +16,26 @@ pipeline {
            description: 'Jenkins job name for blazar-dashboard dependency')
   }
 
-  // Each upstream dependency also is added as a trigger. This means that if any
-  // of the upstream builds complete, a new build of this build is triggered.
+
   triggers {
+    // Each upstream dependency also is added as a trigger. This means that if any
+    // of the upstream builds complete, a new build of this build is triggered.
     upstream(upstreamProjects: "base-kolla/master,${params.HORIZON_JOB_NAME},${params.HORIZON_THEME_JOB_NAME},${params.BLAZAR_DASHBOARD_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
+
+    // Also trigger if any changes were pushed to the master branch that touched
+    // this subfolder.
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+      ],
+      causeString: 'Triggered on $ref',
+      token: JOB_NAME,
+      printContributedVariables: true,
+      regexpFilterText: '$ref $changed_files',
+      regexpFilterExpression: 'refs/heads/master .*horizon/'
+    )
   }
 
   // The Docker registry requires authentication; there is a Credentials item
@@ -44,8 +59,9 @@ pipeline {
     // The build stage actually builds the container using Kolla. The output
     // of this stage is a Docker image locally on disk. KOLLA_PUSH instructs
     // this step to also push the image up to the remote registry.
-    stage('build') {
+    stage('build-and-publish') {
       environment {
+        KOLLA_BUILD_PROFILE = 'horizon'
         KOLLA_PUSH = 'yes'
       }
 
@@ -59,7 +75,7 @@ pipeline {
                       target: "${env.WORKSPACE}/sources")
         copyArtifacts(projectName: "${params.BLAZAR_DASHBOARD_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
-        sh "make horizon-build-with-locals"
+        sh "make build-with-locals"
       }
     }
   }

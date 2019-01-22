@@ -11,6 +11,18 @@ pipeline {
   triggers {
     upstream(upstreamProjects: "base-kolla/master,${params.NOVA_JOB_NAME},${params.BLAZAR_NOVA_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
+
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+      ],
+      causeString: 'Triggered on $ref',
+      token: JOB_NAME,
+      printContributedVariables: true,
+      regexpFilterText: '$ref $changed_files',
+      regexpFilterExpression: 'refs/heads/master .*nova/'
+    )
   }
 
   environment {
@@ -27,8 +39,8 @@ pipeline {
 
     stage('build-and-publish') {
       environment {
-        KOLLA_PUSH = 'yes'
         KOLLA_BUILD_PROFILE = 'nova'
+        KOLLA_PUSH = 'yes'
       }
 
       steps {
