@@ -57,3 +57,9 @@ with these overrides in place:
 # Build container for Horizon, using local sources
 make horizon-build-with-locals
 ```
+
+## Rocky upgrade notes
+
+### Neutron
+
+There is a `networking-baremetal` project added in the Pike release that adds a new `ironic-neutron-agent` system. We may want to start building and using that.
