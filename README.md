@@ -57,6 +57,24 @@ with these overrides in place:
 KOLLA_BUILD_PROFILE=horizon make build-with-locals
 ```
 
+### Bypassing cache
+
+If you wish to force a rebuild of all parent images, you can do so by passing in the `KOLLA_USE_CACHE` environment variable:
+
+```
+# Force a rebuild of all parent images
+KOLLA_BUILD_PROFILE=horizon KOLLA_USE_CACHE=no make build
+```
+
+### Automatically pushing images to a Docker Registry
+
+The `KOLLA_PUSH` environment variable can be used to instruct Kolla to push the images up to a registry once they are built:
+
+```
+# When done building, push Docker images to registry
+KOLLA_BUILD_PROFILE=horizon KOLLA_PUSH=yes make build
+```
+
 ## Rocky upgrade notes
 
 ### Neutron
