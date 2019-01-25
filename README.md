@@ -4,7 +4,7 @@
 
 Each service requires at minimum a folder tree in this repository named after
 the service. This folder should contain at minimum a `kolla-build.conf` and a
-`Jenkinsfile`.
+`Jenkinsfile`. This is called the "build profile" in some of the tooling.
 
 ### `kolla-build.conf`
 
@@ -36,15 +36,14 @@ for more context in to how this works.
 
 ## Building a container
 
-The supported services can be build using a `make` task suffixed with "-build".
-For example:
+The supported services can be build using a `make` task and specifying a build profile with the `KOLLA_BUILD_PROFILE` environment variable. The value of this variable should have a corresponding directory in the root of this repository.
 
 ```
 # Build container for Horizon
-make horizon-build
+KOLLA_BUILD_PROFILE=horizon make build
 
-# Build container for Nova Compute
-make nova-compute-build
+# Build containers for Nova
+KOLLA_BUILD_PROFILE=nova make build
 ```
 
 ### Building with local sources
@@ -55,7 +54,7 @@ with these overrides in place:
 
 ```
 # Build container for Horizon, using local sources
-make horizon-build-with-locals
+KOLLA_BUILD_PROFILE=horizon make build-with-locals
 ```
 
 ## Rocky upgrade notes
