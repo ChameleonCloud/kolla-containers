@@ -3,10 +3,13 @@ include .env
 VENV := source venv/bin/activate &&
 STAMPS := .stamps
 
+KOLLA_FLAGS :=
+
 ifeq ($(KOLLA_PUSH), yes)
-	KOLLA_FLAGS := --push
-else
-	KOLLA_FLAGS :=
+	KOLLA_FLAGS := $(KOLLA_FLAGS) --push
+endif
+ifneq ($(KOLLA_USE_CACHE), no)
+	KOLLA_FLAGS := $(KOLLA_FLAGS) --cache --skip-existing
 endif
 
 build: kolla

@@ -25,6 +25,8 @@ pipeline {
       environment {
         KOLLA_BUILD_PROFILE = 'base'
         KOLLA_PUSH = 'yes'
+        // Force re-building of all images
+        KOLLA_USE_CACHE = 'no'
       }
 
       steps {
