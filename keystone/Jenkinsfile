@@ -1,0 +1,67 @@
+pipeline {
+  agent any
+
+  parameters {
+    string(name: 'KEYSTONE_JOB_NAME', defaultValue: 'keystone/chameleoncloud%2Focata',
+           description: 'Jenkins job name for keystone')
+  }
+
+  triggers {
+    upstream(upstreamProjects: "base-kolla,${params.KEYSTONE_JOB_NAME}",
+             threshold: hudson.model.Result.SUCCESS)
+
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+      ],
+      causeString: 'Triggered on $ref',
+      token: JOB_NAME,
+      printContributedVariables: true,
+      regexpFilterText: '$ref $changed_files',
+      regexpFilterExpression: 'refs/heads/master .*keystone/'
+    )
+  }
+
+  environment {
+    // Necessary so that `docker login` credentials are not put in shared location
+    HOME = "${env.WORKSPACE}"
+    DOCKER_REGISTRY = 'docker.chameleoncloud.org'
+    DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
+  }
+
+  stages {
+    stage('docker-setup') {
+      steps {
+        sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
+      }
+    }
+
+    stage('build-and-publish') {
+      environment {
+        KOLLA_BUILD_PROFILE = 'keystone'
+        KOLLA_PUSH = 'yes'
+      }
+
+      steps {
+        copyArtifacts(projectName: "${params.KEYSTONE_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        sh 'make build-with-locals'
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'docker logout $DOCKER_REGISTRY'
+    }
+
+    // success {
+    //   // Trigger deploy to development environments
+    //   build job: 'kolla-ansible-deploy', wait: false, parameters: [
+    //     string(name: 'KOLLA_SERVICE_NAME', value: 'ironic'),
+    //     string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
+    //   ]
+    // }
+  }
+}
