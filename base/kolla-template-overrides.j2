@@ -1,9 +1,0 @@
-# TODO [jca 2018-01-24]:
-# - remove pycrypto when we are on Pike? because most services have
-#   moved to use the cryptography package instead.
-# - remove blazarclient when we add blazarclient to the base packages
-#   on kolla upstream. There is no reason not to have it there.
-{% set openstack_base_pip_packages_append = [
-  'pycrypto',
-  'python-blazarclient'
-] %}
