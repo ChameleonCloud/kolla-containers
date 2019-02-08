@@ -15,7 +15,7 @@ pipeline {
 
     stage('build-and-publish') {
       environment {
-        KOLLA_BUILD_PROFILE = 'glance'
+        KOLLA_BUILD_PROFILE = 'blazar'
         KOLLA_PUSH = 'yes'
       }
 
@@ -32,7 +32,7 @@ pipeline {
 
     success {
       build job: 'kolla-ansible-deploy', wait: false, parameters: [
-        string(name: 'KOLLA_SERVICE_NAME', value: 'glance'),
+        string(name: 'KOLLA_SERVICE_NAME', value: 'blazar'),
         string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
       ]
     }

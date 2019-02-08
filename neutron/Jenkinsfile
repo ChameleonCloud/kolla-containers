@@ -51,19 +51,16 @@ pipeline {
     }
   }
 
-  // The post section contains tasks to run after the pipeline succeeds or fails.
-  // We log out of the Docker registry to clean up credentials cached on disk.
   post {
     always {
       sh 'docker logout $DOCKER_REGISTRY'
     }
 
-    // success {
-    //   // Trigger deploy to development environments
-    //   build job: 'kolla-ansible-deploy', wait: false, parameters: [
-    //     string(name: 'KOLLA_SERVICE_NAME', value: 'ironic'),
-    //     string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
-    //   ]
-    // }
+    success {
+      build job: 'kolla-ansible-deploy', wait: false, parameters: [
+        string(name: 'KOLLA_SERVICE_NAME', value: 'neutron'),
+        string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
+      ]
+    }
   }
 }
