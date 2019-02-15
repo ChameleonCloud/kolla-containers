@@ -2,12 +2,14 @@ pipeline {
   agent any
 
   parameters {
+    string(name: 'NEUTRON_JOB_NAME', defaultValue: 'neutron/chameleoncloud%2Focata',
+           description: 'Jenkins job name for neutron')
     string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/master',
            description: 'Jenkins job name for networking-generic-switch dependency')
   }
 
   triggers {
-    upstream(upstreamProjects: "base-kolla,${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
+    upstream(upstreamProjects: "base-kolla,${params.NEUTRON_JOB_NAME},${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
 
     GenericTrigger(
@@ -44,6 +46,8 @@ pipeline {
       }
 
       steps {
+        copyArtifacts(projectName: "${params.NEUTRON_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
         copyArtifacts(projectName: "${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         sh 'make build-with-locals'
