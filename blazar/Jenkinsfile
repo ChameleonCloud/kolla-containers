@@ -1,6 +1,28 @@
 pipeline {
   agent any
 
+  parameters {
+    string(name: 'BLAZAR_JOB_NAME', defaultValue: 'blazar/chameleoncloud%2Fstable%2Frocky',
+           description: 'Jenkins job name for blazar')
+  }
+
+  triggers {
+    upstream(upstreamProjects: "base-kolla,${params.BLAZAR_JOB_NAME}",
+             threshold: hudson.model.Result.SUCCESS)
+
+    GenericTrigger(
+      genericVariables: [
+        [key: 'ref', value: '$.ref'],
+        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
+      ],
+      causeString: 'Triggered on $ref',
+      token: JOB_NAME,
+      printContributedVariables: true,
+      regexpFilterText: '$ref $changed_files',
+      regexpFilterExpression: 'refs/heads/master .*blazar/'
+    )
+  }
+
   environment {
     // Necessary so that `docker login` credentials are not put in shared location
     HOME = "${env.WORKSPACE}"
@@ -22,7 +44,9 @@ pipeline {
       }
 
       steps {
-        sh "make build"
+        copyArtifacts(projectName: "${params.BLAZAR_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        sh "make build-with-locals"
       }
     }
   }
