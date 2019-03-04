@@ -1,8 +1,13 @@
 pipeline {
   agent any
 
+  parameters {
+    string(name: 'HEAT_JOB_NAME', defaultValue: 'heat/chameleoncloud%2Fstable%2Frocky',
+           description: 'Jenkins job name for heat')
+  }
+
   triggers {
-    upstream(upstreamProjects: 'base-kolla', threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: 'base-kolla,${param.HEAT_JOB_NAME}', threshold: hudson.model.Result.SUCCESS)
 
     GenericTrigger(
       genericVariables: [
@@ -38,7 +43,9 @@ pipeline {
       }
 
       steps {
-        sh 'make build'
+        copyArtifacts(projectName: "${params.HEAT_JOB_NAME}",
+                      target: "${env.WORKSPACE}/sources")
+        sh "make build-with-locals"
       }
     }
   }
