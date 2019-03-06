@@ -8,11 +8,15 @@ import argparse
 import os
 import sys
 import smtplib
-import configparser
 from datetime import datetime
 from dateutil import tz
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+if sys.version_info[0] == 2:
+    import ConfigParser as configparser
+else:
+    import configparser
 
 from jinja2 import Environment, BaseLoader
 
