@@ -45,6 +45,7 @@ pipeline {
       steps {
         copyArtifacts(projectName: "${params.HEAT_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
+        sh "make clean"
         sh "make build-with-locals"
       }
     }

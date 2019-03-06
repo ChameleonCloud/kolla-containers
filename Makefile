@@ -22,6 +22,12 @@ build-with-locals: kolla
 		--locals-base=$(abspath sources) \
 		$(KOLLA_FLAGS)
 
+# Untags any -base images to ensure they get rebuilt with the child images.
+clean: kolla
+	docker images --format '{{.Repository}}:{{.Tag}}' \
+		| grep '$(KOLLA_BUILD_PROFILE)-base:$(VERSION)' \
+		| xargs -r docker rmi
+
 # Kolla build dependencies
 
 .PHONY: kolla
