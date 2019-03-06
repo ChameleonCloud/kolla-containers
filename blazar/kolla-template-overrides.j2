@@ -5,5 +5,5 @@
 # See "blazar-manager-additions-all" section in kolla-build.conf
 {% block blazar_manager_footer %}
 ADD additions-archive /
-RUN chown -R blazar: /additions && cp -R /additions/* /etc/blazar/
+RUN cp -R /additions/blazar-manager/* /etc/blazar/ && chown -R blazar: /etc/blazar
 {% endblock %}
