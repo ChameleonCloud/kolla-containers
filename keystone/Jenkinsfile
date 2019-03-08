@@ -57,12 +57,11 @@ pipeline {
       sh 'docker logout $DOCKER_REGISTRY'
     }
 
-    // success {
-    //   // Trigger deploy to development environments
-    //   build job: 'kolla-ansible-deploy', wait: false, parameters: [
-    //     string(name: 'KOLLA_SERVICE_NAME', value: 'ironic'),
-    //     string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
-    //   ]
-    // }
+    success {
+      build job: 'kolla-ansible-deploy', wait: false, parameters: [
+        string(name: 'KOLLA_SERVICE_NAME', value: 'keystone'),
+        string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
+      ]
+    }
   }
 }
