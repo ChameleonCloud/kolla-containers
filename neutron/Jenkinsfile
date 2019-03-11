@@ -9,7 +9,7 @@ pipeline {
   }
 
   triggers {
-    upstream(upstreamProjects: "base-kolla,${params.NEUTRON_JOB_NAME},${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
+    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.NEUTRON_JOB_NAME},${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
 
     GenericTrigger(
