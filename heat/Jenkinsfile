@@ -7,7 +7,7 @@ pipeline {
   }
 
   triggers {
-    upstream(upstreamProjects: "base-kolla,${params.HEAT_JOB_NAME}", threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.HEAT_JOB_NAME}", threshold: hudson.model.Result.SUCCESS)
 
     GenericTrigger(
       genericVariables: [

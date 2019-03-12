@@ -7,12 +7,15 @@ source <(sed -e '/^$/d' -e 's/^/export /g' "$DIR/.env")
 mkdir -p "$DIR/build"
 
 build_dir="$DIR/build"
+source_dir="$DIR/sources"
+profile_dir="$DIR/$KOLLA_BUILD_PROFILE"
 python_bin="$DIR/kolla/.tox/$PYTHON_VERSION/bin/python"
 
 # Create build directory with configuration specific to service
 mkdir -p "$build_dir"
-cat "$DIR/kolla-build.conf" "$DIR/$KOLLA_BUILD_PROFILE/kolla-build.conf" 2>/dev/null >"$build_dir/kolla-build.conf"
-cat "$DIR/kolla-template-overrides.j2" "$DIR/$KOLLA_BUILD_PROFILE/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
+cat "$DIR/kolla-build.conf" "$profile_dir/kolla-build.conf" 2>/dev/null >"$build_dir/kolla-build.conf"
+cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
+rm -rf "$source_dir/additions" && cp -r "$profile_dir/additions" "$source_dir/" 2>/dev/null
 
 pushd "$DIR/kolla" >/dev/null
 cleanup() {
@@ -21,7 +24,7 @@ cleanup() {
 trap cleanup EXIT
 
 $python_bin tools/build.py \
-  --config-dir="$build_dir" \
+  --config-dir="$build_dir" --locals-base="$source_dir" \
 	--template-override="$build_dir/kolla-template-overrides.j2" \
 	--type="$KOLLA_INSTALL_TYPE" \
 	--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \

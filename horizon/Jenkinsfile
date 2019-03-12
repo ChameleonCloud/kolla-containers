@@ -20,7 +20,7 @@ pipeline {
   triggers {
     // Each upstream dependency also is added as a trigger. This means that if any
     // of the upstream builds complete, a new build of this build is triggered.
-    upstream(upstreamProjects: "base-kolla,${params.HORIZON_JOB_NAME},${params.HORIZON_THEME_JOB_NAME},${params.BLAZAR_DASHBOARD_JOB_NAME}",
+    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.HORIZON_JOB_NAME},${params.HORIZON_THEME_JOB_NAME},${params.BLAZAR_DASHBOARD_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
 
     // Also trigger if any changes were pushed to the master branch that touched
