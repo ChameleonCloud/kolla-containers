@@ -2,9 +2,9 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'NOVA_JOB_NAME', defaultValue: 'nova/chameleoncloud%2Focata',
+    string(name: 'NOVA_JOB_NAME', defaultValue: 'nova/chameleoncloud%2Frocky',
            description: 'Jenkins job name for nova')
-    string(name: 'BLAZAR_NOVA_JOB_NAME', defaultValue: 'blazar-nova/chameleoncloud%2Focata',
+    string(name: 'BLAZAR_NOVA_JOB_NAME', defaultValue: 'blazar-nova/chameleoncloud%2Frocky',
            description: 'Jenkins job name for blazar-nova dependency')
   }
 
