@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/master',
+    string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/chameleoncloud%2Frocky',
            description: 'Jenkins job name for networking-generic-switch dependency')
   }
 
