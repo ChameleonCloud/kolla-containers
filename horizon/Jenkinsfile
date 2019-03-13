@@ -22,20 +22,6 @@ pipeline {
     // of the upstream builds complete, a new build of this build is triggered.
     upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.HORIZON_JOB_NAME},${params.HORIZON_THEME_JOB_NAME},${params.BLAZAR_DASHBOARD_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
-
-    // Also trigger if any changes were pushed to the master branch that touched
-    // this subfolder.
-    GenericTrigger(
-      genericVariables: [
-        [key: 'ref', value: '$.ref'],
-        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
-      ],
-      causeString: 'Triggered on $ref',
-      token: JOB_NAME,
-      printContributedVariables: true,
-      regexpFilterText: '$ref $changed_files',
-      regexpFilterExpression: 'refs/heads/master .*horizon/'
-    )
   }
 
   // The Docker registry requires authentication; there is a Credentials item
