@@ -2,25 +2,13 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/master',
+    string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/chameleoncloud%2Frocky',
            description: 'Jenkins job name for networking-generic-switch dependency')
   }
 
   triggers {
     upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
              threshold: hudson.model.Result.SUCCESS)
-
-    GenericTrigger(
-      genericVariables: [
-        [key: 'ref', value: '$.ref'],
-        [key: 'changed_files', value: '$.commits[*].["modified","added","removed"][*]']
-      ],
-      causeString: 'Triggered on $ref',
-      token: JOB_NAME,
-      printContributedVariables: true,
-      regexpFilterText: '$ref $changed_files',
-      regexpFilterExpression: 'refs/heads/master .*neutron/'
-    )
   }
 
   environment {
