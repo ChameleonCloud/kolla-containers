@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'KEYSTONE_JOB_NAME', defaultValue: 'keystone/chameleoncloud%2Focata',
+    string(name: 'KEYSTONE_JOB_NAME', defaultValue: 'keystone/chameleoncloud%2Frocky',
            description: 'Jenkins job name for keystone')
   }
 
