@@ -8,11 +8,11 @@ pipeline {
   // - horizon-theme (the custom Horizon theme for Chameleon)
   // - blazar-dashboard (the fork of the plugin that adds Blazar UI to Horizon)
   parameters {
-    string(name: 'HORIZON_JOB_NAME', defaultValue: 'horizon/chameleoncloud%2F11.0.4',
+    string(name: 'HORIZON_JOB_NAME', defaultValue: 'horizon/chameleoncloud%2Frocky',
            description: 'Jenkins job name for horizon')
     string(name: 'HORIZON_THEME_JOB_NAME', defaultValue: 'horizon-theme/master',
            description: 'Jenkins job name for horizon-theme dependency')
-    string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Fstable%2Focata',
+    string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Frocky',
            description: 'Jenkins job name for blazar-dashboard dependency')
   }
 
