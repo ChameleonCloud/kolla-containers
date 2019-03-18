@@ -60,12 +60,5 @@ pipeline {
     always {
       sh 'docker logout $DOCKER_REGISTRY'
     }
-
-    success {
-      build job: 'kolla-ansible-deploy', wait: false, parameters: [
-        string(name: 'KOLLA_SERVICE_NAME', value: 'nova'),
-        string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
-      ]
-    }
   }
 }
