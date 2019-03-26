@@ -1,5 +1,19 @@
 # service-containers
 
+## Setup
+
+Using the build utilities requires having `tox` >= 1.6 installed on your system.
+There is a virtual environment you can set up for this (via `virtualenv`).
+
+```
+# Using virtualenv
+make venv
+source venv/bin/activate
+
+# Or... using pip
+pip install -r requirements.txt
+```
+
 ## Adding a service definition
 
 Each service requires at minimum a folder tree in this repository named after
