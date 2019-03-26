@@ -40,6 +40,9 @@ $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 kolla/.tox/$(PYTHON_VERSION)/bin/activate: kolla/tox.ini
 	cd kolla && tox -e $(PYTHON_VERSION) --notest
 
+kolla/%:
+	git submodule update --init
+
 # Virtualenv
 
 .PHONY: venv
