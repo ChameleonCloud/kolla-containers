@@ -15,7 +15,10 @@ python_bin="$DIR/kolla/.tox/$PYTHON_VERSION/bin/python"
 mkdir -p "$build_dir"
 cat "$DIR/kolla-build.conf" "$profile_dir/kolla-build.conf" 2>/dev/null >"$build_dir/kolla-build.conf"
 cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
-rm -rf "$source_dir/additions" && cp -r "$profile_dir/additions" "$source_dir/" 2>/dev/null
+if [[ -d "$profile_dir/additions" ]]; then
+  mkdir -p "$source_dir"
+	cp -rf "$profile_dir/additions" "$source_dir/additions"
+fi
 
 pushd "$DIR/kolla" >/dev/null
 cleanup() {
