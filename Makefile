@@ -12,9 +12,11 @@ ifneq ($(KOLLA_USE_CACHE), no)
 	KOLLA_FLAGS := $(KOLLA_FLAGS) --cache --skip-existing
 endif
 
+.PHONY: build
 build: kolla
 	./kolla-build $(KOLLA_FLAGS)
 
+.PHONY: build-with-locals
 build-with-locals: kolla
 	./kolla-build \
 		--work-dir=$(abspath build) \
@@ -23,6 +25,7 @@ build-with-locals: kolla
 		$(KOLLA_FLAGS)
 
 # Untags any -base images to ensure they get rebuilt with the child images.
+.PHONY: clean
 clean: kolla
 	docker images --format '{{.Repository}}:{{.Tag}}' \
 		| grep '$(KOLLA_BUILD_PROFILE)-base:$(VERSION)' \
@@ -30,7 +33,6 @@ clean: kolla
 
 # Kolla build dependencies
 
-.PHONY: kolla
 kolla: $(STAMPS)/kolla
 
 $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
@@ -39,13 +41,13 @@ $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 
 kolla/.tox/$(PYTHON_VERSION)/bin/activate: venv kolla/tox.ini
 	$(VENV) cd kolla && tox -e $(PYTHON_VERSION) --notest
+	touch $@
 
 kolla/%:
 	git submodule update --init
 
 # Virtualenv
 
-.PHONY: venv
 venv: $(STAMPS)/venv
 
 $(STAMPS)/venv: requirements.txt
