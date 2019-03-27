@@ -38,7 +38,7 @@ $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 	touch $@
 
 kolla/.tox/$(PYTHON_VERSION)/bin/activate: venv kolla/tox.ini
-	source $</bin/activate && cd kolla && tox -e $(PYTHON_VERSION) --notest
+	$(VENV) cd kolla && tox -e $(PYTHON_VERSION) --notest
 
 kolla/%:
 	git submodule update --init
