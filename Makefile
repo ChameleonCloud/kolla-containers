@@ -37,8 +37,8 @@ $(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
 	mkdir -p $(dir $@)
 	touch $@
 
-kolla/.tox/$(PYTHON_VERSION)/bin/activate: kolla/tox.ini
-	cd kolla && tox -e $(PYTHON_VERSION) --notest
+kolla/.tox/$(PYTHON_VERSION)/bin/activate: venv kolla/tox.ini
+	source $</bin/activate && cd kolla && tox -e $(PYTHON_VERSION) --notest
 
 kolla/%:
 	git submodule update --init
