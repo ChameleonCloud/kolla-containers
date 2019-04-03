@@ -6,6 +6,8 @@ pipeline {
            description: 'Jenkins job name for neutron')
     string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/master',
            description: 'Jenkins job name for networking-generic-switch dependency')
+    string(name: 'DOCKER_TAG', defaultValue: 'chameleoncloud-ocata',
+           description: 'Tag to apply to built docker image')
   }
 
   triggers {

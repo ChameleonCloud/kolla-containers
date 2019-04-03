@@ -25,7 +25,7 @@ build-with-locals: kolla
 # Untags any -base images to ensure they get rebuilt with the child images.
 clean: kolla
 	docker images --format '{{.Repository}}:{{.Tag}}' \
-		| grep '$(KOLLA_BUILD_PROFILE)-base:$(VERSION)' \
+		| grep '$(KOLLA_BUILD_PROFILE)-base:$(DOCKER_TAG)' \
 		| xargs -r docker rmi
 
 # Kolla build dependencies
