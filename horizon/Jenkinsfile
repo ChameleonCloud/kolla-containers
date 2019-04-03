@@ -8,11 +8,14 @@ pipeline {
   // - horizon-theme (the custom Horizon theme for Chameleon)
   // - blazar-dashboard (the fork of the plugin that adds Blazar UI to Horizon)
   parameters {
-    string(name: 'HORIZON_JOB_NAME', defaultValue: 'horizon/chameleoncloud%2Frocky',
+    choice(name: 'HORIZON_JOB_NAME',
+           choices: jobChoices('horizon', 'chameleoncloud%2Frocky'),
            description: 'Jenkins job name for horizon')
-    string(name: 'HORIZON_THEME_JOB_NAME', defaultValue: 'horizon-theme/master',
+    choice(name: 'HORIZON_THEME_JOB_NAME',
+           choices: jobChoices('horizon-theme', 'master'),
            description: 'Jenkins job name for horizon-theme dependency')
-    string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Frocky',
+    choice(name: 'BLAZAR_DASHBOARD_JOB_NAME',
+           choices: jobChoices('blazar-dashboard', 'chameleoncloud%2Frocky'),
            description: 'Jenkins job name for blazar-dashboard dependency')
     string(name: 'DOCKER_TAG', defaultValue: 'chameleoncloud-rocky',
            description: 'Tag to apply to built docker image')
@@ -87,4 +90,11 @@ pipeline {
       ]
     }
   }
+}
+
+@NonCPS
+def jobChoices(projectName, defaultValue) {
+  Hudson.getInstance().getAllItems(org.jenkinsci.plugins.workflow.job.WorkflowJob)
+    .findAll { it.fullName.startsWith "${projectName}/" }
+    .sort { it.fullName.endsWith(defaultValue) ? -1 : 0 }*.fullName
 }
