@@ -14,8 +14,8 @@ pipeline {
            description: 'Jenkins job name for horizon-theme dependency')
     string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Frocky',
            description: 'Jenkins job name for blazar-dashboard dependency')
-    string(name: 'DOCKER_TAG', defaultValue: '',
-           description: 'Tag to apply to built docker image (defaults to value defined in source repo)')
+    string(name: 'DOCKER_TAG', defaultValue: 'chameleoncloud-rocky',
+           description: 'Tag to apply to built docker image')
   }
 
 
@@ -53,7 +53,6 @@ pipeline {
       environment {
         KOLLA_BUILD_PROFILE = 'horizon'
         KOLLA_PUSH = 'yes'
-        VERSION = "${params.DOCKER_TAG}"
       }
 
       steps {

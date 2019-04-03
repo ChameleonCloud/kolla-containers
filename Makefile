@@ -28,7 +28,7 @@ build-with-locals: kolla
 .PHONY: clean
 clean: kolla
 	docker images --format '{{.Repository}}:{{.Tag}}' \
-		| grep '$(KOLLA_BUILD_PROFILE)-base:$(VERSION)' \
+		| grep '$(KOLLA_BUILD_PROFILE)-base:$(DOCKER_TAG)' \
 		| xargs -r docker rmi
 
 # Kolla build dependencies
