@@ -47,7 +47,6 @@ pipeline {
     HOME = "${env.WORKSPACE}"
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
-    VERSION = "${params.DOCKER_TAG}"
   }
 
   // Each build consists of several _stages_...
@@ -68,9 +67,11 @@ pipeline {
       environment {
         KOLLA_BUILD_PROFILE = 'horizon'
         KOLLA_PUSH = 'yes'
+        VERSION = "${params.DOCKER_TAG}"
       }
 
       steps {
+        sh "env"
         // All the upstream artifacts are copied from their respective pipelines
         // to a special 'sources' directory. This directory is defined as
         // $locals_base in Kolla.
