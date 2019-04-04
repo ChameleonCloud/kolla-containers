@@ -2,8 +2,7 @@ pipeline {
   agent any
 
   parameters {
-    choice(name: 'BLAZAR_JOB_NAME',
-           choices: jobChoices('blazar', 'chameleoncloud%2Frocky'),
+    string(name: 'BLAZAR_JOB_NAME', defaultValue: 'blazar/chameleoncloud%2Frocky',
            description: 'Jenkins job name for blazar')
     string(name: 'DOCKER_TAG', defaultValue: 'chameleoncloud-rocky',
            description: 'Tag to apply to built docker image')
@@ -56,11 +55,4 @@ pipeline {
     }
   }
 
-}
-
-@NonCPS
-def jobChoices(projectName, defaultValue) {
-  Hudson.getInstance().getAllItems(org.jenkinsci.plugins.workflow.job.WorkflowJob)
-    .findAll { it.fullName.startsWith "${projectName}/" }
-    .sort { it.fullName.endsWith(defaultValue) ? -1 : 0 }*.fullName
 }
