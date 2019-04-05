@@ -37,7 +37,7 @@ pipeline {
     failure {
       slackSend(
         channel: "#notifications",
-        message: "*Build* of *base* (${env.BRANCH_NAME}) failed. <${env.RUN_DISPLAY_URL}|View build log>",
+        message: "*Build* of *base* (${env.DOCKER_TAG}) failed. <${env.RUN_DISPLAY_URL}|View build log>",
         color: "danger"
       )
     }
@@ -45,7 +45,7 @@ pipeline {
     success {
       slackSend(
         channel: "#notifications",
-        message: "*Build* of *base* (${env.BRANCH_NAME}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
+        message: "*Build* of *base* (${env.DOCKER_TAG}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
         color: "good"
       )
     }
