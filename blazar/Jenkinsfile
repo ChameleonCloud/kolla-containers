@@ -47,7 +47,20 @@ pipeline {
       sh 'docker logout $DOCKER_REGISTRY'
     }
 
+    failure {
+      slackSend(
+        channel: "#notifications",
+        message: "*Build* of *blazar* (${env.BRANCH_NAME}) failed. <${env.RUN_DISPLAY_URL}|View build log>",
+        color: "danger"
+      )
+    }
+
     success {
+      slackSend(
+        channel: "#notifications",
+        message: "*Build* of *blazar* (${env.BRANCH_NAME}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
+        color: "good"
+      )
       build job: 'kolla-ansible-deploy', wait: false, parameters: [
         string(name: 'KOLLA_SERVICE_NAME', value: 'blazar'),
         string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
