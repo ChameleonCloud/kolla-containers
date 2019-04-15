@@ -7,5 +7,5 @@
 ADD additions-archive /
 RUN cp -R /additions/neutron-server/* /etc/neutron/ \
   && (cd /var/lib/kolla/venv/lib/python2.7/site-packages/netmiko \
-      && git apply -p2 /etc/neutron/patches/netmiko/0001-Fix-Dell-DNOS9-compatibility.patch)
+      && git apply -p2 /etc/neutron/patches/netmiko/*.patch)
 {% endblock %}

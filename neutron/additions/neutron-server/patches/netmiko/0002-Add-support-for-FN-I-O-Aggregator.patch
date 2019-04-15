@@ -1,0 +1,25 @@
+From b074519c6e71a27ae8a981419883d511f5b54dd0 Mon Sep 17 00:00:00 2001
+From: Jason <jasonanderson@uchicago.edu>
+Date: Mon, 15 Apr 2019 13:51:56 -0500
+Subject: [PATCH] Add support for FN I/O Aggregator
+
+This uses the same mechanisms as Force10SSH largely, but there may be
+some different commands.
+---
+ netmiko/ssh_dispatcher.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/netmiko/ssh_dispatcher.py b/netmiko/ssh_dispatcher.py
+index 987def3..adefcbd 100644
+--- a/netmiko/ssh_dispatcher.py
++++ b/netmiko/ssh_dispatcher.py
+@@ -86,6 +86,7 @@ CLASS_MAPPER_BASE = {
+     'cisco_xe': CiscoIosSSH,
+     'cisco_xr': CiscoXrSSH,
+     'coriant': CoriantSSH,
++    'dell_fnioa': DellForce10SSH,
+     'dell_force10': DellForce10SSH,
+     'dell_os10': DellOS10SSH,
+     'dell_powerconnect': DellPowerConnectSSH,
+--
+2.20.1
