@@ -22,7 +22,7 @@ pipeline {
       }
 
       steps {
-        sh "make build"
+        sh 'make build'
       }
     }
   }
