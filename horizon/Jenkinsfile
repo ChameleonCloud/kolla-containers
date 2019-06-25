@@ -12,7 +12,7 @@ pipeline {
            description: 'Jenkins job name for horizon')
     string(name: 'HORIZON_THEME_JOB_NAME', defaultValue: 'horizon-theme/master',
            description: 'Jenkins job name for horizon-theme dependency')
-    string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Fstein',
+    string(name: 'BLAZAR_DASHBOARD_JOB_NAME', defaultValue: 'blazar-dashboard/chameleoncloud%2Frocky',
            description: 'Jenkins job name for blazar-dashboard dependency')
     string(name: 'HEAT_DASHBOARD_JOB_NAME', defaultValue: 'heat-dashboard/chameleoncloud%2Frocky',
            description: 'Jenkins job name for heat-dashboard dependency')
