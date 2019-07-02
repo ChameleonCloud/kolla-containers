@@ -4,7 +4,7 @@ pipeline {
   parameters{
     string(name: 'IRONIC_JOB_NAME', defaultValue: 'ironic/chameleoncloud%2Frocky',
            description: 'Jenkins job name for ironic')
-    string(name: 'DOCKER_TAG', defaultValue: 'chameleoncloud-rocky',
+    string(name: 'DOCKER_TAG', defaultValue: 'rocky',
            description: 'Tag to apply to built docker image')
   }
 

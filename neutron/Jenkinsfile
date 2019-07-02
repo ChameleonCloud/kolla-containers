@@ -4,7 +4,7 @@ pipeline {
   parameters {
     string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: 'networking-generic-switch/chameleoncloud%2Frocky',
            description: 'Jenkins job name for networking-generic-switch dependency')
-    string(name: 'DOCKER_TAG', defaultValue: 'chameleoncloud-rocky',
+    string(name: 'DOCKER_TAG', defaultValue: 'rocky',
            description: 'Tag to apply to built docker image')
   }
 

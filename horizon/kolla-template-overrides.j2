@@ -9,6 +9,7 @@ ADD additions-archive /
 RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
   && cp -R /additions/* /etc/openstack-dashboard/themes/chameleoncloud/ \
   && chown -R horizon: /etc/openstack-dashboard/themes
+
 RUN pip --no-cache-dir install --upgrade \
   git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/stable/stein#egg=python-blazarclient
 {% endblock %}
