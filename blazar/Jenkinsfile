@@ -2,9 +2,9 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'BLAZAR_JOB_NAME', defaultValue: 'blazar/chameleoncloud%2Frocky',
+    string(name: 'BLAZAR_JOB_NAME', defaultValue: 'blazar/chameleoncloud%2Fstein',
            description: 'Jenkins job name for blazar')
-    string(name: 'DOCKER_TAG', defaultValue: 'rocky',
+    string(name: 'DOCKER_TAG', defaultValue: 'stein',
            description: 'Tag to apply to built docker image')
   }
 
