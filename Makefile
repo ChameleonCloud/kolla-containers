@@ -3,7 +3,7 @@ include .env
 VENV := source venv/bin/activate &&
 STAMPS := .stamps
 
-KOLLA_FLAGS :=
+KOLLA_FLAGS ?=
 
 ifeq ($(KOLLA_PUSH), yes)
 	KOLLA_FLAGS := $(KOLLA_FLAGS) --push

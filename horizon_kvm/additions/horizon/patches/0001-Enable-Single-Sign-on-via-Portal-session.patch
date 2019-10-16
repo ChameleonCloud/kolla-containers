@@ -1,0 +1,262 @@
+From 0e941cffc07fd16a426edb538488159e213d3694 Mon Sep 17 00:00:00 2001
+From: Alex Rocha <rochaa@tacc.utexas.edu>
+Date: Mon, 17 Dec 2018 11:18:11 -0600
+Subject: [PATCH 1/2] Enable Single Sign on via Portal session
+
+Adds support for a new websso endpoint that will be used to log a user
+in via the existing Portal session. Since the Keystone credentials are
+equivalent to the Portal ones, we perform a shadow login on behalf of
+the user from Portal. Redirect logged out users to Portal to facilitate
+the automatic logging in based on their Portal session.
+
+Ticket: https://collab.tacc.utexas.edu/issues/15088
+---
+ horizon/templates/auth/_logout.html      |   2 +
+ horizon/templates/auth/_logout_form.html |  38 +++++++++
+ horizon/templates/auth/_logout_page.html |  21 +++++
+ horizon/templates/auth/logout.html       |  14 ++++
+ openstack_dashboard/cc_web_sso_urls.py   |  19 +++++
+ openstack_dashboard/cc_websso_views.py   | 102 +++++++++++++++++++++++
+ 6 files changed, 196 insertions(+)
+ create mode 100644 horizon/templates/auth/_logout.html
+ create mode 100644 horizon/templates/auth/_logout_form.html
+ create mode 100644 horizon/templates/auth/_logout_page.html
+ create mode 100644 horizon/templates/auth/logout.html
+ create mode 100644 openstack_dashboard/cc_web_sso_urls.py
+ create mode 100644 openstack_dashboard/cc_websso_views.py
+
+diff --git a/horizon/templates/auth/_logout.html b/horizon/templates/auth/_logout.html
+new file mode 100644
+index 000000000..1e1457bf7
+--- /dev/null
++++ b/horizon/templates/auth/_logout.html
+@@ -0,0 +1,2 @@
++{% load i18n %}
++  {% include 'auth/_logout_page.html' %}
+diff --git a/horizon/templates/auth/_logout_form.html b/horizon/templates/auth/_logout_form.html
+new file mode 100644
+index 000000000..40fd3daf3
+--- /dev/null
++++ b/horizon/templates/auth/_logout_form.html
+@@ -0,0 +1,38 @@
++{% load i18n %}
++
++{% block pre_login %}
++{% endblock %}
++
++  <div class="panel panel-default">
++<style>
++.login .login-title {
++    display: block;
++    clear: both;
++    text-align: center;
++}
++</style>
++    <div class="panel-heading">
++    {% block login_header %}
++      <h3 class="login-title">
++        {% trans 'You are logged out of the Chameleon Dashboard' %}
++      </h3>
++    {% endblock %}
++    </div>
++
++    <div class="panel-body">
++        <span>You may still be logged in to Chameleon Portal, to sign out of the portal, please go to the sign out page </span>
++        <a href="{{cc_logout_url}}">here</a>.
++    </div>
++    <div class="panel-footer">
++      {% block login_footer %}
++        <a href="{% url 'login' %}" id="loginBtn" class="btn btn-primary pull-right">
++          <span >{% trans "Sign In" %}</span>
++        </a>
++        <div class="clearfix"></div>
++      {% endblock %}
++    </div>
++  </div>
++
++{% block post_login%}
++
++{% endblock %}
+diff --git a/horizon/templates/auth/_logout_page.html b/horizon/templates/auth/_logout_page.html
+new file mode 100644
+index 000000000..31dc6283b
+--- /dev/null
++++ b/horizon/templates/auth/_logout_page.html
+@@ -0,0 +1,21 @@
++{% extends 'auth/_logout_form.html' %}
++{% load i18n %}
++
++{% block pre_login %}
++  <div class="container login">
++    <div class="row">
++      <div class="col-xs-11 col-sm-8 col-md-6 col-lg-5 horizontal-center">
++        {{ block.super }}
++{% endblock %}
++
++{% block login_header %}
++  {% include 'auth/_splash.html' %}
++  {{ block.super }}
++{% endblock %}
++
++{% block post_login %}
++      {{ block.super }}
++      </div>
++    </div>
++  </div>
++{% endblock %}
+diff --git a/horizon/templates/auth/logout.html b/horizon/templates/auth/logout.html
+new file mode 100644
+index 000000000..0ef934fc6
+--- /dev/null
++++ b/horizon/templates/auth/logout.html
+@@ -0,0 +1,14 @@
++{% extends "base.html" %}
++{% load i18n %}
++
++{% block title %}{% trans "Logged-Out" %}{% endblock %}
++
++{% block body_id %}splash{% endblock %}
++
++{% block content %}
++  {% include 'auth/_logout.html' %}
++{% endblock %}
++
++{% block footer %}
++  {% include '_login_footer.html' %}
++{% endblock %}
+diff --git a/openstack_dashboard/cc_web_sso_urls.py b/openstack_dashboard/cc_web_sso_urls.py
+new file mode 100644
+index 000000000..9ce9e2d84
+--- /dev/null
++++ b/openstack_dashboard/cc_web_sso_urls.py
+@@ -0,0 +1,19 @@
++from django.conf.urls import url
++from django.conf import settings
++from openstack_auth import utils
++from openstack_auth import views
++from openstack_dashboard import cc_websso_views
++utils.patch_middleware_get_user()
++
++
++""" We need websso enabled for Chameleon portal to sso users into Horizon """
++if utils.is_websso_enabled():
++    urlpatterns = [
++        url(r"^login/$", cc_websso_views.login, name='login'),
++        url(r"^logout/$", cc_websso_views.logout, name='logout'),
++    ]
++
++
++    urlpatterns.append(url(r"^ccwebsso/$", cc_websso_views.cc_websso, name='custom_websso'))
++else:
++    urlpatterns = []
+diff --git a/openstack_dashboard/cc_websso_views.py b/openstack_dashboard/cc_websso_views.py
+new file mode 100644
+index 000000000..9ace91769
+--- /dev/null
++++ b/openstack_dashboard/cc_websso_views.py
+@@ -0,0 +1,102 @@
++import logging
++from django.contrib import auth
++from django.contrib.auth import views as django_auth_views
++from django.conf import settings
++from django import http as django_http
++from django.views.decorators.cache import never_cache
++from django.views.decorators.csrf import csrf_exempt
++from django.views.decorators.csrf import csrf_protect
++from django.views.decorators.debug import sensitive_post_parameters
++from openstack_auth import utils
++from openstack_auth import exceptions
++from openstack_auth import user as auth_user
++from openstack_auth import views as oauth_views
++import six
++import urlparse
++
++LOG = logging.getLogger(__name__)
++
++"""
++    The below overrides the defaul login functionality and redirects to auth with the preconfigured portal with
++    all the required parameters for login to this Horizon instance
++"""
++@sensitive_post_parameters()
++@csrf_protect
++@never_cache
++def login(request, template_name=None, extra_context=None, **kwargs):
++    if not request.user.is_authenticated():
++        host = getattr(settings, 'SSO_CALLBACK_HOST', None)
++        cc_portal_url = getattr(settings, 'CHAMELEON_PORTAL_SSO_BASE_URL', None) + getattr(settings, 'CHAMELEON_PORTAL_SSO_LOGIN_PATH', None)
++        if(host is None or cc_portal_url is None):
++            LOG.error('Misconfigured CC Portal SSO, settings:, '
++                + 'CHAMELEON_PORTAL_SSO_URL: ' + str(cc_portal_url) + ', SSO_CALLBACK_HOST: ' + str(host))
++            raise Exception('SSO Login Error')
++        login_url = cc_portal_url + '?host=' + host
++        if request.GET.get('next'):
++            login_url += '&next=' + request.GET.get('next')
++        if getattr(settings, 'WEBROOT', None) and getattr(settings, 'WEBROOT', None) != '/':
++            login_url += '&webroot=' + getattr(settings, 'WEBROOT', '')
++        return django_http.HttpResponseRedirect(login_url)
++    return oauth_views.login(request, template_name=None, extra_context=None, **kwargs)
++
++"""
++    this is a custom websso endpoint for chameleon portal
++    This primary difference between this and the original websso login code is
++    that the original request's HTTP_REFERER is not used, in the standard websso impmlementation,
++    the HTTP_REFERER would be the Keystone server, which would then be used as the Keystone URL
++    Since we are using the chameleon portal, we want Horizon to use its preconfigured OPENSTACK_KEYSTONE_URL
++"""
++@sensitive_post_parameters()
++@csrf_exempt
++@never_cache
++def cc_websso(request):
++    """Logs a user in using a token from Keystone's POST."""
++    request.META['HTTP_REFERER'] = settings.OPENSTACK_KEYSTONE_URL
++    referer = settings.OPENSTACK_KEYSTONE_URL
++    LOG.info(referer)
++    auth_url = utils.clean_up_auth_url(referer)
++    token = request.POST.get('token')
++    LOG.info('token: ' + token)
++    try:
++        request.user = auth.authenticate(request=request, auth_url=auth_url, token=token)
++    except exceptions.KeystoneAuthException as exc:
++        msg = 'Login failed: %s' % six.text_type(exc)
++        res = django_http.HttpResponseRedirect(settings.LOGOUT_URL)
++        res.set_cookie('logout_reason', msg, max_age=10)
++        return res
++
++    auth_user.set_session_from_user(request, request.user)
++    auth.login(request, request.user)
++    if request.session.test_cookie_worked():
++        request.session.delete_test_cookie()
++
++    next = request.GET.get('next')
++    if next and not bool(urlparse.urlparse(next).netloc):
++        return django_http.HttpResponseRedirect(next)
++
++    return django_http.HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
++
++
++"""
++    This overrides the standard logout and redirect to login page, and instead
++    take users to a custom logout page where they can further log out of Chameleon portal
++"""
++def logout(request, login_url=None, **kwargs):
++    """Logs out the user if he is logged in. Then redirects to the log-in page.
++
++    :param login_url:
++        Once logged out, defines the URL where to redirect after login
++
++    :param kwargs:
++        see django.contrib.auth.views.logout_then_login extra parameters.
++
++    """
++    msg = 'Logging out user "%(username)s".' % \
++        {'username': request.user.username}
++    LOG.info(msg)
++    cc_logout_url = getattr(settings, 'CHAMELEON_PORTAL_SSO_BASE_URL', 'https://www.chameleoncloud.org') \
++        + getattr(settings, 'CHAMELEON_PORTAL_SSO_LOGOUT_PATH', '/logout/')
++    extra_context = {'cc_logout_url': cc_logout_url}
++
++    """ Securely logs a user out. """
++    return django_auth_views.logout(request, template_name='auth/logout.html', extra_context=extra_context)
+-- 
+2.20.1
+

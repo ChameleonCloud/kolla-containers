@@ -35,7 +35,7 @@ $python_bin tools/build.py \
 	--template-override="$build_dir/kolla-template-overrides.j2" \
 	--type="$KOLLA_INSTALL_TYPE" \
 	--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \
-	--registry="$DOCKER_REGISTRY" --namespace="$KOLLA_NAMESPACE" \
+	--registry="${DOCKER_REGISTRY:-}" --namespace="${KOLLA_NAMESPACE:-}" \
 	--tag="$DOCKER_TAG" \
 	--profile="$KOLLA_BUILD_PROFILE" \
 	"$@"

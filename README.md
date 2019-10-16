@@ -20,6 +20,8 @@ Each service requires at minimum a folder tree in this repository named after
 the service. This folder should contain at minimum a `kolla-build.conf` and a
 `Jenkinsfile`. This is called the "build profile" in some of the tooling.
 
+> **Note**: the folder must be named with alphanumeric characters. This is because the folder name will be used as a "profile" name in Kolla, and those are Python configuration keys, which don't like e.g. hyphens.
+
 ### `kolla-build.conf`
 
 The `kolla-build.conf` file is where Kolla looks to find sources for OpenStack
@@ -28,6 +30,15 @@ and also where we pin components to a specific OpenStack release. In addition to
 the service-specific build configuration in the service folder, the root level
 `kolla-build.conf` file is used for all service builds as a default
 configuration.
+
+Importantly, the build configuration must include a `[profiles]` section with
+an entry named after the folder containing the build profile, e.g. for "horizon":
+
+```
+# Maps profile names to a regex of what images should be built for this profile
+[profiles]
+horizon = ^horizon
+```
 
 Kolla supports adding [additions](https://docs.openstack.org/kolla/latest/admin/image-building.html#additions-functionality) to images at build time, which can be a useful
 tool when trying to add in additional sources into a specific image (we do this
