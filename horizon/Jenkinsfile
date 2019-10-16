@@ -69,7 +69,6 @@ pipeline {
                       target: "${env.WORKSPACE}/sources")
         copyArtifacts(projectName: "${params.HEAT_DASHBOARD_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
-        sh "env"
         sh "make clean"
         sh "make build-with-locals"
       }

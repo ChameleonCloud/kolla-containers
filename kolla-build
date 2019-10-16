@@ -2,7 +2,7 @@
 set -u
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" >/dev/null 2>&1)" && pwd)"
-source <(sed -e '/^$/d' -e 's/^/export /g' "$DIR/.env")
+set -a; source "$DIR/.env"; set +a
 
 mkdir -p "$DIR/build"
 
@@ -18,6 +18,10 @@ cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2
 if [[ -d "$profile_dir/additions" ]]; then
   mkdir -p "$source_dir"
 	cp -rf "$profile_dir/additions" "$source_dir/additions"
+fi
+# Allow overriding default env
+if [[ -f "$profile_dir/.env" ]]; then
+	set -a; source "$profile_dir/.env"; set +a
 fi
 
 pushd "$DIR/kolla" >/dev/null
