@@ -20,7 +20,7 @@ build: kolla
 build-with-locals: kolla
 	./kolla-build \
 		--work-dir=$(abspath build) \
-		--config-file=$(abspath $(KOLLA_BUILD_PROFILE)/kolla-build.local-sources.conf) \
+		--config-dir=$(abspath $(KOLLA_BUILD_PROFILE)) \
 		--locals-base=$(abspath sources) \
 		$(KOLLA_FLAGS)
 

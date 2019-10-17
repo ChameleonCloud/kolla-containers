@@ -31,7 +31,7 @@ cleanup() {
 trap cleanup EXIT
 
 $python_bin tools/build.py \
-  --config-dir="$build_dir" --locals-base="$source_dir" \
+  --config-file="$build_dir/kolla-build.conf" --locals-base="$source_dir" \
 	--template-override="$build_dir/kolla-template-overrides.j2" \
 	--type="$KOLLA_INSTALL_TYPE" \
 	--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \
