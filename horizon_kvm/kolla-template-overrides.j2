@@ -6,9 +6,13 @@
 # See "horizon-additions-" sections in kolla-build.conf
 {% block horizon_footer %}
 ADD additions-archive /
+
+# Custom theme
 RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
-  && cp -R /additions/horizon-additions-themes-chameleoncloud*/* /etc/openstack-dashboard/themes/chameleoncloud/ \
+  && cp -R /additions/horizon-additions-themes-*/* /etc/openstack-dashboard/themes/chameleoncloud/ \
   && chown -R horizon: /etc/openstack-dashboard/themes
+
+# Patches
 RUN mkdir -p /etc/horizon/ \
   && cp -R /additions/horizon/* /etc/horizon/ \
   && (cd /var/lib/kolla/venv/lib/python2.7/site-packages \
