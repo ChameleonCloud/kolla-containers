@@ -5,7 +5,7 @@
 # See "neutron-server-additions-extra" section in kolla-build.conf
 {% block neutron_server_footer %}
 ADD additions-archive /
-RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
+RUN cp -R /additions/extra/* /etc/neutron/ \
   && (cd /var/lib/kolla/venv/lib/python2.7/site-packages/netmiko \
       && git apply -p2 /etc/neutron/patches/netmiko/*.patch)
 {% endblock %}
