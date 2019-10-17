@@ -29,7 +29,7 @@ pipeline {
 
     stage('build-and-publish') {
       environment {
-        KOLLA_BUILD_PROFILE = 'horizon-kvm'
+        KOLLA_BUILD_PROFILE = 'horizon_kvm'
         KOLLA_PUSH = 'yes'
       }
 
