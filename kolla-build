@@ -17,7 +17,7 @@ cat "$DIR/kolla-build.conf" "$profile_dir/kolla-build.conf" 2>/dev/null >"$build
 cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
 if [[ -d "$profile_dir/additions" ]]; then
   mkdir -p "$source_dir"
-	cp -rf "$profile_dir/additions" "$source_dir/additions"
+	tar -cf "$source_dir/additions.tar" -C "$profile_dir/additions" .
 fi
 # Allow overriding default env
 if [[ -f "$profile_dir/.env" ]]; then
