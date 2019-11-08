@@ -1,3 +1,0 @@
-[submodule "kolla"]
-	path = kolla
-	url = git@github.com:ChameleonCloud/kolla.git

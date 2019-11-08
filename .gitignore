@@ -1,4 +1,10 @@
+# Makefile stamps
 /.stamps/
+# Output/staging directory
 /build/
+# Local sources (tarballs) for inclusion
 /sources/
+# Local Kolla checkouts
+/kolla/
+# Virtualenv for tox bootstrapping
 /venv/

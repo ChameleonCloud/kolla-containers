@@ -1,7 +1,13 @@
 include .env
 
+# Allow .env overrides to have effect here as well
+ifneq (,$(wildcard $(KOLLA_BUILD_PROFILE)/.env))
+	include $(KOLLA_BUILD_PROFILE)/.env
+endif
+
 VENV := source venv/bin/activate &&
 STAMPS := .stamps
+KOLLA_CHECKOUT := kolla/$(OPENSTACK_BASE_RELEASE)
 
 KOLLA_FLAGS ?=
 
@@ -11,6 +17,14 @@ endif
 ifneq ($(KOLLA_USE_CACHE), no)
 	KOLLA_FLAGS := $(KOLLA_FLAGS) --cache --skip-existing
 endif
+
+.PHONY: print_env
+print_env:
+	@echo Build profile: $(KOLLA_BUILD_PROFILE)
+	@echo OpenStack release: $(OPENSTACK_BASE_RELEASE)
+	@echo Kolla checkout: $(KOLLA_CHECKOUT)
+	@echo Kolla build flags: $(KOLLA_FLAGS)
+	@echo Docker tag: $(DOCKER_TAG)
 
 .PHONY: build
 build: kolla
@@ -32,19 +46,22 @@ clean: kolla
 		| xargs -r docker rmi
 
 # Kolla build dependencies
+.PHONY: kolla
+kolla: $(STAMPS)/$(KOLLA_CHECKOUT)
 
-kolla: $(STAMPS)/kolla
-
-$(STAMPS)/kolla: kolla/.tox/$(PYTHON_VERSION)/bin/activate
+$(STAMPS)/$(KOLLA_CHECKOUT): $(KOLLA_CHECKOUT)/.tox/$(PYTHON_VERSION)/bin/activate
+	@ # Clean up pre-existing kolla stamp for when we had just one checkout
+	@ [[ -f $(STAMPS)/kolla ]] && rm -f $(STAMPS)/kolla || true 
 	mkdir -p $(dir $@)
 	touch $@
 
-kolla/.tox/$(PYTHON_VERSION)/bin/activate: venv kolla/tox.ini
-	$(VENV) cd kolla && tox -e $(PYTHON_VERSION) --notest
+$(KOLLA_CHECKOUT)/.tox/$(PYTHON_VERSION)/bin/activate: venv $(KOLLA_CHECKOUT)/tox.ini
+	$(VENV) cd $(KOLLA_CHECKOUT) && tox -e $(PYTHON_VERSION) --notest
 	touch $@
 
-kolla/%:
-	git submodule update --init
+$(KOLLA_CHECKOUT)/%:
+	git clone --single-branch --branch=chameleoncloud/$(OPENSTACK_BASE_RELEASE) \
+		https://github.com/chameleoncloud/kolla.git $(KOLLA_CHECKOUT)
 
 # Virtualenv
 

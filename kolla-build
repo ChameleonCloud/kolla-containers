@@ -13,7 +13,9 @@ python_bin="$DIR/kolla/.tox/$PYTHON_VERSION/bin/python"
 
 # Create build directory with configuration specific to service
 mkdir -p "$build_dir"
-cat "$DIR/kolla-build.conf" "$profile_dir/kolla-build.conf" 2>/dev/null >"$build_dir/kolla-build.conf"
+cat <(m4 -DOPENSTACK_BASE_RELEASE="$OPENSTACK_BASE_RELEASE" "$DIR/kolla-build.conf.m4") \
+  "$profile_dir/kolla-build.conf" 2>/dev/null \
+	>"$build_dir/kolla-build.conf"
 cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
 if [[ -d "$profile_dir/additions" ]]; then
   mkdir -p "$source_dir"
