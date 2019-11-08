@@ -59,6 +59,20 @@ This Jinja file is used to override or customize the templating of the
 Dockerfile written out by Kolla. See an [example Dockerfile (horizon)](https://github.com/openstack/kolla/blob/master/docker/horizon/Dockerfile.j2) in Kolla
 for more context in to how this works.
 
+### `.env`
+
+This is an optional env file that can override the options in the default `.env`
+file located at the root of this directory. This is most useful for when you would
+like to build from a different OpenStack base release just for your build profile.
+In this case you can override the `OPENSTACK_BASE_RELEASE` env variable like so:
+
+```shell
+# Use Tran release for this build
+OPENSTACK_BASE_RELEASE=train
+```
+
+See the `.env` file at the root of the directory to see what else can be overridden.
+
 ## Building a container
 
 The supported services can be build using a `make` task and specifying a build profile with the `KOLLA_BUILD_PROFILE` environment variable. The value of this variable should have a corresponding directory in the root of this repository.
@@ -100,8 +114,3 @@ The `KOLLA_PUSH` environment variable can be used to instruct Kolla to push the 
 KOLLA_BUILD_PROFILE=horizon KOLLA_PUSH=yes make build
 ```
 
-## Rocky upgrade notes
-
-### Neutron
-
-There is a `networking-baremetal` project added in the Pike release that adds a new `ironic-neutron-agent` system. We may want to start building and using that.
