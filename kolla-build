@@ -26,7 +26,7 @@ if [[ -f "$profile_dir/.env" ]]; then
 	set -a; source "$profile_dir/.env"; set +a
 fi
 
-pushd "$DIR/kolla" >/dev/null
+pushd "$DIR/kolla/$OPENSTACK_BASE_RELEASE" >/dev/null
 cleanup() {
 	popd >/dev/null
 }
