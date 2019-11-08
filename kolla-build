@@ -9,8 +9,6 @@ mkdir -p "$DIR/build"
 build_dir="$DIR/build"
 source_dir="$DIR/sources"
 profile_dir="$DIR/$KOLLA_BUILD_PROFILE"
-kolla_dir="$DIR/kolla/$OPENSTACK_BASE_RELEASE"
-python_bin=".tox/$PYTHON_VERSION/bin/python"
 
 # Create build directory with configuration specific to service
 mkdir -p "$build_dir"
@@ -22,10 +20,14 @@ if [[ -d "$profile_dir/additions" ]]; then
   mkdir -p "$source_dir"
 	tar -cf "$source_dir/additions.tar" -C "$profile_dir/additions" .
 fi
+
 # Allow overriding default env
 if [[ -f "$profile_dir/.env" ]]; then
 	set -a; source "$profile_dir/.env"; set +a
 fi
+
+kolla_dir="$DIR/kolla/$OPENSTACK_BASE_RELEASE"
+python_bin=".tox/$PYTHON_VERSION/bin/python"
 
 pushd "$kolla_dir" >/dev/null
 cleanup() {
