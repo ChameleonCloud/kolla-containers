@@ -9,7 +9,8 @@ mkdir -p "$DIR/build"
 build_dir="$DIR/build"
 source_dir="$DIR/sources"
 profile_dir="$DIR/$KOLLA_BUILD_PROFILE"
-python_bin="$DIR/kolla/.tox/$PYTHON_VERSION/bin/python"
+kolla_dir="$DIR/kolla/$OPENSTACK_BASE_RELEASE"
+python_bin=".tox/$PYTHON_VERSION/bin/python"
 
 # Create build directory with configuration specific to service
 mkdir -p "$build_dir"
@@ -26,7 +27,7 @@ if [[ -f "$profile_dir/.env" ]]; then
 	set -a; source "$profile_dir/.env"; set +a
 fi
 
-pushd "$DIR/kolla/$OPENSTACK_BASE_RELEASE" >/dev/null
+pushd "$kolla_dir" >/dev/null
 cleanup() {
 	popd >/dev/null
 }
