@@ -107,7 +107,7 @@ def main(argv):
     parser.add_argument('--site', type=str, help='Chameleon site', required=True)
 
     args = parser.parse_args(argv[1:])
-    enddatetime_in_utc = datetime.strptime(args.end_datetime, '%Y-%m-%d %H:%M:%S').replace(tzinfo=tz.gettz('UTC'))
+    enddatetime_in_utc = datetime.strptime(args.end_datetime, '%Y-%m-%d %H:%M:%S').replace(tzinfo=tz.tzutc())
     enddatetime_in_central = enddatetime_in_utc.astimezone(tz.gettz('America/Chicago'))
 
     template_vars = {
@@ -120,7 +120,7 @@ def main(argv):
         'site': args.site
     }
 
-    td = enddatetime_in_utc - datetime.now(tz.gettz('UTC'))
+    td = enddatetime_in_utc - datetime.now(tz.tzutc())
     subject = 'Chameleon lease {} ending in {} hours'.format(args.lease_name, str(int(td.total_seconds() / 3600)))
 
     html = render_template(vars=template_vars)
