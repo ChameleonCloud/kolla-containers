@@ -7,5 +7,5 @@
 ADD additions-archive /
 RUN cp -R /additions/extra/* /etc/blazar/ \
   && chown -R blazar: /etc/blazar \
-  && ln -s /etc/blazar/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
+  && ln -s /etc/blazar/blazar-manager/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
 {% endblock %}
