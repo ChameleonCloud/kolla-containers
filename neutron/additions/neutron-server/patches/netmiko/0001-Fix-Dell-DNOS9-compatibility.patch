@@ -1,24 +1,25 @@
-From d1ffbda838df7c208cfb62f859d0a009fcc471ab Mon Sep 17 00:00:00 2001
-From: Jason <jasonanderson@uchicago.edu>
-Date: Wed, 27 Mar 2019 15:20:43 -0500
-Subject: [PATCH] Fix Dell DNOS9 compatibility
+From cd64d77ee172ae727d57acf6f1525ae29d34e9db Mon Sep 17 00:00:00 2001
+From: jakecoll <jakecoll@uchicago.edu>
+Date: Tue, 19 Nov 2019 09:59:03 -0600
+Subject: [PATCH 1/2] Fix Dell DNOS9 compatibility
 
 ---
  netmiko/dell/dell_force10_ssh.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/netmiko/dell/dell_force10_ssh.py b/netmiko/dell/dell_force10_ssh.py
-index 0481b9a..ef0e4e9 100644
+index 0ab2f58..a6c7002 100644
 --- a/netmiko/dell/dell_force10_ssh.py
 +++ b/netmiko/dell/dell_force10_ssh.py
-@@ -6,6 +6,6 @@ from netmiko.cisco_base_connection import CiscoSSHConnection
- class DellForce10SSH(CiscoSSHConnection):
-     """Dell Force10 Driver - supports DNOS9."""
+@@ -7,7 +7,7 @@ class DellForce10SSH(CiscoSSHConnection):
  
--    def save_config(self, cmd='copy running-configuration startup-configuration', confirm=False):
-+    def save_config(self, cmd='copy running-config startup-config', confirm=False):
-         """Saves Config"""
-         return super(DellForce10SSH, self).save_config(cmd=cmd, confirm=confirm)
+     def save_config(
+         self,
+-        cmd="copy running-configuration startup-configuration",
++        cmd="copy running-configuration startup-config",
+         confirm=False,
+         confirm_response="",
+     ):
 -- 
-2.20.1
+2.17.1
 
