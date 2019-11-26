@@ -42,9 +42,8 @@ build-with-locals: kolla
 		$(KOLLA_FLAGS)
 
 .PHONY: clean
-clean: 
-	@# Clean build cache
-	rm -rf build
+clean:
+	rm -rf build kolla
 
 # Kolla build dependencies
 .PHONY: kolla
