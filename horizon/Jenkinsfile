@@ -80,7 +80,6 @@ pipeline {
   post {
     always {
       sh 'docker logout $DOCKER_REGISTRY'
-      cleanWs()
     }
 
     failure {
