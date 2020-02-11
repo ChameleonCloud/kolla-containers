@@ -1,16 +1,13 @@
 pipeline {
   agent any
 
-  parameters {
-    string(name: 'BLAZAR_JOB_NAME', defaultValue: 'blazar/chameleoncloud%2Ftrain',
-           description: 'Jenkins job name for blazar')
+  parameters{
     string(name: 'DOCKER_TAG', defaultValue: 'train',
            description: 'Tag to apply to built docker image')
   }
 
   triggers {
-    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.BLAZAR_JOB_NAME}",
-             threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME}", threshold: hudson.model.Result.SUCCESS)
   }
 
   environment {
@@ -29,28 +26,22 @@ pipeline {
 
     stage('build-and-publish') {
       environment {
-        KOLLA_BUILD_PROFILE = 'blazar'
+        KOLLA_BUILD_PROFILE = 'placement'
         KOLLA_PUSH = 'yes'
       }
 
       steps {
-        copyArtifacts(projectName: "${params.BLAZAR_JOB_NAME}",
-                      target: "${env.WORKSPACE}/sources")
-        sh "make clean"
-        sh "make build-with-locals"
+        sh 'make clean'
+        sh 'make build'
       }
     }
   }
 
   post {
-    always {
-      sh 'docker logout $DOCKER_REGISTRY'
-    }
-
     failure {
       slackSend(
         channel: "#notifications",
-        message: "*Build* of *blazar* (${env.DOCKER_TAG}) failed. <${env.RUN_DISPLAY_URL}|View build log>",
+        message: "*Build* of *placement* (${env.DOCKER_TAG}) failed. <${env.RUN_DISPLAY_URL}|View build log>",
         color: "danger"
       )
     }
@@ -58,14 +49,13 @@ pipeline {
     success {
       slackSend(
         channel: "#notifications",
-        message: "*Build* of *blazar* (${env.DOCKER_TAG}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
+        message: "*Build* of *placement* (${env.DOCKER_TAG}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
         color: "good"
       )
       build job: 'kolla-ansible-deploy', wait: false, parameters: [
-        string(name: 'KOLLA_SERVICE_NAME', value: 'blazar'),
+        string(name: 'KOLLA_SERVICE_NAME', value: 'placement'),
         string(name: 'JENKINS_AGENT_LABEL', value: 'ansible-uc-dev')
       ]
     }
   }
-
 }

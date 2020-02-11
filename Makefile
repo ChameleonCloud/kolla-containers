@@ -10,12 +10,15 @@ STAMPS := .stamps
 KOLLA_CHECKOUT := kolla/$(OPENSTACK_BASE_RELEASE)
 
 KOLLA_FLAGS ?=
+# Always skip ancestors; we want to explicitly build the ancestor
+# images instead of automagically doing this.
+KOLLA_FLAGS := $(KOLLA_FLAGS) --skip-parents
 
 ifeq ($(KOLLA_PUSH), yes)
 	KOLLA_FLAGS := $(KOLLA_FLAGS) --push
 endif
 ifneq ($(KOLLA_USE_CACHE), no)
-	KOLLA_FLAGS := $(KOLLA_FLAGS) --cache --skip-existing
+	KOLLA_FLAGS := $(KOLLA_FLAGS) --cache 
 endif
 
 .PHONY: print_env
@@ -40,7 +43,7 @@ build-with-locals: kolla
 
 .PHONY: clean
 clean:
-	rm -rf build
+	rm -rf build kolla
 
 # Kolla build dependencies
 .PHONY: kolla
