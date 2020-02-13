@@ -2,7 +2,7 @@ include .env
 
 # Allow .env overrides to have effect here as well
 ifneq (,$(wildcard $(KOLLA_BUILD_PROFILE)/.env))
-	include $(KOLLA_BUILD_PROFILE)/.env
+  $(eval export $(shell sed -E -e '/^(#|unset)/d' $(KOLLA_BUILD_PROFILE)/.env))
 endif
 
 VENV := source venv/bin/activate &&
@@ -15,10 +15,10 @@ KOLLA_FLAGS ?=
 KOLLA_FLAGS := $(KOLLA_FLAGS) --skip-parents
 
 ifeq ($(KOLLA_PUSH), yes)
-	KOLLA_FLAGS := $(KOLLA_FLAGS) --push
+  KOLLA_FLAGS := $(KOLLA_FLAGS) --push
 endif
 ifneq ($(KOLLA_USE_CACHE), no)
-	KOLLA_FLAGS := $(KOLLA_FLAGS) --cache 
+  KOLLA_FLAGS := $(KOLLA_FLAGS) --cache 
 endif
 
 .PHONY: print_env
@@ -28,6 +28,7 @@ print_env:
 	@echo Kolla checkout: $(KOLLA_CHECKOUT)
 	@echo Kolla build flags: $(KOLLA_FLAGS)
 	@echo Docker tag: $(DOCKER_TAG)
+	@env
 
 .PHONY: build
 build: kolla
