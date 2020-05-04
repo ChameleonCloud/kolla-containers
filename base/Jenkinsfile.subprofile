@@ -13,12 +13,12 @@ pipeline {
     HOME = "${env.WORKSPACE}"
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
+    KOLLA_BUILD_PROFILE = 'base'
   }
 
   stages {
     stage('build-and-publish') {
       environment {
-        KOLLA_BUILD_PROFILE = 'base'
         KOLLA_PUSH = 'yes'
         // Force re-building of all images
         KOLLA_USE_CACHE = 'no'
