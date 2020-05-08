@@ -18,6 +18,7 @@ pipeline {
            description: 'Jenkins job name for heat-dashboard dependency')
     string(name: 'DOCKER_TAG', defaultValue: 'train',
            description: 'Tag to apply to built docker image')
+    string(name: 'PARENT_DOCKER_TAG', defaultValue: '', description: 'Tag to use for unbuilt parent images')
   }
 
 

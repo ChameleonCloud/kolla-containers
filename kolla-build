@@ -40,6 +40,6 @@ $python_bin tools/build.py \
 	--type="$KOLLA_INSTALL_TYPE" \
 	--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \
 	--registry="${DOCKER_REGISTRY:-}" --namespace="${KOLLA_NAMESPACE:-}" \
-	--tag="$DOCKER_TAG" \
+	--tag="$DOCKER_TAG" --parent-tag="${PARENT_DOCKER_TAG:-}" \
 	--profile="$sub_profile" \
 	"$@"
