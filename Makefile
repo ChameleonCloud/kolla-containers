@@ -14,6 +14,10 @@ endif
 build:
 	./kolla-build $(KOLLA_FLAGS)
 
+# Kept for backwards compatibility
+.PHONY: build-with-locals
+build-with-locals: build
+
 .PHONY: clean
 clean:
 	rm -rf build
