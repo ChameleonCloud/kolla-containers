@@ -66,18 +66,23 @@ fi
 
 pushd "$build_dir" >/dev/null
 
+# Construct kolla-build command invocation
 declare -a cmd=(
 	$VIRTUALENV/src/kolla/tools/build.py \
-		--work-dir="." \
-		--config-file="kolla-build.conf" --locals-base="../sources" \
+		--work-dir="." --config-file="kolla-build.conf" --locals-base="../sources" \
 		--template-override="kolla-template-overrides.j2" \
 		--type="$KOLLA_INSTALL_TYPE" \
 		--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \
 		--registry="${DOCKER_REGISTRY:-}" --namespace="${KOLLA_NAMESPACE:-}" \
-		--tag="$DOCKER_TAG" --parent-tag="${PARENT_DOCKER_TAG:-}" \
-		--profile="$sub_profile" \
-	"$@"
+		--tag="$DOCKER_TAG" \
+		--profile="$sub_profile"
 )
+
+if [[ -n "$PARENT_DOCKER_TAG" ]]; then
+	cmd+=(--parent-tag="$PARENT_DOCKER_TAG")
+fi
+
+cmd+=("$@")
 
 cat <<EOF
 ================================================================================
