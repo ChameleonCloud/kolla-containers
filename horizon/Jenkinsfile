@@ -36,6 +36,9 @@ pipeline {
     HOME = "${env.WORKSPACE}"
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
+    KOLLA_BUILD_PROFILE = 'horizon'
+    KOLLA_PUSH = 'yes'
+    KOLLA_LOCAL_SOURCES = 'yes'
   }
 
   // Each build consists of several _stages_...
@@ -53,11 +56,6 @@ pipeline {
     // of this stage is a Docker image locally on disk. KOLLA_PUSH instructs
     // this step to also push the image up to the remote registry.
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'horizon'
-        KOLLA_PUSH = 'yes'
-      }
-
       steps {
         // All the upstream artifacts are copied from their respective pipelines
         // to a special 'sources' directory. This directory is defined as
@@ -94,7 +92,7 @@ pipeline {
     success {
       slackSend(
         channel: "#notifications",
-        message: "*Build* of *horizon* (${env.DOCKER_TAG}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
+        message: "*Build* of *${env.KOLLA_BUILD_PROFILE}* (${env.DOCKER_TAG}) completed successfuly. <${env.RUN_DISPLAY_URL}|View build log>",
         color: "good"
       )
       // Trigger deploy to development environments

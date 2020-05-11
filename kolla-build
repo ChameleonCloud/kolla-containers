@@ -3,6 +3,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" >/dev/null 2>&1)" && pwd)"
 VIRTUALENV="$(realpath ${VIRTUALENV:-$DIR/venv})"
 FORCE_UPDATES="${FORCE_UPDATES:-no}"
 CHECK_UPDATES=yes
+KOLLA_LOCAL_SOURCES="${KOLLA_LOCAL_SOURCES:-no}"
 
 if [[ ! -d "$VIRTUALENV" ]]; then
 	if type -t scl; then
@@ -50,10 +51,16 @@ sub_profile="${KOLLA_BUILD_SUBPROFILE:-$KOLLA_BUILD_PROFILE}"
 
 # Create build directory with configuration specific to service
 mkdir -p "$build_dir"
-cat <(sed "s/OPENSTACK_BASE_RELEASE/$OPENSTACK_BASE_RELEASE/" "$DIR/kolla-build.conf.m4") \
-  "$profile_dir/kolla-build.conf" 2>/dev/null \
-	>"$build_dir/kolla-build.conf"
-cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" 2>/dev/null >"$build_dir/kolla-template-overrides.j2"
+declare -a conf_files=(
+	<(sed "s/OPENSTACK_BASE_RELEASE/$OPENSTACK_BASE_RELEASE/" "$DIR/kolla-build.conf.m4")
+	"$profile_dir/kolla-build.conf"
+)
+if [[ "$KOLLA_LOCAL_SOURCES" == "yes" && -f "$profile_dir/kolla-build.local-sources.conf"]]; then
+	conf_files+=("$profile_dir/kolla-build.local-sources.conf")
+fi
+cat "${conf_files[@]}" 2>/dev/null >"$build_dir/kolla-build.conf"
+cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" \
+	2>/dev/null >"$build_dir/kolla-template-overrides.j2"
 if [[ -d "$profile_dir/additions" ]]; then
   mkdir -p "$source_dir"
 	tar -cf "$source_dir/additions.tar" -C "$profile_dir/additions" .
