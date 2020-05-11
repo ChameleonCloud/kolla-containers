@@ -55,7 +55,7 @@ declare -a conf_files=(
 	<(sed "s/OPENSTACK_BASE_RELEASE/$OPENSTACK_BASE_RELEASE/" "$DIR/kolla-build.conf.m4")
 	"$profile_dir/kolla-build.conf"
 )
-if [[ "$KOLLA_LOCAL_SOURCES" == "yes" && -f "$profile_dir/kolla-build.local-sources.conf"]]; then
+if [[ "$KOLLA_LOCAL_SOURCES" == "yes" && -f "$profile_dir/kolla-build.local-sources.conf" ]]; then
 	conf_files+=("$profile_dir/kolla-build.local-sources.conf")
 fi
 cat "${conf_files[@]}" 2>/dev/null >"$build_dir/kolla-build.conf"
