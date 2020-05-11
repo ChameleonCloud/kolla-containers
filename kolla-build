@@ -5,8 +5,20 @@ FORCE_UPDATES="${FORCE_UPDATES:-no}"
 CHECK_UPDATES=yes
 
 if [[ ! -d "$VIRTUALENV" ]]; then
+	if [[ type -t scl ]]; then
+		# Be nice and automatically source a Python 3 environment from
+		# Software Collections (if found).
+		scl_python=$(scl -l | grep python | tail -n1)
+		[[ -n "$scl_python" ]] && source scl_source enable "$scl_python"
+	fi
+
+	if [[ "$(python -V | cut -d' ' -f2)" != "3."* ]]; then
+		echo "Python 3.x is required."
+		exit 1
+	fi
+
   echo "Creating virtualenv at $VIRTUALENV ..."
-  virtualenv "$VIRTUALENV" --system-site-packages
+  python -m venv "$VIRTUALENV" --system-site-packages
   "$VIRTUALENV/bin/pip" install --upgrade pip
   FORCE_UPDATES=yes
 fi
@@ -25,7 +37,8 @@ if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
         ! diff -q >/dev/null \
           $kolla_gitref \
           <(cd $kolla_egglink; git fetch; git show-ref -s -d origin/$kolla_checkout); then
-    pip install -e git+$kolla_remote@$kolla_checkout#egg=kolla
+    pip install --upgrade --force-reinstall \
+			-e git+$kolla_remote@$kolla_checkout#egg=kolla
     (cd $kolla_egglink; git rev-parse HEAD > $kolla_gitref)
   fi
 fi
@@ -54,7 +67,7 @@ fi
 pushd "$build_dir" >/dev/null
 
 declare -a cmd=(
-	kolla-build \
+	$VIRTUALENV/src/kolla/tools/build.py \
 		--work-dir="." \
 		--config-file="kolla-build.conf" --locals-base="../sources" \
 		--template-override="kolla-template-overrides.j2" \
