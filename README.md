@@ -113,4 +113,3 @@ The `KOLLA_PUSH` environment variable can be used to instruct Kolla to push the 
 # When done building, push Docker images to registry
 KOLLA_BUILD_PROFILE=horizon KOLLA_PUSH=yes make build
 ```
-

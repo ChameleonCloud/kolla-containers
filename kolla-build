@@ -1,10 +1,34 @@
 #!/usr/bin/env bash
-set -u
-
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" >/dev/null 2>&1)" && pwd)"
+VIRTUALENV="$(realpath ${VIRTUALENV:-$DIR/venv})"
+FORCE_UPDATES="${FORCE_UPDATES:-no}"
+CHECK_UPDATES=yes
+
+if [[ ! -d "$VIRTUALENV" ]]; then
+  echo "Creating virtualenv at $VIRTUALENV ..."
+  virtualenv "$VIRTUALENV" --system-site-packages
+  "$VIRTUALENV/bin/pip" install --upgrade pip
+  FORCE_UPDATES=yes
+fi
+
+source "$VIRTUALENV/bin/activate"
+
 set -a; source "$DIR/.env"; set +a
 
-mkdir -p "$DIR/build"
+# Automatically update dependencies
+if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
+  kolla_remote=https://github.com/chameleoncloud/kolla.git
+  kolla_checkout=${KOLLA_BRANCH:-chameleoncloud/train}
+  kolla_gitref="$VIRTUALENV/kolla.gitref"
+  kolla_egglink="$VIRTUALENV/src/kolla"
+  if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_gitref" || ! -d "$kolla_egglink" ]] || \
+        ! diff -q >/dev/null \
+          $kolla_gitref \
+          <(cd $kolla_egglink; git fetch; git show-ref -s -d origin/$kolla_checkout); then
+    pip install -e git+$kolla_remote@$kolla_checkout#egg=kolla
+    (cd $kolla_egglink; git rev-parse HEAD > $kolla_gitref)
+  fi
+fi
 
 build_dir="$DIR/build"
 source_dir="$DIR/sources"
@@ -27,19 +51,34 @@ if [[ -f "$profile_dir/.env" ]]; then
 	set -a; source "$profile_dir/.env"; set +a
 fi
 
-kolla_dir="$DIR/kolla/$OPENSTACK_BASE_RELEASE"
-python_bin=".tox/$PYTHON_VERSION/bin/python"
+pushd "$build_dir" >/dev/null
 
-pushd "$kolla_dir" >/dev/null
-# Ensure Kolla checkout up to date
-git fetch && git pull
-
-$python_bin tools/build.py \
-  --config-file="$build_dir/kolla-build.conf" --locals-base="$source_dir" \
-	--template-override="$build_dir/kolla-template-overrides.j2" \
-	--type="$KOLLA_INSTALL_TYPE" \
-	--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \
-	--registry="${DOCKER_REGISTRY:-}" --namespace="${KOLLA_NAMESPACE:-}" \
-	--tag="$DOCKER_TAG" --parent-tag="${PARENT_DOCKER_TAG:-}" \
-	--profile="$sub_profile" \
+declare -a cmd=(
+	kolla-build \
+		--work-dir="." \
+		--config-file="kolla-build.conf" --locals-base="../sources" \
+		--template-override="kolla-template-overrides.j2" \
+		--type="$KOLLA_INSTALL_TYPE" \
+		--base="$KOLLA_BASE" --base-tag="$KOLLA_BASE_TAG" --base-arch="$KOLLA_BASE_ARCH" \
+		--registry="${DOCKER_REGISTRY:-}" --namespace="${KOLLA_NAMESPACE:-}" \
+		--tag="$DOCKER_TAG" --parent-tag="${PARENT_DOCKER_TAG:-}" \
+		--profile="$sub_profile" \
 	"$@"
+)
+
+cat <<EOF
+================================================================================
+Build profile:     $KOLLA_BUILD_PROFILE
+OpenStack release: $OPENSTACK_BASE_RELEASE
+Kolla branch:      $KOLLA_BRANCH
+Kolla build flags: $KOLLA_FLAGS
+Docker tag:        $DOCKER_TAG
+Parent Docker tag: $PARENT_DOCKER_TAG
+
+Command:
+
+$(fold -w80 -s <<<"${cmd[@]}")
+================================================================================
+EOF
+
+"${cmd[@]}"
