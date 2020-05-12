@@ -18,6 +18,9 @@ pipeline {
     HOME = "${env.WORKSPACE}"
     DOCKER_REGISTRY = 'docker.chameleoncloud.org'
     DOCKER_REGISTRY_CREDS = credentials('kolla-docker-registry-creds')
+    KOLLA_BUILD_PROFILE = 'keystone'
+    KOLLA_PUSH = 'yes'
+    KOLLA_LOCAL_SOURCES = 'yes'
   }
 
   stages {
@@ -28,11 +31,6 @@ pipeline {
     }
 
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'keystone'
-        KOLLA_PUSH = 'yes'
-      }
-
       steps {
         copyArtifacts(projectName: "${params.KEYSTONE_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
