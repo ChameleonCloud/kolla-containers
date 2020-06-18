@@ -1,4 +1,6 @@
-# service-containers
+# kolla-containers
+
+A central repository of build customizations for [Kolla](https://docs.openstack.org/kolla/latest/) containers specific to Chameleon, and automated triggers for rebuilding pieces of Kolla's image tree when sources change.
 
 ## Setup
 
@@ -16,7 +18,7 @@ pip install -r requirements.txt
 
 ## Adding a service definition
 
-Each service requires at minimum a folder tree in this repository named after
+Each Kolla service requires at minimum a folder tree in this repository named after
 the service. This folder should contain at minimum a `kolla-build.conf` and a
 `Jenkinsfile`. This is called the "build profile" in some of the tooling.
 
