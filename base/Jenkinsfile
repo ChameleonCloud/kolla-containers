@@ -24,7 +24,9 @@ pipeline {
 
       steps {
         sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
-        sh 'make build'
+        withPythonEnv('python3') {
+          sh 'make build'
+        }
       }
     }
   }

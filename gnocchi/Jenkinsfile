@@ -32,7 +32,9 @@ pipeline {
       }
 
       steps {
-        sh 'make build'
+        withPythonEnv('python3') {
+          sh 'make build'
+        }
       }
     }
   }

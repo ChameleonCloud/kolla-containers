@@ -37,7 +37,9 @@ pipeline {
         copyArtifacts(projectName: "${params.BLAZAR_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         sh "make clean"
-        sh "make build-with-locals"
+        withPythonEnv('python3') {
+          sh 'make build-with-locals'
+        }
       }
     }
   }

@@ -37,8 +37,9 @@ pipeline {
         copyArtifacts(projectName: "${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         sh 'make clean'
-        sh 'make build-with-locals'
-      }
+        withPythonEnv('python3') {
+          sh 'make build-with-locals'
+        }
     }
   }
 
