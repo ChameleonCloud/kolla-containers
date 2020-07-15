@@ -6,13 +6,6 @@ CHECK_UPDATES=yes
 KOLLA_LOCAL_SOURCES="${KOLLA_LOCAL_SOURCES:-no}"
 
 if [[ ! -f "$VIRTUALENV/bin/activate" ]]; then
-	if type -t scl; then
-		# Be nice and automatically source a Python 3 environment from
-		# Software Collections (if found).
-		scl_python=$(scl -l | grep python | tail -n1)
-		[[ -n "$scl_python" ]] && source scl_source enable "$scl_python"
-	fi
-
 	if [[ "$(python -V | cut -d' ' -f2)" != "3."* ]]; then
 		echo "Python 3.x is required."
 		exit 1
