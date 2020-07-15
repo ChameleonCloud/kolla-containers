@@ -5,7 +5,7 @@ FORCE_UPDATES="${FORCE_UPDATES:-no}"
 CHECK_UPDATES=yes
 KOLLA_LOCAL_SOURCES="${KOLLA_LOCAL_SOURCES:-no}"
 
-if [[ ! -d "$VIRTUALENV" ]]; then
+if [[ ! -f "$VIRTUALENV/bin/activate" ]]; then
 	if type -t scl; then
 		# Be nice and automatically source a Python 3 environment from
 		# Software Collections (if found).
