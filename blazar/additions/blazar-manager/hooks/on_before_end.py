@@ -52,6 +52,10 @@ will expire on {{ vars['enddatetime_utc'] }} UTC / {{ vars['enddatetime_ct'] }} 
 either the Chameleon <a href='https://chameleoncloud.readthedocs.io/en/latest/technical/reservations.html#extending-a-lease' target='_blank'>web interface</a>
 or <a href='https://chameleoncloud.readthedocs.io/en/latest/technical/reservations.html#id5' target='_blank'>command line interface</a>.</p>
 
+<p>If you cannot or do not wish to extend your lease, you can save the configuration of instances and relaunch them with updated 
+images at a later time by using the <a href="https://chameleoncloud.readthedocs.io/en/latest/technical/images.html" target="_blank">cc-snapshot utility</a>
+, which is presinstalled on all Chameleon supported images.</p>
+
 <br>
 <p><i>
 This is an automatic email, please <b>DO NOT</b> reply!
