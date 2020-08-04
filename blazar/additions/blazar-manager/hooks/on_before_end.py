@@ -53,7 +53,7 @@ either the Chameleon <a href='https://chameleoncloud.readthedocs.io/en/latest/te
 or <a href='https://chameleoncloud.readthedocs.io/en/latest/technical/reservations.html#id5' target='_blank'>command line interface</a>.</p>
 
 <p>You can save the configuration of an instance and relaunch it with updated images at a later time by using the cc-snapshot utility, which is presinstalled on all 
-Chameleon supported images <https://chameleoncloud.readthedocs.io/en/latest/technical/images.html</a>.</p>
+Chameleon supported images <a https://chameleoncloud.readthedocs.io/en/latest/technical/images.html</a>.</p>
 
 <br>
 <p><i>
