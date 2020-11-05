@@ -4,10 +4,13 @@ pipeline {
   parameters{
     string(name: 'DOCKER_TAG', defaultValue: 'train',
            description: 'Tag to apply to built docker image')
+    string(name: 'IRONIC_JOB_NAME', defaultValue: 'ironic/chameleoncloud%2Ftrain',
+           description: 'Jenkins job name for ironic')
   }
 
   triggers {
-    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME}", threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: "base-kolla/${env.BRANCH_NAME},${params.IRONIC_JOB_NAME}",
+             threshold: hudson.model.Result.SUCCESS)
   }
 
   environment {
