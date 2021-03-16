@@ -6,6 +6,11 @@ pipeline {
            description: 'Tag to apply to built docker image')
   }
 
+  triggers {
+    // Force a rebuild every month to keep things sort of fresh
+    cron('@monthly')
+  }
+
   environment {
     // Necessary so that `docker login` credentials are not put in shared location
     HOME = "${env.WORKSPACE}"
