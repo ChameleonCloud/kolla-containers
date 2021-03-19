@@ -40,6 +40,7 @@ pipeline {
         withPythonEnv('python3') {
           sh 'make build-with-locals'
         }
+      }
     }
   }
 
