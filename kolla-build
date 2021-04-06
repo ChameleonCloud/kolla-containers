@@ -60,9 +60,14 @@ if [[ -d "$profile_dir/additions" ]]; then
 fi
 
 # Allow overriding default env
+set -a;
 if [[ -f "$profile_dir/.env" ]]; then
-	set -a; source "$profile_dir/.env"; set +a
+	source "$profile_dir/.env"
 fi
+if [[ -f "$profile_dir/$sub_profile.env" ]]; then
+  source "$profile_dir/$sub_profile.env"
+fi
+set +a
 
 pushd "$build_dir" >/dev/null
 
@@ -87,6 +92,7 @@ cmd+=("$@")
 cat <<EOF
 ================================================================================
 Build profile:     $KOLLA_BUILD_PROFILE
+Install type:      $KOLLA_INSTALL_TYPE
 OpenStack release: $OPENSTACK_BASE_RELEASE
 Kolla branch:      $KOLLA_BRANCH
 Kolla build flags: $KOLLA_FLAGS
