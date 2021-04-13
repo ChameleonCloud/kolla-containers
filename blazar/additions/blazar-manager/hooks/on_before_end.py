@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-'''
+"""
 Blazar before_end action -- email
 
 Email user about the expiration datetime of the lease.
-'''
+"""
 import argparse
 import configparser
 import sys
@@ -15,7 +15,7 @@ from email.mime.text import MIMEText
 
 from jinja2 import Environment
 
-EMAIL_TEMPLATE = '''
+EMAIL_TEMPLATE = """
 <style type="text/css">
 @font-face {
   font-family: 'Open Sans';
@@ -63,12 +63,14 @@ If you have any question or issue, please submit a ticket on our <a href='https:
 
 </div>
 <br><br>
-'''
+"""
+
 
 def render_template(**kwargs):
-    ''' renders a Jinja template into HTML '''
+    """ renders a Jinja template into HTML """
     templ = Environment().from_string(EMAIL_TEMPLATE)
     return templ.render(**kwargs)
+
 
 def send_email(email_host, to, sender, cc=None, bcc=None, subject=None, body=None):
     # convert TO into list if string
@@ -77,62 +79,81 @@ def send_email(email_host, to, sender, cc=None, bcc=None, subject=None, body=Non
 
     to_list = [addr for addr in (to + [cc] + [bcc]) if addr is not None]
 
-    msg = MIMEMultipart('alternative')
-    msg['From'] = sender
-    msg['Subject'] = subject
-    msg['To'] = ','.join(to)
-    msg['Cc'] = cc
-    msg['Bcc'] = bcc
-    msg.attach(MIMEText(body, 'html'))
+    msg = MIMEMultipart("alternative")
+    msg["From"] = sender
+    msg["Subject"] = subject
+    msg["To"] = ",".join(to)
+    msg["Cc"] = cc
+    msg["Bcc"] = bcc
+    msg.attach(MIMEText(body, "html"))
 
     # send email
     server = smtplib.SMTP(email_host, timeout=30)
     server.sendmail(sender, to_list, msg.as_string())
     server.quit()
 
-def main(argv):
-    parser = argparse.ArgumentParser(description='Send notification email to Chameleon user before lease expires.')
-    parser.add_argument('--to', type=str, help='Comma separated list of email addresses of recipients', required=True)
-    parser.add_argument('--sender', type=str, help='Email address of sender', default='noreply@chameleoncloud.org')
-    parser.add_argument('--cc', type=str, help='Email address to cc to', default=None)
-    parser.add_argument('--bcc', type=str, help='Email address to bcc to', default=None)
 
-    parser.add_argument('--username', type=str, help='User name', required=True)
-    parser.add_argument('--project-name', type=str, help='Project name', required=True)
-    parser.add_argument('--lease-name', type=str, help='Lease name', required=True)
-    parser.add_argument('--lease-id', type=str, help='Lease id', required=True)
-    parser.add_argument('--end-datetime', type=str, help='Lease end date and time in UTC', required=True)
-    parser.add_argument('--site', type=str, help='Chameleon site', required=True)
+def main(argv):
+    parser = argparse.ArgumentParser(
+        description="Send notification email to Chameleon user before lease expires."
+    )
+    parser.add_argument(
+        "--to",
+        type=str,
+        help="Comma separated list of email addresses of recipients",
+        required=True,
+    )
+    parser.add_argument(
+        "--sender",
+        type=str,
+        help="Email address of sender",
+        default="noreply@chameleoncloud.org",
+    )
+    parser.add_argument("--cc", type=str, help="Email address to cc to", default=None)
+    parser.add_argument("--bcc", type=str, help="Email address to bcc to", default=None)
+
+    parser.add_argument("--username", type=str, help="User name", required=True)
+    parser.add_argument("--project-name", type=str, help="Project name", required=True)
+    parser.add_argument("--lease-name", type=str, help="Lease name", required=True)
+    parser.add_argument("--lease-id", type=str, help="Lease id", required=True)
+    parser.add_argument(
+        "--end-datetime", type=str, help="Lease end date and time in UTC", required=True
+    )
+    parser.add_argument("--site", type=str, help="Chameleon site", required=True)
 
     args = parser.parse_args(argv[1:])
-    enddatetime_in_utc = datetime.strptime(args.end_datetime, '%Y-%m-%d %H:%M:%S').replace(tzinfo=tz.tzutc())
-    enddatetime_in_central = enddatetime_in_utc.astimezone(tz.gettz('America/Chicago'))
+    enddatetime_in_utc = datetime.strptime(
+        args.end_datetime, "%Y-%m-%d %H:%M:%S"
+    ).replace(tzinfo=tz.tzutc())
+    enddatetime_in_central = enddatetime_in_utc.astimezone(tz.gettz("America/Chicago"))
 
     template_vars = {
-        'username': args.username,
-        'projectname': args.project_name,
-        'leasename': args.lease_name,
-        'leaseid': args.lease_id,
-        'enddatetime_utc': enddatetime_in_utc.strftime("%Y-%m-%d %H:%M:%S"),
-        'enddatetime_ct': enddatetime_in_central.strftime("%Y-%m-%d %H:%M:%S"),
-        'site': args.site
+        "username": args.username,
+        "projectname": args.project_name,
+        "leasename": args.lease_name,
+        "leaseid": args.lease_id,
+        "enddatetime_utc": enddatetime_in_utc.strftime("%Y-%m-%d %H:%M:%S"),
+        "enddatetime_ct": enddatetime_in_central.strftime("%Y-%m-%d %H:%M:%S"),
+        "site": args.site,
     }
 
     td = enddatetime_in_utc - datetime.now(tz.tzutc())
-    subject = 'Chameleon lease {} ending in {} hours'.format(args.lease_name, str(int(td.total_seconds() / 3600)))
+    subject = "Chameleon lease {} ending in {} hours".format(
+        args.lease_name, str(int(td.total_seconds() / 3600))
+    )
 
     html = render_template(vars=template_vars)
 
     # read email host from blazar.conf
-    email_host = '127.0.0.1'
+    email_host = "127.0.0.1"
     blazar_config = configparser.ConfigParser()
     try:
-        blazar_config.read('/etc/blazar/blazar.conf')
-        email_host = blazar_config['physical:host']['email_relay']
+        blazar_config.read("/etc/blazar/blazar.conf")
+        email_host = blazar_config["physical:host"]["email_relay"]
     except Exception:
         pass
     send_email(email_host, args.to, args.sender, args.cc, args.bcc, subject, html)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main(sys.argv))
