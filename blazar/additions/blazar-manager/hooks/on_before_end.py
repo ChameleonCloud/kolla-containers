@@ -5,7 +5,7 @@ Blazar before_end action -- email
 Email user about the expiration datetime of the lease.
 '''
 import argparse
-import os
+import configparser
 import sys
 import smtplib
 from datetime import datetime
@@ -13,12 +13,7 @@ from dateutil import tz
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-if sys.version_info[0] == 2:
-    import ConfigParser as configparser
-else:
-    import configparser
-
-from jinja2 import Environment, BaseLoader
+from jinja2 import Environment
 
 EMAIL_TEMPLATE = '''
 <style type="text/css">
@@ -52,7 +47,7 @@ will expire on {{ vars['enddatetime_utc'] }} UTC / {{ vars['enddatetime_ct'] }} 
 either the Chameleon <a href='https://chameleoncloud.readthedocs.io/en/latest/technical/reservations.html#extending-a-lease' target='_blank'>web interface</a>
 or <a href='https://chameleoncloud.readthedocs.io/en/latest/technical/reservations.html#id5' target='_blank'>command line interface</a>.</p>
 
-<p>If you cannot or do not wish to extend your lease, you can save the configuration of instances and relaunch them with updated 
+<p>If you cannot or do not wish to extend your lease, you can save the configuration of instances and relaunch them with updated
 images at a later time by using the <a href="https://chameleoncloud.readthedocs.io/en/latest/technical/images.html" target="_blank">cc-snapshot utility</a>
 , which is presinstalled on all Chameleon supported images.</p>
 
@@ -80,8 +75,7 @@ def send_email(email_host, to, sender, cc=None, bcc=None, subject=None, body=Non
     if type(to) is not list:
         to = to.split()
 
-    to_list = to + [cc] + [bcc]
-    to_list = filter(None, to_list) # remove null emails
+    to_list = [addr for addr in (to + [cc] + [bcc]) if addr is not None]
 
     msg = MIMEMultipart('alternative')
     msg['From'] = sender
@@ -137,7 +131,8 @@ def main(argv):
         email_host = blazar_config['physical:host']['email_relay']
     except Exception:
         pass
-    send_email(email_host, args.to, args.sender, args.cc, args.bcc, subject, html.encode("utf8"))
+    send_email(email_host, args.to, args.sender, args.cc, args.bcc, subject, html)
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
