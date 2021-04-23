@@ -2,23 +2,23 @@ name: ci
 
 on:
   push:
-  workflow_dispatch:
-    inputs:
-      kolla_profile:
-        description: "Specific service to build"
-        required: false
 jobs:
   buildx:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        arch: [aarch64]
-        base_os: [ubuntu]
+    env:
+      KOLLA_BUILD_PROFILE: zun
+      KOLLA_USE_CACHE: no
+      KOLLA_BASE_ARCH: aarch64
+      KOLLA_BASE: centos
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: setup python
+      - name: Set up Python
         uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip setuptools wheel
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -34,9 +34,4 @@ jobs:
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
       - name: Run Kolla Build
-        env:
-          KOLLA_BUILD_PROFILE: ${{ github.event.inputs.kolla_profile }}
-          KOLLA_USE_CACHE: no
-          KOLLA_BASE_ARCH: ${{ matrix.arch }}
-          KOLLA_BASE: ${{ matrix.base_os }}
         run: make build 
