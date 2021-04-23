@@ -6,6 +6,10 @@ on:
 jobs:
   buildx:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [aarch64]
+        base_os: [ubuntu]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,8 +25,7 @@ jobs:
           echo "Status:    ${{ steps.buildx.outputs.status }}"
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
-      - name: Run kolla
-        env:
-          KOLLA_BUILD_PROFILE: zun
-          KOLLA_USE_CACHE: no
-        run: ./kolla-build
+      - name: Print Kolla Command
+        run: ./kolla-build --version
+      - name: Run Kolla Build
+        run: ./kolla-build --base-arch=${{ matrix.arch }} --base=${{ matrix.base_os }} --profile=zun
