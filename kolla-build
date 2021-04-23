@@ -21,18 +21,22 @@ source "$VIRTUALENV/bin/activate"
 
 set -a; source "$DIR/.env"; set +a
 
+KOLLA_BRANCH="${KOLLA_BRANCH:-chameleoncloud/train}"
+DOCKER_TAG="${DOCKER_TAG:-train}"
+
 # Automatically update dependencies
 if [[ "$CHECK_UPDATES" == "yes" || "$FORCE_UPDATES" == "yes" ]]; then
   kolla_remote=https://github.com/chameleoncloud/kolla.git
-  kolla_checkout=${KOLLA_BRANCH:-chameleoncloud/train}
+  kolla_checkout="$KOLLA_BRANCH"
   kolla_gitref="$VIRTUALENV/kolla.gitref"
   kolla_egglink="$VIRTUALENV/src/kolla"
   if [[ "$FORCE_UPDATES" == "yes" || ! -f "$kolla_gitref" || ! -d "$kolla_egglink" ]] || \
         ! diff -q >/dev/null \
           $kolla_gitref \
           <(cd $kolla_egglink; git fetch; git show-ref -s -d origin/$kolla_checkout); then
-    pip install --upgrade --force-reinstall \
-			-e git+$kolla_remote@$kolla_checkout#egg=kolla
+    pushd "$VIRTUALENV" || ( echo "pushd error!" && exit 1 )
+    pip install -e git+$kolla_remote@$kolla_checkout#egg=kolla
+    popd || ( echo "popd error!" && exit 1 )
     (cd $kolla_egglink; git rev-parse HEAD > $kolla_gitref)
   fi
 fi
