@@ -6,14 +6,12 @@ jobs:
   buildx:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         arch: [aarch64]
         include:
           - base_os: debian
             os_tag: 10
-          - base_os: centos
-            os_tag: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -48,16 +46,9 @@ jobs:
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
-          KOLLA_FLAGS: --template-only
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.arch }}
         run: |
           rm **/.env
           make build
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          push: false
-          platforms: ${{ matrix.arch }}
-          context: build/docker/base/
       - name: List Build Images
         run: docker image ls
