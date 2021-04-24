@@ -57,6 +57,6 @@ jobs:
           rm -f .env
           rm -f */.env
           rm -f */*/.env
-          ./kolla-build
+          ./kolla-build --build-args "platform: ${{ matrix.arch }}"
       - name: List Build Images
         run: docker image ls
