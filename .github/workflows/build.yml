@@ -5,11 +5,15 @@ on:
 jobs:
   buildx:
     runs-on: ubuntu-latest
-    env:
-      KOLLA_BUILD_PROFILE: zun
-      KOLLA_USE_CACHE: no
-      KOLLA_BASE_ARCH: aarch64
-      KOLLA_BASE: centos
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: [aarch64]
+        include:
+          - base_os: debian
+            os_tag: 10
+          - base_os: centos
+            os_tag: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,6 +41,23 @@ jobs:
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
       - name: Run Kolla Build
-        run: make build
+        env:
+          KOLLA_USE_CACHE: no
+          KOLLA_INSTALL_TYPE: source
+          KOLLA_BUILD_PROFILE: zun
+          KOLLA_BASE: ${{ matrix.base_os }}
+          KOLLA_BASE_TAG: ${{ matrix.os_tag }}
+          KOLLA_BASE_ARCH: ${{ matrix.arch }}
+          KOLLA_FLAGS: --template-only
+        run: |
+          rm **/.env
+          make build
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          platforms: ${{ matrix.arch }}
+          context: build/docker/base/
       - name: List Build Images
         run: docker image ls
