@@ -2,6 +2,11 @@ name: ci
 
 on:
   push:
+
+env:
+  DOCKER_REGISTRY: docker.chameleoncloud.org
+  KOLLA_NAMESPACE: kolla
+  OPENSTACK_BASE_RELEASE: train
 jobs:
   buildx:
     runs-on: ubuntu-latest
