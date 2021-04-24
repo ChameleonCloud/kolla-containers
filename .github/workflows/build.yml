@@ -9,6 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         arch: [aarch64]
+        base_os: [debian]
         include:
           - base_os: debian
             os_tag: 10
@@ -48,7 +49,9 @@ jobs:
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.arch }}
         run: |
-          rm **/.env
-          make build
+          rm -f .env
+          rm -f */.env
+          rm -f */*/.env
+          ./kolla-build
       - name: List Build Images
         run: docker image ls
