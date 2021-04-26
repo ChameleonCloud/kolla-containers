@@ -50,11 +50,13 @@ jobs:
       - name: Run Kolla Build
         env:
           KOLLA_USE_CACHE: no
+          KOLLA_PUSH: yes
           KOLLA_INSTALL_TYPE: source
           KOLLA_BUILD_PROFILE: zun
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
+          DOCKER_TAG: train-${{ matrix.arch }}
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
         run: |
           rm -f .env
