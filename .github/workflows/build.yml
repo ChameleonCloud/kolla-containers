@@ -10,6 +10,7 @@ env:
   OPENSTACK_BASE_RELEASE: train
 jobs:
   buildx:
+    environment: Chameleon CI
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
