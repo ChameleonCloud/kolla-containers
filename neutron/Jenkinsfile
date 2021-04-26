@@ -4,7 +4,7 @@ pipeline {
   parameters {
     string(name: 'NETWORKING_GENERIC_SWITCH_JOB_NAME', defaultValue: '/networking-generic-switch/chameleoncloud%2Ftrain',
            description: 'Jenkins job name for networking-generic-switch dependency')
-    string(name: 'DOCKER_TAG', defaultValue: 'train',
+    string(name: 'DOCKER_TAG', defaultValue: 'train-centos7',
            description: 'Tag to apply to built docker image')
   }
 
@@ -31,6 +31,8 @@ pipeline {
       environment {
         KOLLA_BUILD_PROFILE = 'neutron'
         KOLLA_PUSH = 'yes'
+        // Force to build entire chain
+        KOLLA_USE_CACHE = 'no'
       }
 
       steps {
