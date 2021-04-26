@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+
+env:
+  DOCKER_REGISTRY: docker.chameleoncloud.org
+  KOLLA_NAMESPACE: kolla
+  KOLLA_BRANCH: feature/pass_platform_to_docker
+  OPENSTACK_BASE_RELEASE: train
+jobs:
+  buildx:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [aarch64]
+        base_os: [debian]
+        include:
+          - arch: aarch64
+            platform: linux/arm64
+          - base_os: debian
+            os_tag: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Cache python deps
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+      - name: Inspect builder
+        run: |
+          echo "Name:      ${{ steps.buildx.outputs.name }}"
+          echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
+          echo "Status:    ${{ steps.buildx.outputs.status }}"
+          echo "Flags:     ${{ steps.buildx.outputs.flags }}"
+          echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+      - name: Run Kolla Build
+        env:
+          KOLLA_USE_CACHE: no
+          KOLLA_INSTALL_TYPE: source
+          KOLLA_BUILD_PROFILE: zun
+          KOLLA_BASE: ${{ matrix.base_os }}
+          KOLLA_BASE_TAG: ${{ matrix.os_tag }}
+          KOLLA_BASE_ARCH: ${{ matrix.arch }}
+          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
+        run: |
+          rm -f .env
+          rm -f */.env
+          rm -f */*/.env
+          ./kolla-build --build-args "--platform: ${{ matrix.platform }}"
+      - name: List Build Images
+        run: docker image ls
