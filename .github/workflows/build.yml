@@ -60,6 +60,7 @@ jobs:
           KOLLA_PUSH: yes
           KOLLA_INSTALL_TYPE: source
           KOLLA_BUILD_PROFILE: zun
+          KOLLA_FLAGS: "--build-args '--platform: ${{ matrix.platform }}'"
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
@@ -69,6 +70,6 @@ jobs:
           rm -f .env
           rm -f */.env
           rm -f */*/.env
-          ./kolla-build --build-args "--platform: ${{ matrix.platform }}"
+          make build
       - name: List Build Images
         run: docker image ls
