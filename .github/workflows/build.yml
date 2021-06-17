@@ -60,6 +60,7 @@ jobs:
           KOLLA_PUSH: yes
           KOLLA_INSTALL_TYPE: source
           KOLLA_BUILD_PROFILE: zun
+          KOLLA_BUILD_SUBPROFILE: compute
           KOLLA_FLAGS: "--build-args '--platform: ${{ matrix.platform }}'"
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
