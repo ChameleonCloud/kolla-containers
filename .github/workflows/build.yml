@@ -16,12 +16,14 @@ jobs:
       fail-fast: false
       matrix:
         arch: [aarch64]
-        base_os: [debian]
+        base_os: [debian, ubuntu]
         include:
           - arch: aarch64
             platform: linux/arm64
           - base_os: debian
             os_tag: 10
+          - base_os: ubuntu
+            os-tag: 18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
