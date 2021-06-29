@@ -4,16 +4,11 @@ A central repository of build customizations for [Kolla](https://docs.openstack.
 
 ## Setup
 
-Using the build utilities requires having `tox` >= 1.6 installed on your system.
-There is a virtual environment you can set up for this (via `virtualenv`).
+Using the build utilities requires having Python 3 and the `venv` module installed:
 
 ```
-# Using virtualenv
-make venv
-source venv/bin/activate
-
-# Or... using pip
-pip install -r requirements.txt
+# e.g., for Ubuntu/Debian
+apt-get install python3-venv
 ```
 
 ## Adding a service definition
@@ -114,4 +109,19 @@ The `KOLLA_PUSH` environment variable can be used to instruct Kolla to push the 
 ```
 # When done building, push Docker images to registry
 KOLLA_BUILD_PROFILE=horizon KOLLA_PUSH=yes make build
+```
+
+### Cross-compiling
+
+It is possible to cross-compile Docker images in order to, e.g., build an ARM image on an x86 machine. Docker BuildKit has support built-in for this, but `docker-py` does not yet have support for BuildKit. Fortunately, [it is possible to configure Docker in a more general way for cross-compiling](https://www.stereolabs.com/docs/docker/building-arm-container-on-x86/).
+
+```shell
+sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+```
+
+Once the above is complete, you can set the platform by specifying `DOCKER_DEFAULT_PLATFORM` to, e.g. "linux/arm64".
+
+```shell
+DOCKER_DEFAULT_PLATFORM=linux/arm64 KOLLA_BASE_ARCH=aarch64 KOLLA_BUILD_PROFILE=base make build
 ```
