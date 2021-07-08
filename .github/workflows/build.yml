@@ -79,6 +79,7 @@ jobs:
           rm -f .env
           rm -f */.env
           rm -f */*/.env
+          rm -f */*/*.env
           make build
       - name: List Build Images
         run: docker image ls
