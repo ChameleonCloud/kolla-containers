@@ -15,9 +15,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [aarch64]
+        arch: [aarch64, x86_64]
         base_os: [debian, ubuntu]
         include:
+          - arch: x86_64
+            platform: linux/amd64
           - arch: aarch64
             platform: linux/arm64
           - base_os: debian
