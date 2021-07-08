@@ -62,6 +62,8 @@ jobs:
           echo "Status:    ${{ steps.buildx.outputs.status }}"
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+      - name: delete env files
+        run: find . -type f -name "*.env" -delete
       - name: Run Kolla Build
         env:
           KOLLA_USE_CACHE: no
@@ -75,11 +77,6 @@ jobs:
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
           DOCKER_TAG: ${{ matrix.docker_tag }}
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
-        run: |
-          rm -f .env
-          rm -f */.env
-          rm -f */*/.env
-          rm -f */*/*.env
-          make build
+        run: make build
       - name: List Build Images
         run: docker image ls
