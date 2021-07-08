@@ -71,7 +71,7 @@ jobs:
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
-          DOCKER_TAG: train-${{ matrix.arch }}
+          DOCKER_TAG: train
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
         run: |
           rm -f .env
