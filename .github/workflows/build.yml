@@ -20,8 +20,10 @@ jobs:
         base_os: [debian, ubuntu]
         include:
           - arch: x86_64
+            docker_tag: ${{ env.OPENSTACK_BASE_RELEASE }}
             platform: linux/amd64
           - arch: aarch64
+            docker_tag: ${{ env.OPENSTACK_BASE_RELEASE }}-aarch64
             platform: linux/arm64
           - base_os: debian
             os_tag: 10
@@ -71,7 +73,7 @@ jobs:
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
-          DOCKER_TAG: train-${{ matrix.arch }}
+          DOCKER_TAG: ${{ matrix.docker_tag }}
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
         run: |
           rm -f .env
