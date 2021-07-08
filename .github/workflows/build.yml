@@ -8,6 +8,7 @@ env:
   KOLLA_NAMESPACE: kolla
   KOLLA_BRANCH: chameleoncloud/train
   OPENSTACK_BASE_RELEASE: train
+  SHOULD_PUSH: ${{ github.ref == 'refs/heads/master' }}
 jobs:
   buildx:
     environment: Chameleon CI
@@ -47,6 +48,7 @@ jobs:
           install: true
       - name: Login to Registry
         uses: docker/login-action@v1
+        if: ${{ env.SHOULD_PUSH }}
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ secrets.CC_REGISTRY_USERNAME }}
@@ -61,7 +63,7 @@ jobs:
       - name: Run Kolla Build
         env:
           KOLLA_USE_CACHE: no
-          KOLLA_PUSH: yes
+          KOLLA_PUSH: ${{ env.SHOULD_PUSH }}
           KOLLA_INSTALL_TYPE: source
           KOLLA_BUILD_PROFILE: zun
           KOLLA_BUILD_SUBPROFILE: compute
