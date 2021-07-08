@@ -1,5 +1,8 @@
 KOLLA_FLAGS ?=
 
+ifeq ($(KOLLA_PUSH), true)
+  KOLLA_FLAGS := $(KOLLA_FLAGS) --push
+endif
 ifeq ($(KOLLA_PUSH), yes)
   KOLLA_FLAGS := $(KOLLA_FLAGS) --push
 endif
