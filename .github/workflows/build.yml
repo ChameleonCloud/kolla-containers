@@ -20,10 +20,10 @@ jobs:
         base_os: [debian, ubuntu]
         include:
           - arch: x86_64
-            docker_tag: ${{ env.OPENSTACK_BASE_RELEASE }}
+            docker_tag: train
             platform: linux/amd64
           - arch: aarch64
-            docker_tag: ${{ env.OPENSTACK_BASE_RELEASE }}-aarch64
+            docker_tag: train-aarch64
             platform: linux/arm64
           - base_os: debian
             os_tag: 10
