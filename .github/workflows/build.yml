@@ -8,6 +8,7 @@ env:
   KOLLA_NAMESPACE: kolla
   KOLLA_BRANCH: chameleoncloud/train
   OPENSTACK_BASE_RELEASE: train
+  SHOULD_PUSH: ${{ github.ref == 'refs/heads/master' }}
 jobs:
   buildx:
     environment: Chameleon CI
@@ -15,15 +16,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [aarch64]
+        arch: [aarch64, x86_64]
         base_os: [debian, ubuntu]
         include:
+          - arch: x86_64
+            docker_tag: train
+            platform: linux/amd64
           - arch: aarch64
+            docker_tag: train-aarch64
             platform: linux/arm64
           - base_os: debian
             os_tag: 10
           - base_os: ubuntu
-            os-tag: 18.04
+            os_tag: 18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -45,6 +50,7 @@ jobs:
           install: true
       - name: Login to Registry
         uses: docker/login-action@v1
+        if: ${{ env.SHOULD_PUSH }}
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ secrets.CC_REGISTRY_USERNAME }}
@@ -56,10 +62,12 @@ jobs:
           echo "Status:    ${{ steps.buildx.outputs.status }}"
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+      - name: delete env files
+        run: find . -type f -name "*.env" -delete
       - name: Run Kolla Build
         env:
           KOLLA_USE_CACHE: no
-          KOLLA_PUSH: yes
+          KOLLA_PUSH: ${{ env.SHOULD_PUSH }}
           KOLLA_INSTALL_TYPE: source
           KOLLA_BUILD_PROFILE: zun
           KOLLA_BUILD_SUBPROFILE: compute
@@ -67,12 +75,8 @@ jobs:
           KOLLA_BASE: ${{ matrix.base_os }}
           KOLLA_BASE_TAG: ${{ matrix.os_tag }}
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
-          DOCKER_TAG: train-${{ matrix.arch }}
+          DOCKER_TAG: ${{ matrix.docker_tag }}
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
-        run: |
-          rm -f .env
-          rm -f */.env
-          rm -f */*/.env
-          make build
+        run: make build
       - name: List Build Images
         run: docker image ls
