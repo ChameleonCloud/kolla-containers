@@ -77,6 +77,6 @@ jobs:
           KOLLA_BASE_ARCH: ${{ matrix.arch }}
           DOCKER_TAG: ${{ matrix.docker_tag }}
           DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
-        run: make build
+        run: ./run.sh python build.py --push --use-cache
       - name: List Build Images
         run: docker image ls

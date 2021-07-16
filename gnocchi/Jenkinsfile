@@ -33,7 +33,7 @@ pipeline {
 
       steps {
         withPythonEnv('python3') {
-          sh 'make build'
+          sh './run.sh python build.py --push --use-cache'
         }
       }
     }

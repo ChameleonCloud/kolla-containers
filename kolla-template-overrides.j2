@@ -1,8 +1,59 @@
 {% extends parent_template %}
 
+#########
+# Blazar
+#########
+
+# See "blazar-manager-additions-extra" section in kolla-build.conf
+{% block blazar_manager_footer %}
+ADD additions-archive /
+RUN cp -R /additions/extra/* /etc/blazar/ \
+  && chown -R blazar: /etc/blazar \
+  && ln -s /etc/blazar/blazar-manager/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
+{% endblock %}
+
 # TODO [jca 2018-01-24]:
 # - remove blazarclient when we add blazarclient to the base packages
 #   on kolla upstream. There is no reason not to have it there.
 {% set openstack_base_pip_packages_append = [
   'python-blazarclient'
 ] %}
+
+#########
+# Horizon
+#########
+
+# Add chameleoncloud theme via additions
+# See "horizon-additions-theme-chameleoncloud" section in kolla-build.conf
+{% block horizon_footer %}
+ADD additions-archive /
+RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
+  && cp -R /additions/theme-chameleoncloud/*/* /etc/openstack-dashboard/themes/chameleoncloud/ \
+  && chown -R horizon: /etc/openstack-dashboard/themes
+
+RUN pip --no-cache-dir install --upgrade \
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/stable/train#egg=python-blazarclient
+{% endblock %}
+
+##########
+# Neutron
+##########
+
+# See "neutron-server-additions-extra" section in kolla-build.conf
+{% block neutron_server_footer %}
+ADD additions-archive /
+RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
+  && (cd /var/lib/kolla/venv/lib/python2.7/site-packages/netmiko \
+      && git apply -p2 /etc/neutron/patches/netmiko/*.patch)
+{% endblock %}
+
+##########
+# Nova
+##########
+
+# Install patched version of python-ironicclient
+# NOTE(jason): Is this still necessary? Look at
+{% block nova_compute_ironic_footer %}
+RUN pip --no-cache-dir install --upgrade \
+  git+https://github.com/ChameleonCloud/python-ironicclient.git@2.5.2#egg=python-ironicclient
+{% endblock %}

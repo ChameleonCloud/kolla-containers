@@ -76,10 +76,10 @@ The supported services can be build using a `make` task and specifying a build p
 
 ```
 # Build container for Horizon
-KOLLA_BUILD_PROFILE=horizon make build
+KOLLA_BUILD_PROFILE=horizon ./run.sh python build.py --push --use-cache
 
 # Build containers for Nova
-KOLLA_BUILD_PROFILE=nova make build
+KOLLA_BUILD_PROFILE=nova ./run.sh python build.py --push --use-cache
 ```
 
 ### Building with local sources
@@ -90,7 +90,7 @@ with these overrides in place:
 
 ```
 # Build container for Horizon, using local sources
-KOLLA_BUILD_PROFILE=horizon make build-with-locals
+KOLLA_BUILD_PROFILE=horizon ./run.sh python build.py --push --use-cache
 ```
 
 ### Bypassing cache
@@ -99,7 +99,7 @@ If you wish to force a rebuild of all parent images, you can do so by passing in
 
 ```
 # Force a rebuild of all parent images
-KOLLA_BUILD_PROFILE=horizon KOLLA_USE_CACHE=no make build
+KOLLA_BUILD_PROFILE=horizon KOLLA_USE_CACHE=no ./run.sh python build.py --push --use-cache
 ```
 
 ### Automatically pushing images to a Docker Registry
@@ -108,7 +108,7 @@ The `KOLLA_PUSH` environment variable can be used to instruct Kolla to push the 
 
 ```
 # When done building, push Docker images to registry
-KOLLA_BUILD_PROFILE=horizon KOLLA_PUSH=yes make build
+KOLLA_BUILD_PROFILE=horizon KOLLA_PUSH=yes ./run.sh python build.py --push --use-cache
 ```
 
 ### Cross-compiling
@@ -123,5 +123,5 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 Once the above is complete, you can set the platform by specifying `DOCKER_DEFAULT_PLATFORM` to, e.g. "linux/arm64".
 
 ```shell
-DOCKER_DEFAULT_PLATFORM=linux/arm64 KOLLA_BASE_ARCH=aarch64 KOLLA_BUILD_PROFILE=base make build
+DOCKER_DEFAULT_PLATFORM=linux/arm64 KOLLA_BASE_ARCH=aarch64 KOLLA_BUILD_PROFILE=base ./run.sh python build.py --push --use-cache
 ```
