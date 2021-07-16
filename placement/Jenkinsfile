@@ -31,9 +31,9 @@ pipeline {
       }
 
       steps {
-        sh 'make clean'
+        sh 'rm -rf build'
         withPythonEnv('python3') {
-          sh 'make build'
+          sh './run.sh python build.py --push --use-cache'
         }
       }
     }

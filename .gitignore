@@ -2,9 +2,15 @@
 /.stamps/
 # Output/staging directory
 /build/
+/docker/
 # Local sources (tarballs) for inclusion
 /sources/
 # Local Kolla checkouts
 /kolla/
 # Virtualenv for tox bootstrapping
 /venv/
+# Templated config
+kolla-build.conf
+# Python build files
+__pycache__/
+*.pyc
