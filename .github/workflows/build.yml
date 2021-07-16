@@ -4,11 +4,8 @@ on:
   push:
 
 env:
-  DOCKER_REGISTRY: docker.chameleoncloud.org
-  KOLLA_NAMESPACE: kolla
-  KOLLA_BRANCH: chameleoncloud/train
-  OPENSTACK_BASE_RELEASE: train
   SHOULD_PUSH: ${{ github.ref == 'refs/heads/master' }}
+
 jobs:
   buildx:
     environment: Chameleon CI
@@ -16,19 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [aarch64, x86_64]
-        base_os: [debian, ubuntu]
-        include:
-          - arch: x86_64
-            docker_tag: train
-            platform: linux/amd64
-          - arch: aarch64
-            docker_tag: train-aarch64
-            platform: linux/arm64
-          - base_os: debian
-            os_tag: 10
-          - base_os: ubuntu
-            os_tag: 18.04
+        config_set: [edge_aarch64_debian, edge_aarch64_ubuntu, edge_x86_centos]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -62,21 +47,9 @@ jobs:
           echo "Status:    ${{ steps.buildx.outputs.status }}"
           echo "Flags:     ${{ steps.buildx.outputs.flags }}"
           echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
-      - name: delete env files
-        run: find . -type f -name "*.env" -delete
       - name: Run Kolla Build
-        env:
-          KOLLA_USE_CACHE: no
-          KOLLA_PUSH: ${{ env.SHOULD_PUSH }}
-          KOLLA_INSTALL_TYPE: source
-          KOLLA_BUILD_PROFILE: zun
-          KOLLA_BUILD_SUBPROFILE: compute
-          KOLLA_FLAGS: "--build-args '--platform: ${{ matrix.platform }}'"
-          KOLLA_BASE: ${{ matrix.base_os }}
-          KOLLA_BASE_TAG: ${{ matrix.os_tag }}
-          KOLLA_BASE_ARCH: ${{ matrix.arch }}
-          DOCKER_TAG: ${{ matrix.docker_tag }}
-          DOCKER_DEFAULT_PLATFORM: ${{ matrix.platform }}
-        run: ./run.sh python build.py --push --use-cache
+        run: |
+          ./run.sh python build.py --config-set ${{ matrix.config_set }} \
+            ${{ fromJSON('["--no-push", "--push"]')[env.SHOULD_PUSH] }}
       - name: List Build Images
         run: docker image ls
