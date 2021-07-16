@@ -9,12 +9,15 @@ defaults:
   # to use, as well as the base requirements that
   # build the openstack-base images.
   # Defaults to the value of $OPENSTACK_RELEASE
+  # for legacy reasons.
   openstack_release: train
   # The Docker tag to add to the built image(s).
+  # Defaults to $DOCKER_TAG for legacy reasons.
   tag: train
   # See [profiles] in kolla-build.conf -- this determines
   # which images are built.
   # Defaults to the value of $KOLLA_BUILD_PROFILE
+  # for legacy reasons.
   profile:
   # Kolla image defaults, shouldn't need to change
   # these any time soon.

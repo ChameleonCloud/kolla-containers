@@ -15,6 +15,7 @@
 import os
 import pathlib
 import shutil
+import tarfile
 import sys
 
 import click
@@ -35,12 +36,15 @@ def cli(config_file=None, config_set=None, push=None, use_cache=None):
 
     build_dir = pathlib.Path("./build")
     build_dir.mkdir(exist_ok=True)
+    source_dir = pathlib.Path("./sources")
+    source_dir.mkdir(exist_ok=True)
 
     kolla_config = {
         # We will chdir into the build directory before invoking Kolla
         "work_dir": ".",
         "config_file": "kolla-build.conf",
         "template_override": "kolla-template-overrides.j2",
+        "locals_base": "../sources",
     }
 
     docker_tag = os.getenv("DOCKER_TAG")
@@ -76,31 +80,12 @@ def cli(config_file=None, config_set=None, push=None, use_cache=None):
         kolla_argv.append("--skip-parents")
         kolla_argv.append("--cache")
 
-    """
-    build_dir="$DIR/build"
-    source_dir="$DIR/sources"
-    profile_dir="$DIR/$KOLLA_BUILD_PROFILE"
-    sub_profile="${KOLLA_BUILD_SUBPROFILE:-$KOLLA_BUILD_PROFILE}"
+    if "profile" in kolla_config:
+        additions_dir = pathlib.Path(kolla_config["profile"], "additions")
+        if additions_dir.exists():
+            with tarfile.open(source_dir.joinpath("additions.tar"), "w") as tar:
+                tar.add(additions_dir, arcname=os.path.sep)
 
-    # Create build directory with configuration specific to service
-    mkdir -p "$build_dir"
-    declare -a conf_files=(
-        <(sed "s/OPENSTACK_BASE_RELEASE/$OPENSTACK_BASE_RELEASE/" "$DIR/kolla-build.conf.m4")
-        "$profile_dir/kolla-build.conf"
-    )
-    if [[ "$KOLLA_LOCAL_SOURCES" == "yes" && -f "$profile_dir/kolla-build.local-sources.conf" ]]; then
-        conf_files+=("$profile_dir/kolla-build.local-sources.conf")
-    fi
-    cat "${conf_files[@]}" 2>/dev/null >"$build_dir/kolla-build.conf"
-    cat "$DIR/kolla-template-overrides.j2" "$profile_dir/kolla-template-overrides.j2" \
-        2>/dev/null >"$build_dir/kolla-template-overrides.j2"
-    if [[ -d "$profile_dir/additions" ]]; then
-    mkdir -p "$source_dir"
-        tar -cf "$source_dir/additions.tar" -C "$profile_dir/additions" .
-    fi
-    """
-
-    # Copy files
     shutil.copy(
         "./kolla-template-overrides.j2",
         build_dir.joinpath("kolla-template-overrides.j2")
