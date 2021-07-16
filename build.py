@@ -37,7 +37,8 @@ def cli(config_file=None, config_set=None, push=None, use_cache=None):
     build_dir.mkdir(exist_ok=True)
 
     kolla_config = {
-        "work_dir": str(build_dir),
+        # We will chdir into the build directory before invoking Kolla
+        "work_dir": ".",
         "config_file": "kolla-build.conf",
         "template_override": "kolla-template-overrides.j2",
     }
@@ -112,6 +113,8 @@ def cli(config_file=None, config_set=None, push=None, use_cache=None):
     kolla_build_conf_tmpl = env.get_template("kolla-build.conf.j2")
     with open(pathlib.Path(build_dir, "kolla-build.conf"), "w") as f:
         f.write(kolla_build_conf_tmpl.render(**kolla_config))
+
+    os.chdir(build_dir.absolute())
 
     print("kolla-build \\")
     print("  " + " \\\n  ".join(kolla_argv))
