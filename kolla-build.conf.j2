@@ -27,7 +27,7 @@ location = $tarballs_base/requirements/requirements-stable-{{ openstack_release 
 
 [blazar-base]
 type = git
-location = git@github.com:ChameleonCloud/blazar.git
+location = https://github.com/ChameleonCloud/blazar.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [blazar-manager-additions-extra]
@@ -40,12 +40,12 @@ location = $tarballs_base/cinder/cinder-stable-{{ openstack_release }}.tar.gz
 
 [cyborg-base]
 type = git
-location = git@github.com:ChameleonCloud/cyborg.git
+location = https://github.com/ChameleonCloud/cyborg.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [doni-base]
 type = git
-location = git@github.com:ChameleonCloud/doni.git
+location = https://github.com/ChameleonCloud/doni.git
 reference = main
 
 [glance-base]
@@ -61,27 +61,27 @@ location = https://github.com/gnocchixyz/gnocchi.git
 
 [heat-base]
 type = git
-location = git@github.com:ChameleonCloud/heat.git
+location = https://github.com/ChameleonCloud/heat.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [horizon]
 type = git
-location = git@github.com:ChameleonCloud/horizon.git
+location = https://github.com/ChameleonCloud/horizon.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [horizon-additions-theme-chameleoncloud]
 type = git
-location = git@github.com:ChameleonCloud/horizon-theme.git
+location = https://github.com/ChameleonCloud/horizon-theme.git
 reference = master
 
 [horizon-plugin-blazar-dashboard]
 type = git
-location = git@github.com:ChameleonCloud/blazar-dashboard.git
+location = https://github.com/ChameleonCloud/blazar-dashboard.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [horizon-plugin-heat-dashboard]
 type = git
-location = git@github.com:ChameleonCloud/heat-dashboard.git
+location = https://github.com/ChameleonCloud/heat-dashboard.git
 reference = chameleoncloud/{{ openstack_release }}
 
 # TODO: remove when change I0db7a95c4a99fe4157b3623a14135eb7b5dd69d9
@@ -93,12 +93,12 @@ reference = stable/{{ openstack_release }}
 
 [ironic-base]
 type = git
-location = git@github.com:ChameleonCloud/ironic.git
+location = https://github.com/ChameleonCloud/ironic.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [keystone-base]
 type = git
-location = git@github.com:ChameleonCloud/keystone.git
+location = https://github.com/ChameleonCloud/keystone.git
 reference = chameleoncloud/{{ openstack_release }}
 
 # NOTE(jason): pin kuryr to ussuri release; remove this when we are past Train on the base
@@ -111,7 +111,7 @@ location = $tarballs_base/neutron/neutron-stable-{{ openstack_release }}.tar.gz
 
 [neutron-base-plugin-networking-generic-switch]
 type = git
-location = git@github.com:ChameleonCloud/networking-generic-switch.git
+location = https://github.com/ChameleonCloud/networking-generic-switch.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [neutron-server-additions-extra]
@@ -120,12 +120,12 @@ location = $locals_base/additions.tar
 
 [nova-base]
 type = git
-location = git@github.com:ChameleonCloud/nova.git
+location = https://github.com/ChameleonCloud/nova.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [nova-base-plugin-blazar]
 type = git
-location = git@github.com:ChameleonCloud/blazar-nova.git
+location = https://github.com/ChameleonCloud/blazar-nova.git
 reference = chameleoncloud/{{ openstack_release }}
 
 [placement-base]
