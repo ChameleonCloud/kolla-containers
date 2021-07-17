@@ -3,7 +3,7 @@ defaults:
   # Which registry to push built images to
   # (requires having already authenticated
   # as a user with push access)
-  registry: docker.chameleoncloud.org
+  # registry: docker.chameleoncloud.org
   # The base release of OpenStack to build from.
   # This determines which checkout of Kolla
   # to use, as well as the base requirements that
@@ -25,7 +25,7 @@ defaults:
   base_tag: 8
   base_arch: x86_64
   type: source
-  namespace: kolla
+  # namespace: kolla
 
 config_sets:
   base:

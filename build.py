@@ -81,6 +81,14 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         "locals_base": "../sources",
     }
 
+    docker_registry = os.getenv("DOCKER_REGISTRY")
+    if docker_registry:
+        kolla_config["registry"] = docker_registry
+
+    kolla_namespace = os.getenv("KOLLA_NAMESPACE")
+    if kolla_namespace:
+        kolla_config["namespace"] = kolla_namespace
+
     docker_tag = os.getenv("DOCKER_TAG")
     if docker_tag:
         kolla_config["tag"] = docker_tag
