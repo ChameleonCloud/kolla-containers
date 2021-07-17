@@ -20,7 +20,7 @@ neutron = ironic-neutron-agent,neutron-base,neutron-dhcp-agent,neutron-l3-agent,
 nova = ^nova-
 placement = ^placement
 # For building just the edge services
-edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch),^openvswitch,^zun-(base|compute)
+edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch),^openvswitch,^zun-(base|compute),fluentd
 
 [openstack-base]
 location = $tarballs_base/requirements/requirements-stable-{{ openstack_release }}.tar.gz
