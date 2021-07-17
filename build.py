@@ -15,13 +15,13 @@
 import os
 import pathlib
 import shutil
-import tarfile
 import sys
+import tarfile
 
 import click
+import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from kolla.image import build as kolla_build
-import yaml
 
 
 @click.command("build")
@@ -146,10 +146,18 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
 
     # Kolla reads its input straight from sys.argv
     sys.argv = [""] + kolla_argv
-    bad, good, unmatched, skipped = kolla_build.run_build()
-    if bad:
-        sys.exit(1)
 
+    build_status = kolla_build.run_build()
+    if build_status is not None:
+        (
+            bad,
+            good,
+            unmatched,
+            skipped,
+            unbuildable
+        ) = build_status
+        if bad:
+            sys.exit(1)
 
 if __name__ == "__main__":
     cli()
