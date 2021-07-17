@@ -1,20 +1,41 @@
+---
 name: ci
 
 on:
   push:
-
+    branches:
+      - "master"
+      - "staging"
 env:
-  SHOULD_PUSH: ${{ github.ref == 'refs/heads/master' }}
-
+  DOCKER_REGISTRY: ghcr.io
+  BASE_NAMESPACE: chameleoncloud
 jobs:
   buildx:
     environment: Chameleon CI
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
-        config_set: [edge_aarch64_debian, edge_aarch64_ubuntu, edge_x86_centos]
+        config_set:
+          # - edge_aarch64_debian
+          # - edge_aarch64_ubuntu
+          # - edge_x86_centos
+          - edge_x86_ubuntu
+
     steps:
+      - name: Set env to staging
+        if: endsWith(github.ref, '/staging')
+        run: |
+          echo "KOLLA_NAMESPACE=${BASE_NAMESPACE}/kolla-dev" >> $GITHUB_ENV
+          echo "SHOULD_PUSH=true" >> $GITHUB_ENV
+      - name: Set env to production
+        if: endsWith(github.ref, '/master')
+        run: |
+          echo "KOLLA_NAMESPACE=${BASE_NAMESPACE}/kolla" >> $GITHUB_ENV
+          echo "SHOULD_PUSH=true" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Python
@@ -38,8 +59,8 @@ jobs:
         if: ${{ env.SHOULD_PUSH }}
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ secrets.CC_REGISTRY_USERNAME }}
-          password: ${{ secrets.CC_REGISTRY_PASSWORD }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Inspect builder
         run: |
           echo "Name:      ${{ steps.buildx.outputs.name }}"
