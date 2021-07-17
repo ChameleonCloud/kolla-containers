@@ -27,15 +27,18 @@ import yaml
 @click.command("build")
 @click.option(
     "--config-file",
+    metavar="FILE",
     default="build_config.yaml",
     help=("The YAML configuration file that holds the configuration sets."),
 )
 @click.option(
     "--config-set",
+    metavar="NAME",
     help=("Which configuration set defined in the configuration file to use."),
 )
 @click.option(
     "--build-dir",
+    metavar="DIR",
     default="build",
     help=(
         "The build directory to use as the build context for this build. "
