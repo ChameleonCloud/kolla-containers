@@ -25,16 +25,47 @@ import yaml
 
 
 @click.command("build")
-@click.option("--config-file", default="build_config.yaml")
-@click.option("--config-set")
-@click.option("--push/--no-push", default=False)
-@click.option("--use-cache/--no-use-cache", default=True)
-def cli(config_file=None, config_set=None, push=None, use_cache=None):
+@click.option(
+    "--config-file",
+    default="build_config.yaml",
+    help=("The YAML configuration file that holds the configuration sets."),
+)
+@click.option(
+    "--config-set",
+    help=("Which configuration set defined in the configuration file to use."),
+)
+@click.option(
+    "--build-dir",
+    default="build",
+    help=(
+        "The build directory to use as the build context for this build. "
+        "If you are runnning multiple builds in parallel, use different "
+        "build directories for each to avoid cross-contamination of build "
+        "sources and configuration."
+    ),
+)
+@click.option(
+    "--push/--no-push",
+    default=False,
+    help=("Whether to push the images to a Docker registry on successful build."),
+)
+@click.option(
+    "--use-cache/--no-use-cache",
+    default=True,
+    help=(
+        "Whether to attempt to use cached images in the build chain. There are two "
+        "layers of cache: the first will not even attempt to re-build an image's "
+        "parent if the parent image/tag is detected on the host system, the second "
+        "will instruct Docker to use cached Dockerfile build steps w/in a single "
+        "build invocation."
+    ),
+)
+def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=None):
     build_config = {}
     with open(config_file, "r") as f:
         build_config = yaml.safe_load(f)
 
-    build_dir = pathlib.Path("./build")
+    build_dir = pathlib.Path(build_dir)
     build_dir.mkdir(exist_ok=True)
     source_dir = pathlib.Path("./sources")
     source_dir.mkdir(exist_ok=True)
@@ -88,13 +119,10 @@ def cli(config_file=None, config_set=None, push=None, use_cache=None):
 
     shutil.copy(
         "./kolla-template-overrides.j2",
-        build_dir.joinpath("kolla-template-overrides.j2")
+        build_dir.joinpath("kolla-template-overrides.j2"),
     )
 
-    env = Environment(
-        loader=FileSystemLoader("."),
-        autoescape=select_autoescape()
-    )
+    env = Environment(loader=FileSystemLoader("."), autoescape=select_autoescape())
     kolla_build_conf_tmpl = env.get_template("kolla-build.conf.j2")
     with open(pathlib.Path(build_dir, "kolla-build.conf"), "w") as f:
         f.write(kolla_build_conf_tmpl.render(**kolla_config))
