@@ -101,3 +101,11 @@ config_sets:
     base_tag: "8"
     base_arch: x86_64
     profile: edge
+
+  # We have some edge deployments that support x86; this builds just the
+  # edge services for that architecture.
+  edge_x86_ubuntu:
+    base: ubuntu
+    base_tag: "18.04"
+    base_arch: x86_64
+    profile: edge
