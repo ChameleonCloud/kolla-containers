@@ -20,7 +20,7 @@ neutron = ironic-neutron-agent,neutron-base,neutron-dhcp-agent,neutron-l3-agent,
 nova = ^nova-
 placement = ^placement
 # For building just the edge services
-edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch|server),^openvswitch,^zun-(base|compute),fluentd,kolla-toolbox,cron,chrony,tgtd,iscsid
+edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch|server$),^openvswitch,^zun-(base|compute),fluentd,kolla-toolbox,cron,chrony,tgtd,iscsid
 
 [openstack-base]
 location = $tarballs_base/requirements/requirements-stable-{{ openstack_release }}.tar.gz
@@ -114,9 +114,11 @@ type = git
 location = https://github.com/ChameleonCloud/networking-generic-switch.git
 reference = chameleoncloud/{{ openstack_release }}
 
-[neutron-server-additions-extra]
-type = local
-location = $locals_base/additions.tar
+# Note(Mike): Comment out the additions, it currently prevents building for python3
+# these could be handled by forking netmiko
+#[neutron-server-additions-extra]
+#type = local
+#location = $locals_base/additions.tar
 
 [nova-base]
 type = git
