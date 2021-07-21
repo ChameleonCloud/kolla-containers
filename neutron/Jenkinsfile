@@ -28,19 +28,12 @@ pipeline {
     }
 
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'neutron'
-        KOLLA_PUSH = 'yes'
-        // Force to build entire chain
-        KOLLA_USE_CACHE = 'no'
-      }
-
       steps {
         copyArtifacts(projectName: "${params.NETWORKING_GENERIC_SWITCH_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         sh 'rm -rf build'
         withPythonEnv('python3') {
-          sh './run.sh python build.py --push --use-cache'
+          sh './run.sh python build.py --config-set neutron --push --use-cache'
         }
       }
     }

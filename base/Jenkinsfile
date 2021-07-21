@@ -20,17 +20,10 @@ pipeline {
 
   stages {
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'base'
-        KOLLA_PUSH = 'yes'
-        // Force re-building of all images
-        KOLLA_USE_CACHE = 'no'
-      }
-
       steps {
         sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
         withPythonEnv('python3') {
-          sh './run.sh python build.py --push --use-cache'
+          sh './run.sh python build.py --config-set base --push --use-cache'
         }
       }
     }

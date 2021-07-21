@@ -27,17 +27,12 @@ pipeline {
     }
 
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'heat'
-        KOLLA_PUSH = 'yes'
-      }
-
       steps {
         copyArtifacts(projectName: "${params.HEAT_JOB_NAME}",
                       target: "${env.WORKSPACE}/sources")
         sh "rm -rf build"
         withPythonEnv('python3') {
-          sh './run.sh python build.py --push --use-cache'
+          sh './run.sh python build.py --config-set heat --push --use-cache'
         }
       }
     }

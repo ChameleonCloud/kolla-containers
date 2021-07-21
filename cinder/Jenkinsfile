@@ -26,15 +26,10 @@ pipeline {
     }
 
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'cinder'
-        KOLLA_PUSH = 'yes'
-      }
-
       steps {
         sh "rm -rf build"
         withPythonEnv('python3') {
-          sh './run.sh python build.py --push --use-cache'
+          sh './run.sh python build.py --config-set cinder --push --use-cache'
         }
       }
     }

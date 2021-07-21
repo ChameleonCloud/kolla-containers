@@ -26,14 +26,9 @@ pipeline {
     }
 
     stage('build-and-publish') {
-      environment {
-        KOLLA_BUILD_PROFILE = 'gnocchi'
-        KOLLA_PUSH = 'yes'
-      }
-
       steps {
         withPythonEnv('python3') {
-          sh './run.sh python build.py --push --use-cache'
+          sh './run.sh python build.py --config-set gnocchi --push --use-cache'
         }
       }
     }
