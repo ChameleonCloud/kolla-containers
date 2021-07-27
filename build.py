@@ -113,6 +113,8 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         # images instead of automagically doing this.
         kolla_argv.append("--skip-parents")
         kolla_argv.append("--cache")
+    else:
+        kolla_argv.append("--nocache")
 
     if "profile" in kolla_config:
         additions_dir = pathlib.Path(kolla_config["profile"], "additions")
