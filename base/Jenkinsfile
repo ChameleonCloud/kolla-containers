@@ -23,7 +23,7 @@ pipeline {
       steps {
         sh 'docker login --username=$DOCKER_REGISTRY_CREDS_USR --password=$DOCKER_REGISTRY_CREDS_PSW $DOCKER_REGISTRY'
         withPythonEnv('python3') {
-          sh './run.sh python build.py --config-set base --push'
+          sh './run.sh python build.py --config-set base --push --no-use-cache'
         }
       }
     }
