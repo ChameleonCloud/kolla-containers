@@ -33,7 +33,7 @@ pipeline {
                       target: "${env.WORKSPACE}/sources")
         sh 'rm -rf build'
         withPythonEnv('python3') {
-          sh './run.sh python build.py --config-set neutron --push --use-cache'
+          sh './run.sh python build.py --config-set neutron_centos7 --push --use-cache'
         }
       }
     }
