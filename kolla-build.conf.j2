@@ -16,7 +16,7 @@ horizon = ^horizon$
 horizon_kvm = ^base,^openstack-base,^horizon$
 ironic = ^ironic(?!-neutron),dnsmasq,iscsi
 keystone = ^keystone
-neutron = ironic-neutron-agent,neutron-base,neutron-dhcp-agent,neutron-l3-agent,neutron-metadata-agent$,neutron-openvswitch-agent,neutron-server$
+neutron = ironic-neutron-agent,neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server|wireguard-agent)$
 nova = ^nova-
 placement = ^placement
 # For building just the edge services
