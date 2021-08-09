@@ -43,7 +43,7 @@ RUN pip --no-cache-dir install --upgrade \
 {% block neutron_server_footer %}
 ADD additions-archive /
 RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
-  && (cd /var/lib/kolla/venv/lib/python2.7/site-packages/netmiko \
+  && (cd /var/lib/kolla/venv/lib/python{{ distro_python_version }}/site-packages/netmiko \
       && git apply -p2 /etc/neutron/patches/netmiko/*.patch)
 {% endblock %}
 
