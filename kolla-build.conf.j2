@@ -114,6 +114,11 @@ type = git
 location = https://github.com/ChameleonCloud/networking-generic-switch.git
 reference = chameleoncloud/{{ openstack_release }}
 
+[neutron-base-plugin-networking-wireguard]
+type = git
+location = https://github.com/ChameleonCloud/networking-wireguard.git
+reference = chameleoncloud/{{ openstack_release }}
+
 [neutron-server-additions-extra]
 type = local
 location = $locals_base/additions.tar
