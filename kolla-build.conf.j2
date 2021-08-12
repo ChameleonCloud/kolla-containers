@@ -19,6 +19,7 @@ keystone = ^keystone
 neutron = ironic-neutron-agent,neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server|wireguard-agent)$
 nova = ^nova-
 placement = ^placement
+zun = ^zun-
 # For building just the edge services
 edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch),^openvswitch,^zun-(base|compute)
 
