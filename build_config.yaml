@@ -77,6 +77,21 @@ config_sets:
     profile: base
     platform: linux/amd64
 
+  base_x86_centos7:
+    base: centos
+    base_tag: "7"
+    base_arch: x86_64
+    profile: base
+    platform: linux/amd64
+    tag: train-centos7
+
+  base_x86_centos8:
+    base: centos
+    base_tag: "8"
+    base_arch: x86_64
+    profile: base
+    platform: linux/amd64
+
   # ARM64 configuration for edge deployments. Many edge devices (e.g.,
   # the Raspberry Pi platform) are ARM-based and cannot run x86 containers.
   # Debian is used as the base in this case, as it has the most support in

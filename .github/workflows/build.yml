@@ -9,6 +9,7 @@ on:
 env:
   DOCKER_REGISTRY: ghcr.io
   BASE_NAMESPACE: chameleoncloud
+  KOLLA_BRANCH: "bugfix/apt-elastic-6"
 jobs:
   buildx:
     environment: Chameleon CI
@@ -21,9 +22,11 @@ jobs:
       matrix:
         config_set:
           - base_x86_ubuntu
-          - edge_aarch64_debian
-          - edge_aarch64_ubuntu
-          - edge_x86_centos
+          # - base_x86_centos7
+          # - base_x86_centos8
+          # - edge_aarch64_debian
+          # - edge_aarch64_ubuntu
+          # - edge_x86_centos
     steps:
       - name: Set env to staging
         if: endsWith(github.ref, '/staging')
