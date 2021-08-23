@@ -74,7 +74,7 @@ config_sets:
     base: ubuntu
     base_tag: "18.04"
     base_arch: x86_64
-    profile: base
+    profile: ciab
     platform: linux/amd64
 
   base_x86_centos7:
