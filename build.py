@@ -121,6 +121,8 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         # images instead of automagically doing this.
         kolla_argv.append("--skip-parents")
         kolla_argv.append("--cache")
+    else:
+        kolla_argv.append("--nocache")
 
     if "profile" in kolla_config:
         additions_dir = pathlib.Path(kolla_config["profile"], "additions")
@@ -146,18 +148,10 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
 
     # Kolla reads its input straight from sys.argv
     sys.argv = [""] + kolla_argv
+    bad, good, unmatched, skipped, unbuildable = kolla_build.run_build()
+    if bad:
+        sys.exit(1)
 
-    build_status = kolla_build.run_build()
-    if build_status is not None:
-        (
-            bad,
-            good,
-            unmatched,
-            skipped,
-            unbuildable
-        ) = build_status
-        if bad:
-            sys.exit(1)
 
 if __name__ == "__main__":
     cli()

@@ -114,11 +114,14 @@ type = git
 location = https://github.com/ChameleonCloud/networking-generic-switch.git
 reference = chameleoncloud/{{ openstack_release }}
 
-# Note(Mike): Comment out the additions, it currently prevents building for python3
-# these could be handled by forking netmiko
-#[neutron-server-additions-extra]
-#type = local
-#location = $locals_base/additions.tar
+[neutron-base-plugin-networking-wireguard]
+type = git
+location = https://github.com/ChameleonCloud/networking-wireguard.git
+reference = chameleoncloud/{{ openstack_release }}
+
+[neutron-server-additions-extra]
+type = local
+location = $locals_base/additions.tar
 
 [nova-base]
 type = git

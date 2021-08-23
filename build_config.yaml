@@ -70,17 +70,12 @@ config_sets:
     profile: neutron
     tag: train-centos7
 
-  # build neutron quickly for centos8 patches
-  neutron_centos8:
-    base: centos
-    base_tag: "8"
-    profile: neutron
-
-  # build neutron quickly for ubuntu support
-  neutron_ubuntu:
+  base_x86_ubuntu:
     base: ubuntu
     base_tag: "18.04"
-    profile: neutron
+    base_arch: x86_64
+    profile: base
+    platform: linux/amd64
 
   # ARM64 configuration for edge deployments. Many edge devices (e.g.,
   # the Raspberry Pi platform) are ARM-based and cannot run x86 containers.
