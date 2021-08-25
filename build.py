@@ -111,7 +111,10 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
 
     kolla_argv = []
     for arg, value in kolla_config.items():
-        if value is not None:
+        if arg == "profiles":
+            for profile in value:
+                kolla_argv.append(f"--profile={profile}")
+        elif value is not None:
             kolla_argv.append(f"--{arg.replace('_', '-')}={value}")
 
     if push:
@@ -124,11 +127,18 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
     else:
         kolla_argv.append("--nocache")
 
-    if "profile" in kolla_config:
-        additions_dir = pathlib.Path(kolla_config["profile"], "additions")
+    def add_tar_path(additions_dir: pathlib.Path):
         if additions_dir.exists():
             with tarfile.open(source_dir.joinpath("additions.tar"), "w") as tar:
                 tar.add(additions_dir, arcname=os.path.sep)
+
+    if "profiles" in kolla_config:
+        for profile in kolla_config["profiles"]:
+            additions_dir = pathlib.Path(profile, "additions")
+            add_tar_path(additions_dir)
+    elif "profile" in kolla_config:
+        additions_dir = pathlib.Path(kolla_config["profile"], "additions")
+        add_tar_path(additions_dir)
 
     shutil.copy(
         "./kolla-template-overrides.j2",
