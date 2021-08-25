@@ -22,8 +22,6 @@ placement = ^placement
 # For building just the edge services
 edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch|server$),^openvswitch,^zun-(base|compute),fluentd,kolla-toolbox,cron,chrony,tgtd,iscsid
 
-ciab=base,blazar,cinder,doni,glance,gnocchi,heat,horizon,ironic,keystone,neutron,nova,placement
-
 [openstack-base]
 location = $tarballs_base/requirements/requirements-stable-{{ openstack_release }}.tar.gz
 

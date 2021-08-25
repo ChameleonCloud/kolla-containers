@@ -75,7 +75,7 @@ config_sets:
     base_tag: "18.04"
     base_arch: x86_64
     platform: linux/amd64
-    profile: ciab
+    profile: gnocchi
 
   base_x86_centos7:
     base: centos
