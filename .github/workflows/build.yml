@@ -13,7 +13,8 @@ env:
 jobs:
   buildx:
     environment: Chameleon CI
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -22,8 +23,8 @@ jobs:
       matrix:
         config_set:
           - base_x86_ubuntu
-          # - base_x86_centos7
-          # - base_x86_centos8
+          - base_x86_centos7
+          - base_x86_centos8
           # - edge_aarch64_debian
           # - edge_aarch64_ubuntu
           # - edge_x86_centos
