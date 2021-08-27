@@ -9,7 +9,7 @@ on:
 env:
   DOCKER_REGISTRY: ghcr.io
   BASE_NAMESPACE: chameleoncloud
-  KOLLA_BRANCH: "bugfix/apt-elastic-6"
+  KOLLA_BRANCH: chameleoncloud/train
 jobs:
   buildx:
     environment: Chameleon CI
