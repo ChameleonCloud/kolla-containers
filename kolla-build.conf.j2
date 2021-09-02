@@ -110,7 +110,9 @@ type = url
 location = $tarballs_base/kuryr-libnetwork/kuryr-libnetwork-stable-ussuri.tar.gz
 
 [neutron-base]
-location = $tarballs_base/neutron/neutron-stable-{{ openstack_release }}.tar.gz
+type = git
+location = https://github.com/ChameleonCloud/neutron.git
+reference = chameleoncloud/{{ openstack_release }}
 
 [neutron-base-plugin-networking-generic-switch]
 type = git
