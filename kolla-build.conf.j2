@@ -115,7 +115,7 @@ type = git
 location = https://github.com/ChameleonCloud/networking-generic-switch.git
 reference = chameleoncloud/{{ openstack_release }}
 
-{% if enable_networking_wireguard | bool %}
+{% if enable_networking_wireguard %}
 [neutron-base-plugin-networking-wireguard]
 type = git
 location = https://github.com/ChameleonCloud/networking-wireguard.git
