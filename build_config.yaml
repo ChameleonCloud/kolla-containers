@@ -29,7 +29,8 @@ defaults:
   # EXTRA PARAMETERS
   # These are just used to template the *.j2 files for the kolla
   # build configuration
-  enable_networking_wireguard: True 
+  build_conf_extras:
+    enable_networking_wireguard: True 
 
 config_sets:
   base:
@@ -73,8 +74,9 @@ config_sets:
     base_tag: "7"
     profile: neutron
     tag: train-centos7
-    # networking-wireguard requires Python 3
-    enable_networking_wireguard: False
+    build_conf_extras:
+      # networking-wireguard requires Python 3
+      enable_networking_wireguard: False
 
   # ARM64 configuration for edge deployments. Many edge devices (e.g.,
   # the Raspberry Pi platform) are ARM-based and cannot run x86 containers.

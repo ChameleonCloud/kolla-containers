@@ -92,6 +92,9 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         kolla_config["profile"] = profile
 
     default_config_set = build_config.get("defaults", {})
+    # Extract build conf extras; they are not a "real" kolla config
+    # option and can't be passed to Kolla.
+    build_conf_extras = default_config_set.pop("build_conf_extras", {})
     if default_config_set:
         kolla_config.update(default_config_set)
 
@@ -100,6 +103,8 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         if not config_set:
             raise ValueError(f"No config set found for '{config_set}'")
         kolla_config.update(config_set)
+        cfgset_build_conf_extras = config_set.pop("build_conf_extras", {})
+        build_conf_extras.update(cfgset_build_conf_extras)
 
     kolla_argv = []
     for arg, value in kolla_config.items():
@@ -130,7 +135,9 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
     env = Environment(loader=FileSystemLoader("."), autoescape=select_autoescape())
     kolla_build_conf_tmpl = env.get_template("kolla-build.conf.j2")
     with open(pathlib.Path(build_dir, "kolla-build.conf"), "w") as f:
-        f.write(kolla_build_conf_tmpl.render(**kolla_config))
+        tmpl_vars = kolla_config.copy()
+        tmpl_vars.update(build_conf_extras)
+        f.write(kolla_build_conf_tmpl.render(**tmpl_vars))
 
     os.chdir(build_dir.absolute())
 
