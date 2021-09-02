@@ -102,8 +102,8 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         config_set = build_config.get("config_sets", {}).get(config_set)
         if not config_set:
             raise ValueError(f"No config set found for '{config_set}'")
-        kolla_config.update(config_set)
         cfgset_build_conf_extras = config_set.pop("build_conf_extras", {})
+        kolla_config.update(config_set)
         build_conf_extras.update(cfgset_build_conf_extras)
 
     kolla_argv = []
