@@ -72,7 +72,7 @@ config_sets:
   # assume iptables.
   neutron_centos7:
     base_tag: "7"
-    profile: neutron
+    profile: neutron_centos7
     tag: train-centos7
     build_conf_extras:
       # networking-wireguard requires Python 3
