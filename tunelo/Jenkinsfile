@@ -2,8 +2,6 @@ pipeline {
   agent any
 
   parameters {
-    string(name: 'TUNELO_JOB_NAME', defaultValue: 'tunelo/main',
-           description: 'Jenkins job name for tunelo')
     string(name: 'DOCKER_TAG', defaultValue: 'train',
            description: 'Tag to apply to built docker image (defaults to value defined in source repo)')
     booleanParam(name: 'KOLLA_USE_CACHE', defaultValue: true,
@@ -35,8 +33,6 @@ pipeline {
 
     stage('build-and-publish') {
       steps {
-        copyArtifacts(projectName: "${params.TUNELO_JOB_NAME}",
-                      target: "${env.WORKSPACE}/sources")
         sh 'rm -rf build'
         withPythonEnv('python3') {
           sh './run.sh python build.py --config-set tunelo --push --use-cache'
