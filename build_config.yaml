@@ -30,7 +30,7 @@ defaults:
   # These are just used to template the *.j2 files for the kolla
   # build configuration
   build_conf_extras:
-    enable_networking_wireguard: True 
+    enable_networking_wireguard: True
 
 config_sets:
   base:
@@ -63,6 +63,8 @@ config_sets:
     profile: nova
   placement:
     profile: placement
+  tunelo:
+    profile: tunelo
   zun:
     profile: zun
 
