@@ -21,7 +21,7 @@ pipeline {
     KOLLA_BUILD_PROFILE = 'tunelo'
     KOLLA_PUSH = 'yes'
     KOLLA_LOCAL_SOURCES = 'yes'
-    KOLLA_USE_CACHE = "${boolToString(params.KOLLA_USE_CACHE)}"
+    KOLLA_USE_CACHE = "${useCacheFlag(params.KOLLA_USE_CACHE)}"
   }
 
   stages {
@@ -35,7 +35,7 @@ pipeline {
       steps {
         sh 'rm -rf build'
         withPythonEnv('python3') {
-          sh './run.sh python build.py --config-set tunelo --push --use-cache'
+          sh './run.sh python build.py --config-set tunelo --push $KOLLA_USE_CACHE'
         }
       }
     }
@@ -68,6 +68,6 @@ pipeline {
   }
 }
 
-def boolToString(Boolean value) {
-  return value ? "yes" : "no"
+def useCacheFlag(Boolean value) {
+  return value ? "--use-cache" : "--no-use-cache"
 }
