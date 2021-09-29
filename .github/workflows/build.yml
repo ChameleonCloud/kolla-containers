@@ -5,6 +5,7 @@ on:
 
 env:
   SHOULD_PUSH: ${{ github.ref == 'refs/heads/master' }}
+  DOCKER_REGISTRY: docker.chameleoncloud.org
 
 jobs:
   buildx:
