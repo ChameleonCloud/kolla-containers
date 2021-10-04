@@ -111,3 +111,8 @@ config_sets:
     base_tag: "8"
     base_arch: x86_64
     profile: edge
+
+  neutron_x86_ubuntu:
+    base: ubuntu
+    base_tag: "18.04"
+    profile: neutron
