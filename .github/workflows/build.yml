@@ -19,6 +19,16 @@ jobs:
           - edge_aarch64_ubuntu
           - edge_x86_centos
     steps:
+      - name: Set env to staging
+        if: endsWith(github.ref, '/staging')
+        run: |
+          echo "KOLLA_NAMESPACE=kolla-dev" >> $GITHUB_ENV
+          echo "SHOULD_PUSH=1" >> $GITHUB_ENV
+      - name: Set env to production
+        if: endsWith(github.ref, '/master')
+        run: |
+          echo "KOLLA_NAMESPACE=kolla" >> $GITHUB_ENV
+          echo "SHOULD_PUSH=1" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Python
@@ -30,12 +40,6 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Set env to staging
-        if: endsWith(github.ref, '/staging')
-        run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
-      - name: Set env to production
-        if: endsWith(github.ref, '/master')
-        run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
