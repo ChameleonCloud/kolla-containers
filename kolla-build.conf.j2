@@ -26,6 +26,8 @@ zun = ^zun-
 # For building just the edge services
 edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch),^openvswitch,^zun-(base|compute)
 
+grafana = ^grafana
+
 [openstack-base]
 location = $tarballs_base/requirements/requirements-stable-{{ openstack_release }}.tar.gz
 

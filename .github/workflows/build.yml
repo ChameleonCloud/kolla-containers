@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         config_set:
-          - neutron_x86_ubuntu
+          - base_x86_ubuntu
           - edge_aarch64_debian
           - edge_aarch64_ubuntu
           - edge_x86_centos

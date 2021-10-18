@@ -112,7 +112,12 @@ config_sets:
     base_arch: x86_64
     profile: edge
 
-  neutron_x86_ubuntu:
+  base_x86_ubuntu:
     base: ubuntu
     base_tag: "18.04"
-    profile: neutron
+    base_arch: x86_64
+    platform: linux/amd64
+    profiles:
+      - base
+      - grafana
+      - neutron
