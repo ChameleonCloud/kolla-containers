@@ -81,16 +81,6 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         "locals_base": "../sources",
     }
 
-    docker_tag = os.getenv("DOCKER_TAG")
-    if docker_tag:
-        kolla_config["tag"] = docker_tag
-    openstack_release = os.getenv("OPENSTACK_BASE_RELEASE")
-    if openstack_release:
-        kolla_config["openstack_release"] = openstack_release
-    profile = os.getenv("KOLLA_BUILD_PROFILE")
-    if profile:
-        kolla_config["profile"] = profile
-
     default_config_set = build_config.get("defaults", {})
     # Extract build conf extras; they are not a "real" kolla config
     # option and can't be passed to Kolla.
@@ -105,6 +95,20 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
         cfgset_build_conf_extras = config_set.pop("build_conf_extras", {})
         kolla_config.update(config_set)
         build_conf_extras.update(cfgset_build_conf_extras)
+
+    kolla_namespace = os.getenv("KOLLA_NAMESPACE")
+    if kolla_namespace:
+        kolla_config["namespace"] = kolla_namespace
+
+    docker_tag = os.getenv("DOCKER_TAG")
+    if docker_tag:
+        kolla_config["tag"] = docker_tag
+    openstack_release = os.getenv("OPENSTACK_BASE_RELEASE")
+    if openstack_release:
+        kolla_config["openstack_release"] = openstack_release
+    profile = os.getenv("KOLLA_BUILD_PROFILE")
+    if profile:
+        kolla_config["profile"] = profile
 
     kolla_argv = []
     for arg, value in kolla_config.items():
