@@ -10,6 +10,7 @@ on:
       kolla_build_profile:
         description: "Kolla Profile to build"
         required: true
+        default: base
 
 env:
   DOCKER_REGISTRY: docker.chameleoncloud.org
