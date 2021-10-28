@@ -37,6 +37,11 @@ import yaml
     help=("Which configuration set defined in the configuration file to use."),
 )
 @click.option(
+    "--profile",
+    metavar="NAME",
+    help=("Which build profile to use (this affects which set(s) of containers are built."),
+)
+@click.option(
     "--build-dir",
     metavar="DIR",
     default="build",
@@ -63,7 +68,7 @@ import yaml
         "build invocation."
     ),
 )
-def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=None):
+def cli(config_file=None, config_set=None, profile=None, build_dir=None, push=None, use_cache=None):
     build_config = {}
     with open(config_file, "r") as f:
         build_config = yaml.safe_load(f)
@@ -106,7 +111,8 @@ def cli(config_file=None, config_set=None, build_dir=None, push=None, use_cache=
     openstack_release = os.getenv("OPENSTACK_BASE_RELEASE")
     if openstack_release:
         kolla_config["openstack_release"] = openstack_release
-    profile = os.getenv("KOLLA_BUILD_PROFILE")
+    
+    profile = profile or os.getenv("KOLLA_BUILD_PROFILE")
     if profile:
         kolla_config["profile"] = profile
 

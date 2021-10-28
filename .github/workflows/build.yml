@@ -8,12 +8,11 @@ on:
   workflow_dispatch:
     inputs:
       kolla_build_profile:
-        description: "Kolla Profle to build"
+        description: "Kolla Profile to build"
         required: true
 
 env:
   DOCKER_REGISTRY: docker.chameleoncloud.org
-  KOLLA_BUILD_PROFILE: ${{ github.event.inputs.kolla_build_profile}}
   KOLLA_NAMESPACE: kolla-dev
 
 jobs:
@@ -24,10 +23,10 @@ jobs:
       fail-fast: false
       matrix:
         config_set:
-          - base_x86_ubuntu
-          - edge_aarch64_debian
-          - edge_aarch64_ubuntu
-          - edge_x86_centos
+          - aarch64_debian
+          - aarch64_ubuntu
+          - x86_centos
+          - x86_ubuntu
     steps:
       - name: Set env to staging
         if: endsWith(github.ref, '/staging')
@@ -71,6 +70,7 @@ jobs:
       - name: Run Kolla Build
         run: |
           ./run.sh python build.py --config-set ${{ matrix.config_set }} \
+            --profile ${{ github.event.inputs.kolla_build_profile }} \
             ${{ fromJSON('["--no-push", "--push"]')[env.SHOULD_PUSH] }}
       - name: List Build Images
         run: docker image ls

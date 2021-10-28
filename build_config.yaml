@@ -21,9 +21,6 @@ defaults:
   profile:
   # Kolla image defaults, shouldn't need to change
   # these any time soon.
-  base: centos
-  base_tag: 8
-  base_arch: x86_64
   type: source
   namespace: kolla
   # EXTRA PARAMETERS
@@ -33,41 +30,33 @@ defaults:
     enable_networking_wireguard: True
 
 config_sets:
-  base:
-    profile: base
-  blazar:
-    profile: blazar
-  cinder:
-    profile: cinder
-  cyborg:
-    profile: cyborg
-  doni:
-    profile: doni
-  glance:
-    profile: glance
-  gnocchi:
-    profile: gnocchi
-  heat:
-    profile: heat
-  horizon:
-    profile: horizon
-  horizon_kvm:
-    profile: horizon_kvm
-  ironic:
-    profile: ironic
-  keystone:
-    profile: keystone
-  neutron:
-    profile: neutron
-  nova:
-    profile: nova
-  placement:
-    profile: placement
-  tunelo:
-    profile: tunelo
-  zun:
-    profile: zun
+  aarch64_debian:
+    base: debian
+    base_tag: "10"
+    base_arch: aarch64
+    platform: linux/arm64
+    tag: train-aarch64
 
+  aarch64_ubuntu:
+    base: ubuntu
+    base_tag: "18.04"
+    base_arch: aarch64
+    platform: linux/arm64
+    tag: train-aarch64 
+
+  x86_centos:
+    base: centos
+    base_tag: "8"
+    base_arch: x86_64
+    platform: linux/amd64
+  
+  x86_ubuntu:
+    base: ubuntu
+    base_tag: "18.04"
+    base_arch: x86_64
+    platform: linux/amd64
+
+  # LEGACY, remove after migration off Trian. 
   # Neutron must run at the same OS distribution as the host currently due
   # to the iptables/nf_tables migration, in particular b/w CentOS7 and 8.
   # CentOS 7 host kernel doesn't support nf_tables and the userland binaries
@@ -79,46 +68,3 @@ config_sets:
     build_conf_extras:
       # networking-wireguard requires Python 3
       enable_networking_wireguard: False
-
-  # ARM64 configuration for edge deployments. Many edge devices (e.g.,
-  # the Raspberry Pi platform) are ARM-based and cannot run x86 containers.
-  # Debian is used as the base in this case, as it has the most support in
-  # Kolla for ARM.
-  edge_aarch64_debian:
-    base: debian
-    base_tag: "10"
-    base_arch: aarch64
-    profile: edge
-    platform: linux/arm64
-    tag: train-aarch64
-
-  # Ubuntu for ARM64 edge deployments. This mostly exists because the
-  # Jetson platform uses L4T, which is Ubuntu-based, and the Jetson kernel
-  # is built with some assumptions based in Ubuntu 18.04, such as iptables
-  # instead of nf_tables.
-  edge_aarch64_ubuntu:
-    base: ubuntu
-    base_tag: "18.04"
-    base_arch: aarch64
-    profile: edge
-    platform: linux/arm64
-    tag: train-aarch64
-
-  # We have some edge deployments that support x86; this builds just the
-  # edge services for that architecture.
-  edge_x86_centos:
-    base: centos
-    base_tag: "8"
-    base_arch: x86_64
-    profile: edge
-
-  base_x86_ubuntu:
-    base: ubuntu
-    base_tag: "18.04"
-    base_arch: x86_64
-    platform: linux/amd64
-    profiles:
-      - base
-      - grafana
-      - neutron
-      - doni
