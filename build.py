@@ -23,6 +23,10 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from kolla.image import build as kolla_build
 import yaml
 
+import pydot #needed to load graphvis dependency from kolla-build
+import networkx as nx #traverse dependency graph
+from jinja2 import Environment, FileSystemLoader, select_autoescape  # template docker bakefile
+from python_on_whales import docker  # docker cli wrapper, has buildx support
 
 @click.command("build")
 @click.option(
@@ -39,7 +43,10 @@ import yaml
 @click.option(
     "--profile",
     metavar="NAME",
-    help=("Which build profile to use (this affects which set(s) of containers are built."),
+    help=(
+        "Which build profile to use (this affects which set(s) of containers are built."
+    ),
+    multiple=True,
 )
 @click.option(
     "--build-dir",
@@ -68,7 +75,14 @@ import yaml
         "build invocation."
     ),
 )
-def cli(config_file=None, config_set=None, profile=None, build_dir=None, push=None, use_cache=None):
+def cli(
+    config_file=None,
+    config_set=None,
+    profile=None,
+    build_dir=None,
+    push=None,
+    use_cache=None,
+):
     build_config = {}
     with open(config_file, "r") as f:
         build_config = yaml.safe_load(f)
@@ -111,16 +125,16 @@ def cli(config_file=None, config_set=None, profile=None, build_dir=None, push=No
     openstack_release = os.getenv("OPENSTACK_BASE_RELEASE")
     if openstack_release:
         kolla_config["openstack_release"] = openstack_release
-    
+
     profile = profile or os.getenv("KOLLA_BUILD_PROFILE")
     if profile:
         kolla_config["profile"] = profile
 
     kolla_argv = []
     for arg, value in kolla_config.items():
-        if arg == "profiles":
-            for profile in value:
-                kolla_argv.append(f"--profile={profile}")
+        if arg == "profile":
+            for entry in value:
+                kolla_argv.append(f"--{arg.replace('_', '-')}={entry}")
         elif value is not None:
             kolla_argv.append(f"--{arg.replace('_', '-')}={value}")
 
@@ -139,13 +153,10 @@ def cli(config_file=None, config_set=None, profile=None, build_dir=None, push=No
             with tarfile.open(source_dir.joinpath("additions.tar"), "w") as tar:
                 tar.add(additions_dir, arcname=os.path.sep)
 
-    if "profiles" in kolla_config:
-        for profile in kolla_config["profiles"]:
+    if "profile" in kolla_config:
+        for profile in kolla_config["profile"]:
             additions_dir = pathlib.Path(profile, "additions")
             add_tar_path(additions_dir)
-    elif "profile" in kolla_config:
-        additions_dir = pathlib.Path(kolla_config["profile"], "additions")
-        add_tar_path(additions_dir)
 
     shutil.copy(
         "./kolla-template-overrides.j2",
@@ -159,7 +170,14 @@ def cli(config_file=None, config_set=None, profile=None, build_dir=None, push=No
         tmpl_vars.update(build_conf_extras)
         f.write(kolla_build_conf_tmpl.render(**tmpl_vars))
 
+    templates_dir = pathlib.Path("templates").absolute()
+
     os.chdir(build_dir.absolute())
+
+    dep_path = pathlib.Path("./kolla_deps.DOT").absolute()
+
+    kolla_argv.append("--save-dependency")
+    kolla_argv.append(str(dep_path))
 
     print("kolla-build \\")
     print("  " + " \\\n  ".join(kolla_argv))
@@ -167,10 +185,77 @@ def cli(config_file=None, config_set=None, profile=None, build_dir=None, push=No
 
     # Kolla reads its input straight from sys.argv
     sys.argv = [""] + kolla_argv
-    bad, good, unmatched, skipped, unbuildable = kolla_build.run_build()
-    if bad:
+    try:
+        result = kolla_build.run_build()
+    except Exception as ex:
+        print(ex.args)
         sys.exit(1)
 
+
+    targets = get_docker_contexts(dep_graph_path=dep_path,
+                        docker_base_path=pathlib.Path("docker"),
+                        docker_registry=kolla_config.get("registry"),
+                        namespace=kolla_config.get("namespace"))
+
+    bakefile = template_bakefile(pathlib.Path("."), targets, templates_dir)
+    run_buildx_bake(bakefile=bakefile)
+
+def get_docker_contexts(dep_graph_path, docker_base_path, docker_registry, namespace):
+    graphs = pydot.graph_from_dot_file(str(dep_graph_path))
+    print("Loaded dependency graph from:", str(dep_graph_path))
+
+    pydot_graph = graphs[0]
+    G = nx.nx_pydot.from_pydot(pydot_graph)
+    openstack_dep_order = nx.dfs_preorder_nodes(G,"openstack-base")
+
+    #TODO this shouldn't be static
+    src_tags = [
+        "latest",
+        "92384459237",
+    ]
+
+    targets = []
+    for node in openstack_dep_order:
+        tags = [f"{docker_registry}/{namespace}/{node}:{tag}" for tag in src_tags]
+        prefix = str(node).split("-")[0]
+
+        node_path = pathlib.Path(docker_base_path, node)
+        if not node_path.exists():
+            node_path = pathlib.Path(docker_base_path, prefix, node)
+        target_dict = {
+            "name": node,
+            "context": str(node_path),
+            "tags": tags
+        }
+
+        print(node, node_path, node_path.exists())
+        if node_path.exists():
+            targets.append(target_dict)
+
+    return targets
+
+def template_bakefile(build_path, targets, templates_dir):
+    env = Environment(
+        loader=FileSystemLoader(templates_dir),
+        autoescape=select_autoescape()
+    )
+    template = env.get_template("docker-bake.hcl.j2")
+
+    target_names = [target['name'] for target in targets]
+
+    bakefile_text = template.render(target_names=target_names, targets=targets)
+    bakefile = pathlib.Path(build_path, "docker-bake.hcl")
+
+    with open(bakefile, 'w+',) as f:
+        f.write(bakefile_text)
+
+    return bakefile
+
+
+def run_buildx_bake(bakefile):
+    docker.buildx.bake(
+       files=[bakefile]
+)
 
 if __name__ == "__main__":
     cli()
