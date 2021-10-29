@@ -37,6 +37,14 @@ jobs:
         run: |
           echo "KOLLA_NAMESPACE=kolla" >> $GITHUB_ENV
           echo "SHOULD_PUSH=1" >> $GITHUB_ENV
+      - name: Set profile argument
+        if: github.event.inputs.kolla_build_profile == ''
+        run:
+          echo "KOLLA_BUILD_PROFILE=base" >> $GITHUB_ENV
+      - name: Set profile argument
+        if: github.event.inputs.kolla_build_profile != ''
+        run:
+          echo "KOLLA_BUILD_PROFILE=${{ github.event.inputs.kolla_build_profile }}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Python
@@ -71,7 +79,6 @@ jobs:
       - name: Run Kolla Build
         run: |
           ./run.sh python build.py --config-set ${{ matrix.config_set }} \
-            --profile ${{ github.event.inputs.kolla_build_profile }} \
             ${{ fromJSON('["--no-push", "--push"]')[env.SHOULD_PUSH] }}
       - name: List Build Images
         run: docker image ls
