@@ -38,8 +38,8 @@ if [[ -f "${env_file}" ]]; then
 fi
 
 # Set these _after_ sourcing a possible .env file, so it can be defaulted there.
-KOLLA_BRANCH="${KOLLA_BRANCH:-chameleoncloud/train}"
-DOCKER_TAG="${DOCKER_TAG:-train}"
+KOLLA_BRANCH="${KOLLA_BRANCH:-chameleoncloud/xena}"
+DOCKER_TAG="${DOCKER_TAG:-xena}"
 
 # Automatically update dependencies
 if [[ "${CHECK_UPDATES}" == "yes" || "${FORCE_UPDATES}" == "yes" ]]; then

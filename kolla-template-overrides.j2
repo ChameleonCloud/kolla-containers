@@ -45,6 +45,7 @@ RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
   && cp -R /additions/theme-chameleoncloud/*/* /etc/openstack-dashboard/themes/chameleoncloud/ \
   && chown -R horizon: /etc/openstack-dashboard/themes
 
+# FIXME: still on Train release
 RUN pip --no-cache-dir install --upgrade \
   git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/stable/train#egg=python-blazarclient
 {% endblock %}

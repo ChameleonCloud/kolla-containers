@@ -10,10 +10,10 @@ defaults:
   # build the openstack-base images.
   # Defaults to the value of $OPENSTACK_RELEASE
   # for legacy reasons.
-  openstack_release: train
+  openstack_release: xena
   # The Docker tag to add to the built image(s).
   # Defaults to $DOCKER_TAG for legacy reasons.
-  tag: train
+  tag: xena
   # See [profiles] in kolla-build.conf -- this determines
   # which images are built.
   # Defaults to the value of $KOLLA_BUILD_PROFILE
@@ -32,27 +32,27 @@ defaults:
 config_sets:
   aarch64_debian:
     base: debian
-    base_tag: "10"
+    base_tag: bullseye
     base_arch: aarch64
     platform: linux/arm64
-    tag: train-aarch64
+    tag: xena-aarch64
 
   aarch64_ubuntu:
     base: ubuntu
-    base_tag: "18.04"
+    base_tag: "20.04"
     base_arch: aarch64
     platform: linux/arm64
-    tag: train-aarch64
+    tag: xena-aarch64
 
   x86_centos:
     base: centos
-    base_tag: "8"
+    base_tag: stream8 
     base_arch: x86_64
     platform: linux/amd64
 
   x86_ubuntu:
     base: ubuntu
-    base_tag: "18.04"
+    base_tag: "20.04"
     base_arch: x86_64
     platform: linux/amd64
 
@@ -67,7 +67,7 @@ config_sets:
     profiles:
       - horizon_kvm
 
-  # LEGACY, remove after migration off Train.
+  # LEGACY, remove after migration off Trian.
   # Neutron must run at the same OS distribution as the host currently due
   # to the iptables/nf_tables migration, in particular b/w CentOS7 and 8.
   # CentOS 7 host kernel doesn't support nf_tables and the userland binaries
@@ -77,6 +77,8 @@ config_sets:
     tag: train-centos7
     profiles:
       - neutron_centos7
+    profile: neutron_centos7
+    tag: xena-centos7
     build_conf_extras:
       # networking-wireguard requires Python 3
       enable_networking_wireguard: False

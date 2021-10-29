@@ -16,7 +16,7 @@ horizon_kvm = ^base,^openstack-base,^horizon$
 ironic = ^ironic(?!-neutron),dnsmasq,iscsi
 keystone = ^keystone
 manila = ^manila-
-neutron = ironic-neutron-agent,neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server|wireguard-agent)$
+neutron = ironic-neutron-agent,^neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server|wireguard-agent)$,^ovn-
 # Same as "neutron" profile but minus wireguard agent, which needs Python 3
 neutron_centos7 = ironic-neutron-agent,neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server)$
 nova = ^nova-
@@ -25,9 +25,6 @@ tunelo = ^tunelo-
 zun = ^zun-
 
 grafana = ^grafana
-
-[openstack-base]
-location = $tarballs_base/requirements/requirements-stable-{{ openstack_release }}.tar.gz
 
 [blazar-base]
 type = git
@@ -42,17 +39,18 @@ location = $locals_base/additions.tar
 type = url
 location = $tarballs_base/cinder/cinder-stable-{{ openstack_release }}.tar.gz
 
+[cyborg-base]
+type = git
+location = https://github.com/ChameleonCloud/cyborg.git
+reference = chameleoncloud/{{ openstack_release }}
+
 [doni-base]
 type = git
 location = https://github.com/ChameleonCloud/doni.git
 reference = main
 
-[glance-base]
-type = url
-location = $tarballs_base/glance/glance-stable-{{ openstack_release }}.tar.gz
-
-# NOTE(jason): Gnocchi uses 4.3 as that's the closest to Train; consider updating
-# when we move past Train on the base.
+# NOTE(jason): Gnocchi uses 4.3 as that's the closest to xena; consider updating
+# when we move past xena on the base.
 [gnocchi-base]
 type = git
 reference = stable/4.3
@@ -86,13 +84,6 @@ reference = chameleoncloud/{{ openstack_release }}
 type = git
 location = https://github.com/ChameleonCloud/heat-dashboard.git
 reference = chameleoncloud/{{ openstack_release }}
-
-# TODO: remove when change I0db7a95c4a99fe4157b3623a14135eb7b5dd69d9
-# has been published in version >3.5.4 of ironic-ui
-[horizon-plugin-ironic-ui]
-type = git
-location = https://opendev.org/openstack/ironic-ui
-reference = stable/{{ openstack_release }}
 
 [horizon-plugin-zun-ui]
 type = git
@@ -140,9 +131,6 @@ reference = chameleoncloud/{{ openstack_release }}
 type = git
 location = https://github.com/ChameleonCloud/blazar-nova.git
 reference = chameleoncloud/{{ openstack_release }}
-
-[placement-base]
-location = $tarballs_base/placement/placement-stable-{{ openstack_release }}.tar.gz
 
 [tunelo-base]
 type = git
