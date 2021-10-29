@@ -1,0 +1,15 @@
+# docker-bake.hcl
+variable "TAG" {
+    default = "train"
+}
+
+group "default" {
+    targets = {{ target_names | replace("'", '"') }}
+}
+
+{% for target in targets %}
+target {{target.name}} {
+    context = "{{target.context}}"
+    tags = {{ target.tags | replace("'", '"') }}
+}
+{% endfor %}
