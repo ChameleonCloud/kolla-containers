@@ -15,7 +15,6 @@ on:
 env:
   DOCKER_REGISTRY: docker.chameleoncloud.org
   KOLLA_NAMESPACE: kolla-dev
-  KOLLA_BUILD_PROFILE: ${{ github.event.inputs.kolla_build_profile }} 
 
 jobs:
   buildx:
@@ -72,7 +71,7 @@ jobs:
       - name: Run Kolla Build
         run: |
           ./run.sh python build.py --config-set ${{ matrix.config_set }} \
-            --profile ${{ env.KOLLA_BUILD_PROFILE }} \
+            --profile ${{ github.event.inputs.kolla_build_profile }} \
             ${{ fromJSON('["--no-push", "--push"]')[env.SHOULD_PUSH] }}
       - name: List Build Images
         run: docker image ls
