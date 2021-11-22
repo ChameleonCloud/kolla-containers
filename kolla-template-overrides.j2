@@ -52,6 +52,9 @@ RUN pip --no-cache-dir install --upgrade \
 
 # See "neutron-server-additions-extra" section in kolla-build.conf
 {% block neutron_server_footer %}
+{% if distro_python_version.startswith('3') %}
+RUN pip install netmiko==3.4.0
+{% endif %}
 ADD additions-archive /
 RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
   && (cd /var/lib/kolla/venv/lib/python{{ distro_python_version }}/site-packages/netmiko \
