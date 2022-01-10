@@ -70,7 +70,7 @@ ENV prometheus_version=2.3.2
 # Zun
 ######
 
-# NOTE(jason): Remove this past Ussuri
+# NOTE(jason): Remove this past Victoria; kubernetes 12.x is needed for zun-compute-k8s
 {% block zun_compute_k8s_footer %}
-RUN pip --no-cache-dir install --upgrade kubernetes==11.0.0
+RUN pip --no-cache-dir install --upgrade kubernetes==12.0.0
 {% endblock %}
