@@ -65,3 +65,12 @@ RUN pip --no-cache-dir install --upgrade \
 {% block prometheus_server_repository_version %}
 ENV prometheus_version=2.3.2
 {% endblock %}
+
+######
+# Zun
+######
+
+# NOTE(jason): Remove this past Ussuri
+{% block zun_compute_k8s_footer %}
+RUN pip --no-cache-dir install --upgrade kubernetes==11.0.0
+{% endblock %}
