@@ -100,9 +100,10 @@ def cli(config_file=None, config_set=None, profile=None, pattern=None, build_dir
         kolla_config.update(default_config_set)
 
     if config_set:
-        config_set = build_config.get("config_sets", {}).get(config_set)
+        config_set_name = config_set
+        config_set = build_config.get("config_sets", {}).get(config_set_name)
         if not config_set:
-            raise ValueError(f"No config set found for '{config_set}'")
+            raise ValueError(f"No config set found for '{config_set_name}'")
         cfgset_build_conf_extras = config_set.pop("build_conf_extras", {})
         kolla_config.update(config_set)
         build_conf_extras.update(cfgset_build_conf_extras)

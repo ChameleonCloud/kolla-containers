@@ -20,6 +20,17 @@ RUN cp -R /additions/extra/* /etc/blazar/ \
 ] %}
 
 #########
+# Doni
+#########
+
+{% block doni_worker_header %}
+# Force upgrade PyJWT so that balena-sdk dependencies can be satisfied.
+# The requirements repo has a constraint on PyJWT so we have to install both
+# separately to avoid getting downgraded.
+RUN pip --no-cache-dir install --upgrade PyJWT>=2.0.0 balena-sdk
+{% endblock %}
+
+#########
 # Horizon
 #########
 
