@@ -73,5 +73,6 @@ config_sets:
   x86_centos7:
     base: centos
     base_tag: "7"
+    tag: train-centos7
     base_arch: x86_64
     platform: linux/amd64
