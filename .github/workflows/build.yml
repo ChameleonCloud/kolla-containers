@@ -31,6 +31,7 @@ jobs:
           - aarch64_debian
           - aarch64_ubuntu
           - x86_centos
+          - x86_centos7
           - x86_ubuntu
     steps:
       - name: Set env to staging
@@ -41,19 +42,16 @@ jobs:
         run: |
           echo "KOLLA_NAMESPACE=kolla" >> $GITHUB_ENV
           echo "SHOULD_PUSH=1" >> $GITHUB_ENV
-      
+
       - name: Set profile argument from workflow inputs
         if: github.event.inputs.kolla_build_profile != ''
-        run:
-          echo "KOLLA_BUILD_PROFILE=${{ github.event.inputs.kolla_build_profile }}" >> $GITHUB_ENV
+        run: echo "KOLLA_BUILD_PROFILE=${{ github.event.inputs.kolla_build_profile }}" >> $GITHUB_ENV
       - name: Set pattern argument from workflow inputs
         if: github.event.inputs.build_pattern != ''
-        run:
-          echo "KOLLA_BUILD_PATTERN=${{ github.event.inputs.build_pattern }}" >> $GITHUB_ENV
+        run: echo "KOLLA_BUILD_PATTERN=${{ github.event.inputs.build_pattern }}" >> $GITHUB_ENV
       - name: Set push argument from workflow inputs
         if: github.event.inputs.push == 'yes'
-        run:
-          echo "SHOULD_PUSH=1" >> $GITHUB_ENV
+        run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v2
