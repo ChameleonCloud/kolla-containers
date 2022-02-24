@@ -1,10 +1,6 @@
 name: ci
 
 on:
-  push:
-    branches:
-      - master
-      - staging
   workflow_dispatch:
     inputs:
       kolla_build_profile:
