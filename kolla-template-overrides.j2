@@ -53,6 +53,9 @@ RUN pip --no-cache-dir install --upgrade \
 # See "neutron-server-additions-extra" section in kolla-build.conf
 {% block neutron_server_footer %}
 {% if distro_python_version.startswith('3') %}
+# TODO [ms 2022-03-03]:
+# - This overrides the upper-constrained netmiko version in order to fix slow CLI connectivity on Dell OS10.
+#   Conditional is due to python2 dependence in train-centos7. Remove this after xena upgrade.
 RUN pip install netmiko==3.4.0
 {% endif %}
 ADD additions-archive /
