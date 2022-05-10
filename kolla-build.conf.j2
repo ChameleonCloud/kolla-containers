@@ -16,6 +16,7 @@ horizon = ^horizon$
 horizon_kvm = ^base,^openstack-base,^horizon$
 ironic = ^ironic(?!-neutron),dnsmasq,iscsi
 keystone = ^keystone
+manila = ^manila-
 neutron = ironic-neutron-agent,neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server|wireguard-agent)$
 # Same as "neutron" profile but minus wireguard agent, which needs Python 3
 neutron_centos7 = ironic-neutron-agent,neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server)$
