@@ -39,13 +39,17 @@ import yaml
 @click.option(
     "--profile",
     metavar="NAME",
-    help=("Which build profile to use (this affects which set(s) of containers are built."),
+    help=(
+        "Which build profile to use (this affects which set(s) of containers are built."
+    ),
 )
 @click.option(
     "--pattern",
     metavar="REGEX",
-    help=("A pattern matching which container image names should be built. This should only "
-          "be used if no profile is given."),
+    help=(
+        "A pattern matching which container image names should be built. This should only "
+        "be used if no profile is given."
+    ),
 )
 @click.option(
     "--build-dir",
@@ -74,7 +78,15 @@ import yaml
         "build invocation."
     ),
 )
-def cli(config_file=None, config_set=None, profile=None, pattern=None, build_dir=None, push=None, use_cache=None):
+def cli(
+    config_file=None,
+    config_set=None,
+    profile=None,
+    pattern=None,
+    build_dir=None,
+    push=None,
+    use_cache=None,
+):
     build_config = {}
     with open(config_file, "r") as f:
         build_config = yaml.safe_load(f)
@@ -118,7 +130,7 @@ def cli(config_file=None, config_set=None, profile=None, pattern=None, build_dir
     openstack_release = os.getenv("OPENSTACK_BASE_RELEASE")
     if openstack_release:
         kolla_config["openstack_release"] = openstack_release
-    
+
     profile = profile or os.getenv("KOLLA_BUILD_PROFILE")
     if profile:
         kolla_config["profiles"] = profile.split(",")
@@ -155,9 +167,6 @@ def cli(config_file=None, config_set=None, profile=None, pattern=None, build_dir
         for profile in kolla_config["profiles"]:
             additions_dir = pathlib.Path(profile, "additions")
             add_tar_path(additions_dir)
-    elif kolla_config.get("profile"):
-        additions_dir = pathlib.Path(kolla_config["profile"], "additions")
-        add_tar_path(additions_dir)
 
     shutil.copy(
         "./kolla-template-overrides.j2",

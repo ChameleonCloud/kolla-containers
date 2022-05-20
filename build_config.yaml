@@ -55,7 +55,7 @@ config_sets:
     base_tag: "18.04"
     base_arch: x86_64
     platform: linux/amd64
-    
+
   # Support KVM builds of Horizon; tag separately to avoid overwriting
   # the bare metal build.
   horizon_kvm:
@@ -64,7 +64,8 @@ config_sets:
     base_arch: x86_64
     platform: linux/amd64
     tag: train-kvm
-    profile: horizon_kvm
+    profiles:
+      - horizon_kvm
 
   # LEGACY, remove after migration off Train.
   # Neutron must run at the same OS distribution as the host currently due
@@ -73,8 +74,9 @@ config_sets:
   # assume iptables.
   neutron_centos7:
     base_tag: "7"
-    profile: neutron_centos7
     tag: train-centos7
+    profiles:
+      - neutron_centos7
     build_conf_extras:
       # networking-wireguard requires Python 3
       enable_networking_wireguard: False
