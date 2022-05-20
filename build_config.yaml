@@ -55,6 +55,15 @@ config_sets:
     base_tag: "18.04"
     base_arch: x86_64
     platform: linux/amd64
+    
+  # Support KVM builds of Horizon; tag separately to avoid overwriting
+  # the bare metal build.
+  horizon_kvm:
+    base: ubuntu
+    base_tag: "18.04"
+    base_arch: x86_64
+    platform: linux/amd64
+    tag: train-kvm
 
   # LEGACY, remove after migration off Train.
   # Neutron must run at the same OS distribution as the host currently due
