@@ -34,15 +34,16 @@ Additional notes:
 
 ## Building a container
 
-The supported services can be build using the `build.py` script and passing the name of a configuration set.
-The configuration sets are defined in the `build_config.yaml` file.
+The supported services can be build using the `build.py` script and passing the name of a configuration set
+and a profile name. The configuration sets are defined in the `build_config.yaml` file and set things
+like the platform/architecture and base distro for the build.
 
 ```
 # Build container for Horizon
-./run.sh python build.py --config-set horizon
+./run.sh python build.py --config-set x86_ubuntu --profile horizon
 
 # Build containers for Nova
-./run.sh python build.py --config-set nova
+./run.sh python build.py --config-set x86_ubuntu --profile nova
 ```
 
 ### Bypassing cache
@@ -59,7 +60,7 @@ If you wish to force a rebuild of all parent images, you can do so by passing in
 The `--push` flag can be used to instruct Kolla to push the images up to a registry once they are built:
 
 ```
-./run.sh python build.py --config-set horizon --push
+./run.sh python build.py --config-set x86_ubuntu --profile horizon --push
 ```
 
 ### Cross-compiling
