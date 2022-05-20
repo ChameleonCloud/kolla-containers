@@ -24,8 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         config_set:
-          - aarch64_debian
-          - aarch64_ubuntu
           - x86_centos
           - x86_centos7
           - x86_ubuntu
