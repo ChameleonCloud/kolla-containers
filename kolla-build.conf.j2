@@ -71,15 +71,19 @@ type = git
 location = https://github.com/ChameleonCloud/heat.git
 reference = chameleoncloud/{{ openstack_release }}
 
-[horizon]
-type = git
-location = https://github.com/ChameleonCloud/horizon.git
-reference = chameleoncloud/{{ openstack_release }}
-
 [horizon-additions-theme-chameleoncloud]
 type = git
 location = https://github.com/ChameleonCloud/horizon-theme.git
 reference = master
+
+{# Only override default horizon builds if we're building NOT for KVM;
+   The KVM build should use the default Horizon build, as we customize the
+   GUI for the bare metal use case significantly. #}
+{% if "horizon_kvm" not in profiles %}
+[horizon]
+type = git
+location = https://github.com/ChameleonCloud/horizon.git
+reference = chameleoncloud/{{ openstack_release }}
 
 [horizon-plugin-blazar-dashboard]
 type = git
@@ -102,6 +106,7 @@ reference = stable/{{ openstack_release }}
 type = git
 location = https://github.com/ChameleonCloud/zun-ui.git
 reference = chameleoncloud/{{ openstack_release }}
+{% endif %}
 
 [ironic-base]
 type = git
