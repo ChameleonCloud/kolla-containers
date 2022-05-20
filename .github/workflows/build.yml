@@ -1,4 +1,4 @@
-name: ci
+name: multi-configset
 
 on:
   workflow_dispatch:
