@@ -181,6 +181,15 @@ def cli(
         f.write(kolla_build_conf_tmpl.render(**tmpl_vars))
 
     os.chdir(build_dir.absolute())
+    
+    with open("kolla-build.conf", "r") as build_conf, \
+         open("kolla-template-overrides.j2", "r") as overrides_conf:
+        print("kolla-build.conf")
+        print("="*32)
+        print(build_conf.read())
+        print("kolla-template-overrides.j2")
+        print("="*32)
+        print(overrides_conf.read())
 
     print("kolla-build \\")
     print("  " + " \\\n  ".join(kolla_argv))
