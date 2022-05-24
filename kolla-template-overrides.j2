@@ -34,6 +34,18 @@ RUN pip --no-cache-dir install --upgrade PyJWT>=2.0.0 balena-sdk
 # Horizon
 #########
 
+{% block horizon_header %}
+# NOTE(jason): This is a hack but I haven't found the root cause yet.
+# Set a version so PBR doesn't try to detect it via Git tags or setup.cfg;
+# This doesn't seem to work very well when we pull Horizon in via a Git source.
+# This should be a no-op for other builds (like KVM horizon), as it shouldn't really
+# matter what version of the package it thinks is installed, since it's a root
+# package (i.e., no others depend on it.)
+# This tag makes sense to be the next dev version following the most recent tag
+# on the stable release branch.
+ENV PBR_VERSION=16.2.2-dev
+{% endblock %}
+
 # Add chameleoncloud theme via additions
 # See "horizon-additions-theme-chameleoncloud" section in kolla-build.conf
 {% block horizon_footer %}
