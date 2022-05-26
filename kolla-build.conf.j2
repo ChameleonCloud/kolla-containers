@@ -5,7 +5,6 @@ maintainer = University of Chicago
 base = ^base,chrony,cron,elasticsearch,fluentd,kibana,kolla-toolbox,haproxy,keepalived,letsencrypt,mariadb,memcached,openstack-base,^openvswitch,prometheus,rabbitmq,redis,tgtd
 blazar = ^blazar-
 cinder = ^cinder-
-cyborg = ^cyborg-
 doni = ^doni-
 glance = ^glance-
 gnocchi = ^gnocchi-
@@ -24,8 +23,6 @@ nova = ^nova-
 placement = ^placement
 tunelo = ^tunelo-
 zun = ^zun-
-# For building just the edge services
-edge = ^(openstack-)?base,^cyborg-(base|agent),etcd,kuryr,^neutron-(base|openvswitch),^openvswitch,^zun-(base|compute)
 
 grafana = ^grafana
 
@@ -44,11 +41,6 @@ location = $locals_base/additions.tar
 [cinder-base]
 type = url
 location = $tarballs_base/cinder/cinder-stable-{{ openstack_release }}.tar.gz
-
-[cyborg-base]
-type = git
-location = https://github.com/ChameleonCloud/cyborg.git
-reference = chameleoncloud/{{ openstack_release }}
 
 [doni-base]
 type = git
@@ -117,11 +109,6 @@ reference = chameleoncloud/{{ openstack_release }}
 type = git
 location = https://github.com/ChameleonCloud/keystone.git
 reference = chameleoncloud/{{ openstack_release }}
-
-# NOTE(jason): pin kuryr to ussuri release; remove this when we are past Train on the base
-[kuryr-libnetwork]
-type = url
-location = $tarballs_base/kuryr-libnetwork/kuryr-libnetwork-stable-ussuri.tar.gz
 
 [neutron-base]
 type = git

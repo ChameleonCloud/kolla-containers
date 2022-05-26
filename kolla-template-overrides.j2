@@ -1,8 +1,19 @@
 {% extends parent_template %}
 
+# NOTE(jason): There are severl hacks for an issue w/ pbr, which
+# I haven't found the root cause for yet.
+# We must set a version so PBR doesn't try to detect it via Git tags or setup.cfg;
+# This doesn't seem to work very well when we pull sources in via Git.
+# Such tags make sense to be the next dev version following the most recent tag
+# on the stable release branch. Yes, it sucks. See PBR_VERSION.
+
 #########
 # Blazar
 #########
+
+{% block blazar_base_header %}
+ENV PBR_VERSION=4.0.2-chameleon
+{% endblock %}
 
 # See "blazar-manager-additions-extra" section in kolla-build.conf
 {% block blazar_manager_footer %}
@@ -23,6 +34,10 @@ RUN cp -R /additions/extra/* /etc/blazar/ \
 # Doni
 #########
 
+{% block doni_base_header %}
+ENV PBR_VERSION=1.0.0-chameleon
+{% endblock %}
+
 {% block doni_worker_header %}
 # Force upgrade PyJWT so that balena-sdk dependencies can be satisfied.
 # The requirements repo has a constraint on PyJWT so we have to install both
@@ -31,19 +46,19 @@ RUN pip --no-cache-dir install --upgrade PyJWT>=2.0.0 balena-sdk
 {% endblock %}
 
 #########
+# Heat
+#########
+
+{% block heat_base_header %}
+ENV PBR_VERSION=13.1.10-chameleon
+{% endblock %}
+
+#########
 # Horizon
 #########
 
 {% block horizon_header %}
-# NOTE(jason): This is a hack but I haven't found the root cause yet.
-# Set a version so PBR doesn't try to detect it via Git tags or setup.cfg;
-# This doesn't seem to work very well when we pull Horizon in via a Git source.
-# This should be a no-op for other builds (like KVM horizon), as it shouldn't really
-# matter what version of the package it thinks is installed, since it's a root
-# package (i.e., no others depend on it.)
-# This tag makes sense to be the next dev version following the most recent tag
-# on the stable release branch.
-ENV PBR_VERSION=16.2.2-dev
+ENV PBR_VERSION=16.2.2-chameleon
 {% endblock %}
 
 # Add chameleoncloud theme via additions
@@ -59,8 +74,20 @@ RUN pip --no-cache-dir install --upgrade \
 {% endblock %}
 
 ##########
+# Ironic
+##########
+
+{% block ironic_base_header %}
+ENV PBR_VERSION=13.0.8-chameleon
+{% endblock %}
+
+##########
 # Neutron
 ##########
+
+{% block neutron_base_header %}
+ENV PBR_VERSION=15.3.5-chameleon
+{% endblock %}
 
 # See "neutron-server-additions-extra" section in kolla-build.conf
 {% block neutron_server_footer %}
@@ -80,6 +107,10 @@ RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
 # Nova
 ##########
 
+{% block nova_base_header %}
+ENV PBR_VERSION=20.6.2-chameleon
+{% endblock %}
+
 # Install patched version of python-ironicclient
 # NOTE(jason): Is this still necessary? Look at
 {% block nova_compute_ironic_footer %}
@@ -95,9 +126,21 @@ RUN pip --no-cache-dir install --upgrade \
 ENV prometheus_version=2.3.2
 {% endblock %}
 
+##########
+# Tunelo
+##########
+
+{% block tunelo_base_header %}
+ENV PBR_VERSION=1.0.0-chameleon
+{% endblock %}
+
 ######
 # Zun
 ######
+
+{% block zun_base_header %}
+ENV PBR_VERSION=4.0.1-chameleon
+{% endblock %}
 
 # NOTE(jason): Remove this past Victoria; kubernetes 12.x is needed for zun-compute-k8s
 {% block zun_compute_k8s_footer %}
