@@ -33,7 +33,7 @@ jobs:
         if: endsWith(github.ref, '/staging')
         run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
       - name: Set env to production
-        if: endsWith(github.ref, '/master')
+        if: endsWith(github.ref, '/master') || endsWith(github.ref, '/xena')
         run: |
           echo "KOLLA_NAMESPACE=kolla" >> $GITHUB_ENV
           echo "SHOULD_PUSH=1" >> $GITHUB_ENV
