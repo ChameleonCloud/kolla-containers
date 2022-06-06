@@ -47,7 +47,7 @@ reference = chameleoncloud/{{ openstack_release }}
 [doni-base]
 type = git
 location = https://github.com/ChameleonCloud/doni.git
-reference = main
+reference = chameleoncloud/{{ openstack_release }}
 
 # NOTE(jason): Gnocchi uses 4.3 as that's the closest to xena; consider updating
 # when we move past xena on the base.
@@ -135,7 +135,7 @@ reference = chameleoncloud/{{ openstack_release }}
 [tunelo-base]
 type = git
 location = https://github.com/ChameleonCloud/tunelo.git
-reference = main
+reference = chameleoncloud/{{ openstack_release }}
 
 [zun-base]
 type = git
