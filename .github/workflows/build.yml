@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         config_set:
-          - x86_centos7
+          - x86_centos
           - x86_ubuntu
     steps:
       - name: Set env to staging
