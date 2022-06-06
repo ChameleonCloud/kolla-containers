@@ -80,12 +80,6 @@ RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
 # Nova
 ##########
 
-# Install patched version of python-ironicclient
-# NOTE(jason): Is this still necessary? Look at
-{% block nova_compute_ironic_footer %}
-RUN pip --no-cache-dir install --upgrade \
-  git+https://github.com/ChameleonCloud/python-ironicclient.git@2.5.2#egg=python-ironicclient
-{% endblock %}
 
 ##########
 # Prometheus
