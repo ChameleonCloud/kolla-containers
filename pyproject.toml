@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "kolla-containers"
+version = "0.1.0"
+description = ""
+authors = ["Michael Sherman <shermanm@uchicago.edu>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+kolla = { git = "https://github.com/ChameleonCloud/kolla.git", branch = "chameleoncloud/xena" }
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
