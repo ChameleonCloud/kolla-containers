@@ -2,7 +2,7 @@
 maintainer = University of Chicago
 
 [profiles]
-base = ^base,chrony,cron,elasticsearch,fluentd,kibana,kolla-toolbox,haproxy,keepalived,letsencrypt,mariadb,memcached,openstack-base,^openvswitch,prometheus,rabbitmq,redis,tgtd
+base = ^base,chrony,cron,elasticsearch,fluentd,kibana,kolla-toolbox,haproxy,keepalived,letsencrypt,mariadb,memcached,openstack-base,^openvswitch,prometheus,grafana,rabbitmq,redis,tgtd
 blazar = ^blazar-
 cinder = ^cinder-
 doni = ^doni-
@@ -13,7 +13,7 @@ horizon = ^horizon$
 # Explicitly build entire chain, this build doesn't have a
 # 'base' job that provides the base images for it.
 horizon_kvm = ^base,^openstack-base,^horizon$
-ironic = ^ironic(?!-neutron),dnsmasq,iscsi
+ironic = ^ironic(?!-neutron),dnsmasq,iscsi,prometheus-ironic-exporter
 keystone = ^keystone
 manila = ^manila-
 neutron = ironic-neutron-agent,^neutron-(base|dhcp-agent|l3-agent|metadata-agent|openvswitch-agent|server|wireguard-agent)$,^ovn-
@@ -24,6 +24,7 @@ placement = ^placement
 tunelo = ^tunelo-
 zun = ^zun-
 
+prometheus = ^prometheus
 grafana = ^grafana
 
 [blazar-base]
