@@ -87,7 +87,8 @@ RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
 # Zun
 ######
 
-# NOTE(jason): Remove this past Victoria; kubernetes 12.x is needed for zun-compute-k8s
 {% block zun_compute_k8s_footer %}
-RUN pip --no-cache-dir install --upgrade kubernetes==12.0.0
+# NOTE(Mike) Needed to fix eventlet bug, remove after upgrading to Yoga or later.
+# https://bugs.launchpad.net/oslo.messaging/+bug/1934937
+RUN pip --no-cache-dir install --upgrade oslo.log==5.0.1
 {% endblock %}
