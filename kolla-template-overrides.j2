@@ -45,10 +45,6 @@ RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
   && cp -R /additions/theme-chameleoncloud/*/* /etc/openstack-dashboard/themes/chameleoncloud/ \
   && chown -R horizon: /etc/openstack-dashboard/themes
 
-# Add Chameleon overrides for horizon
-RUN pip --no-cache-dir install --upgrade \
-  git+https://github.com/ChameleonCloud/horizon-chameleon.git@main#egg=horizon-chameleon
-
 # Override with our fork, which includes support for device resources amongst other things
 RUN pip --no-cache-dir install --upgrade \
   git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/xena#egg=python-blazarclient
