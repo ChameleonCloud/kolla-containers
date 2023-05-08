@@ -3,7 +3,9 @@ defaults:
   # Which registry to push built images to
   # (requires having already authenticated
   # as a user with push access)
-  registry: docker.chameleoncloud.org
+  registry: ghcr.io
+  namespace: chameleoncloud/kolla
+
   # The base release of OpenStack to build from.
   # This determines which checkout of Kolla
   # to use, as well as the base requirements that
@@ -22,7 +24,7 @@ defaults:
   # Kolla image defaults, shouldn't need to change
   # these any time soon.
   type: source
-  namespace: kolla
+
   # EXTRA PARAMETERS
   # These are just used to template the *.j2 files for the kolla
   # build configuration
