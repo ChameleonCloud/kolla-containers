@@ -16,8 +16,8 @@ on:
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  KOLLA_NAMESPACE_DEV: ChameleonCloud/kolla-dev
-  KOLLA_NAMESPACE_PROD: ChameleonCloud/kolla
+  KOLLA_NAMESPACE_DEV: chameleoncloud/kolla-dev
+  KOLLA_NAMESPACE_PROD: chameleoncloud/kolla
 
 jobs:
   buildx:
