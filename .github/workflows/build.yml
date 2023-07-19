@@ -29,17 +29,6 @@ jobs:
         config_set:
           - x86_ubuntu
     steps:
-      - name: Set env to staging
-        if: endsWith(github.ref, '/staging')
-        run: |
-          echo "KOLLA_NAMESPACE=$KOLLA_NAMESPACE_DEV" >> $GITHUB_ENV
-          echo "SHOULD_PUSH=1" >> $GITHUB_ENV
-      - name: Set env to production
-        if: endsWith(github.ref, '/master') || endsWith(github.ref, '/xena')
-        run: |
-          echo "KOLLA_NAMESPACE=KOLLA_NAMESPACE_PROD" >> $GITHUB_ENV
-          echo "SHOULD_PUSH=1" >> $GITHUB_ENV
-
       - name: Set profile argument from workflow inputs
         if: github.event.inputs.kolla_build_profile != ''
         run: echo "KOLLA_BUILD_PROFILE=${{ github.event.inputs.kolla_build_profile }}" >> $GITHUB_ENV
