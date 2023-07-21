@@ -10,7 +10,10 @@ on:
       push:
         description: "Push images to registry? (yes/no)"
         required: true
-        default: no
+        default: "no"
+        options:
+          - "yes"
+          - "no"
       tag:
         description: "Override default tag"
 
