@@ -1,195 +1,62 @@
-#!/usr/bin/env python
-# Copyright 2021 University of Chicago
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import os
-import pathlib
-import shutil
-import tarfile
+#!python3
+
+
 import sys
+from os import environ
 
-import click
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 from kolla.image import build as kolla_build
-import yaml
+
+PROFILES= [
+    "base",
+    "blazar",
+    "cinder",
+    "doni",
+    "glance",
+    "gnocchi",
+    "heat",
+    "horizon",
+    "ironic",
+    "keystone",
+    "manila",
+    "neutron",
+    "nova",
+    "placement",
+    "tunelo",
+    "zun",
+]
 
 
-@click.command("build")
-@click.option(
-    "--config-file",
-    metavar="FILE",
-    default="build_config.yaml",
-    help=("The YAML configuration file that holds the configuration sets."),
-)
-@click.option(
-    "--config-set",
-    metavar="NAME",
-    help=("Which configuration set defined in the configuration file to use."),
-)
-@click.option(
-    "--profile",
-    metavar="NAME",
-    help=(
-        "Which build profile to use (this affects which set(s) of containers are built."
-    ),
-)
-@click.option(
-    "--pattern",
-    metavar="REGEX",
-    help=(
-        "A pattern matching which container image names should be built. This should only "
-        "be used if no profile is given."
-    ),
-)
-@click.option(
-    "--build-dir",
-    metavar="DIR",
-    default="build",
-    help=(
-        "The build directory to use as the build context for this build. "
-        "If you are runnning multiple builds in parallel, use different "
-        "build directories for each to avoid cross-contamination of build "
-        "sources and configuration."
-    ),
-)
-@click.option(
-    "--push/--no-push",
-    default=False,
-    help=("Whether to push the images to a Docker registry on successful build."),
-)
-@click.option(
-    "--use-cache/--no-use-cache",
-    default=True,
-    help=(
-        "Whether to attempt to use cached images in the build chain. There are two "
-        "layers of cache: the first will not even attempt to re-build an image's "
-        "parent if the parent image/tag is detected on the host system, the second "
-        "will instruct Docker to use cached Dockerfile build steps w/in a single "
-        "build invocation."
-    ),
-)
-def cli(
-    config_file=None,
-    config_set=None,
-    profile=None,
-    pattern=None,
-    build_dir=None,
-    push=None,
-    use_cache=None,
-):
-    build_config = {}
-    with open(config_file, "r") as f:
-        build_config = yaml.safe_load(f)
-
-    build_dir = pathlib.Path(build_dir)
-    build_dir.mkdir(exist_ok=True)
-    source_dir = pathlib.Path("./sources")
-    source_dir.mkdir(exist_ok=True)
-
-    kolla_config = {
-        # We will chdir into the build directory before invoking Kolla
-        "work_dir": ".",
-        "config_file": "kolla-build.conf",
-        "template_override": "kolla-template-overrides.j2",
-        "locals_base": "../sources",
-    }
-
-    default_config_set = build_config.get("defaults", {})
-    # Extract build conf extras; they are not a "real" kolla config
-    # option and can't be passed to Kolla.
-    build_conf_extras = default_config_set.pop("build_conf_extras", {})
-    if default_config_set:
-        kolla_config.update(default_config_set)
-
-    if config_set:
-        config_set_name = config_set
-        config_set = build_config.get("config_sets", {}).get(config_set_name)
-        if not config_set:
-            raise ValueError(f"No config set found for '{config_set_name}'")
-        cfgset_build_conf_extras = config_set.pop("build_conf_extras", {})
-        kolla_config.update(config_set)
-        build_conf_extras.update(cfgset_build_conf_extras)
-
-    kolla_namespace = os.getenv("KOLLA_NAMESPACE")
-    if kolla_namespace:
-        kolla_config["namespace"] = kolla_namespace
-
-    docker_tag = os.getenv("DOCKER_TAG")
-    if docker_tag:
-        kolla_config["tag"] = docker_tag
-    openstack_release = os.getenv("OPENSTACK_BASE_RELEASE")
-    if openstack_release:
-        kolla_config["openstack_release"] = openstack_release
-
-    profile = profile or os.getenv("KOLLA_BUILD_PROFILE")
-    if profile:
-        kolla_config["profiles"] = profile.split(",")
-
+def main():
     kolla_argv = []
-    for arg, value in kolla_config.items():
-        if arg == "profiles":
-            for profile in value:
-                kolla_argv.append(f"--profile={profile}")
-        elif value is not None:
-            kolla_argv.append(f"--{arg.replace('_', '-')}={value}")
 
-    if push:
-        kolla_argv.append("--push")
-    if use_cache:
-        # Always skip ancestors; we want to explicitly build the ancestor
-        # images instead of automagically doing this.
-        kolla_argv.append("--skip-parents")
+    kolla_argv.extend( ["--config-file", "kolla-build.conf"] )
+    kolla_argv.extend( ["--template-override", "kolla-template-overrides.j2"])
+
+    if environ.get("KOLLA_CACHE", None):
         kolla_argv.append("--cache")
+
+    if environ.get("PULL", None) == 1:
+        kolla_argv.append("--pull")
+
+    if environ.get("SHOULD_PUSH", None) == 1:
+        kolla_argv.append("--push")
+
+    build_tag = environ.get("DOCKER_TAG", None)
+    if build_tag:
+        kolla_argv.extend( ["--tag", build_tag])
+
+    # allow selecting images to build via profile or pattern.
+    # If unset, build all images with a known profile
+    build_profile = environ.get("KOLLA_BUILD_PROFILE", None)
+    build_pattern = environ.get("KOLLA_BUILD_PATTERN", None)
+    if build_profile:
+        kolla_argv.extend( ["--profile", build_profile])
+    elif build_pattern:
+        kolla_argv.append(build_pattern)
     else:
-        kolla_argv.append("--nocache")
+        for profile in PROFILES:
+            kolla_argv.extend( ["--profile", profile])
 
-    # This argument needs to go last
-    pattern = pattern or os.getenv("KOLLA_BUILD_PATTERN")
-    if pattern:
-        kolla_argv.append(pattern)
-
-    def add_tar_path(additions_dir: pathlib.Path):
-        if additions_dir.exists():
-            with tarfile.open(source_dir.joinpath("additions.tar"), "w") as tar:
-                tar.add(additions_dir, arcname=os.path.sep)
-
-    if kolla_config.get("profiles"):
-        for profile in kolla_config["profiles"]:
-            additions_dir = pathlib.Path(profile, "additions")
-            add_tar_path(additions_dir)
-
-    shutil.copy(
-        "./kolla-template-overrides.j2",
-        build_dir.joinpath("kolla-template-overrides.j2"),
-    )
-
-    env = Environment(loader=FileSystemLoader("."), autoescape=select_autoescape())
-    kolla_build_conf_tmpl = env.get_template("kolla-build.conf.j2")
-    with open(pathlib.Path(build_dir, "kolla-build.conf"), "w") as f:
-        tmpl_vars = kolla_config.copy()
-        tmpl_vars.update(build_conf_extras)
-        f.write(kolla_build_conf_tmpl.render(**tmpl_vars))
-
-    os.chdir(build_dir.absolute())
-    
-    with open("kolla-build.conf", "r") as build_conf, \
-         open("kolla-template-overrides.j2", "r") as overrides_conf:
-        print("kolla-build.conf")
-        print("="*32)
-        print(build_conf.read())
-        print("kolla-template-overrides.j2")
-        print("="*32)
-        print(overrides_conf.read())
 
     print("kolla-build \\")
     print("  " + " \\\n  ".join(kolla_argv))
@@ -201,6 +68,9 @@ def cli(
     if bad:
         sys.exit(1)
 
+    for img in good:
+        print(f"built {img}")
+
 
 if __name__ == "__main__":
-    cli()
+    main()

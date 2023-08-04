@@ -1,21 +1,23 @@
-name: multi-configset
+name: build-containers
 
 on:
   workflow_dispatch:
     inputs:
       kolla_build_profile:
         description: "Kolla profile(s) to build (e.g., 'base', 'ironic'), comma-separated"
-      build_pattern:
+      kolla_build_pattern:
         description: "Kolla image build pattern (e.g., '^ironic-')"
       push:
-        description: "Push images to registry? (yes/no)"
+        type: boolean
+        description: "Push images to registry? (true/false)"
         required: true
-        default: "no"
-        options:
-          - "yes"
-          - "no"
+        default: false
       tag:
         description: "Override default tag"
+      cache:
+        type: boolean
+      pull:
+        type: boolean
 
 env:
   DOCKER_REGISTRY: ghcr.io
@@ -23,24 +25,25 @@ env:
   KOLLA_NAMESPACE_PROD: chameleoncloud/kolla
 
 jobs:
-  buildx:
+  build-containers:
     environment: Chameleon CI
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        config_set:
-          - x86_ubuntu
     steps:
       - name: Set profile argument from workflow inputs
         if: github.event.inputs.kolla_build_profile != ''
         run: echo "KOLLA_BUILD_PROFILE=${{ github.event.inputs.kolla_build_profile }}" >> $GITHUB_ENV
       - name: Set pattern argument from workflow inputs
-        if: github.event.inputs.build_pattern != ''
-        run: echo "KOLLA_BUILD_PATTERN=${{ github.event.inputs.build_pattern }}" >> $GITHUB_ENV
+        if: github.event.inputs.kolla_build_pattern != ''
+        run: echo "KOLLA_BUILD_PATTERN=${{ github.event.inputs.kolla_build_pattern }}" >> $GITHUB_ENV
       - name: Set push argument from workflow inputs
-        if: github.event.inputs.push == 'yes'
+        if: github.event.inputs.push == true
         run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
+      - name: Set Cache argument from workflow inputs
+        if: github.event.inputs.cache == true
+        run: echo "KOLLA_CACHE=1" >> $GITHUB_ENV
+      - name: Set Pull argument from workflow inputs
+        if: github.event.inputs.pull == true
+        run: echo "PULL=1" >> $GITHUB_ENV
       - name: Set tag argument from workflow inputs
         if: github.event.inputs.tag != ''
         run: echo "DOCKER_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
@@ -51,13 +54,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-      - name: Cache python deps
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          cache: 'pip' # caching pip dependencies
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -71,16 +68,6 @@ jobs:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Inspect builder
-        run: |
-          echo "Name:      ${{ steps.buildx.outputs.name }}"
-          echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
-          echo "Status:    ${{ steps.buildx.outputs.status }}"
-          echo "Flags:     ${{ steps.buildx.outputs.flags }}"
-          echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
       - name: Run Kolla Build
         run: |
-          ./run.sh python build.py --config-set ${{ matrix.config_set }} \
-            ${{ fromJSON('["--no-push", "--push"]')[env.SHOULD_PUSH] }}
-      - name: List Build Images
-        run: docker image ls
+          ./run.sh python3 do_build.py
