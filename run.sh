@@ -51,18 +51,22 @@ if [[ "${CHECK_UPDATES}" == "yes" || "${FORCE_UPDATES}" == "yes" ]]; then
     sha256sum "${pip_requirements}" >"${pip_requirements_chksum}"
   fi
 
-  kolla_remote=https://github.com/chameleoncloud/kolla.git
-  kolla_checkout="${KOLLA_BRANCH}"
-  kolla_gitref="${VIRTUALENV}"/kolla.gitref
-  kolla_egglink="${VIRTUALENV}"/src/kolla
-  if [[ "${FORCE_UPDATES}" == "yes" || ! -f "${kolla_gitref}" || ! -d "${kolla_egglink}" ]] || \
-        ! diff -q >/dev/null \
-          "${kolla_gitref}" \
-          <(cd "${kolla_egglink}"; git fetch; git show-ref -s -d origin/"${kolla_checkout}"); then
-    pushd "${VIRTUALENV}" || ( echo "pushd error!" && exit 1 )
-    pip install -e git+"${kolla_remote}"@"${kolla_checkout}"#egg=kolla
-    popd || ( echo "popd error!" && exit 1 )
-    (cd "${kolla_egglink}"; git rev-parse HEAD >"${kolla_gitref}")
+  if [ -z ${KOLLA_LOCAL_CHECKOUT+x} ]; then
+    kolla_remote=https://github.com/chameleoncloud/kolla.git
+    kolla_checkout="${KOLLA_BRANCH}"
+    kolla_gitref="${VIRTUALENV}"/kolla.gitref
+    kolla_egglink="${VIRTUALENV}"/src/kolla
+    if [[ "${FORCE_UPDATES}" == "yes" || ! -f "${kolla_gitref}" || ! -d "${kolla_egglink}" ]] || \
+          ! diff -q >/dev/null \
+            "${kolla_gitref}" \
+            <(cd "${kolla_egglink}"; git fetch; git show-ref -s -d origin/"${kolla_checkout}"); then
+      pushd "${VIRTUALENV}" || ( echo "pushd error!" && exit 1 )
+      pip install -e git+"${kolla_remote}"@"${kolla_checkout}"#egg=kolla
+      popd || ( echo "popd error!" && exit 1 )
+      (cd "${kolla_egglink}"; git rev-parse HEAD >"${kolla_gitref}")
+    fi
+  else
+    pip install -e ${KOLLA_LOCAL_CHECKOUT}
   fi
 fi
 
