@@ -9,6 +9,7 @@
 /kolla/
 # Virtualenv for tox bootstrapping
 /venv/
+.venv
 # Templated config
 kolla-build.conf
 # Python build files
