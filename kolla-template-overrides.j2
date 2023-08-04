@@ -70,6 +70,11 @@ RUN pip --no-cache-dir install --upgrade \
 # Neutron
 ##########
 
+{% block neutron_base_header %}
+# version 1.0.0 doesn't work for python3, conflicts with xena upper-constraints
+RUN sed -i 's|^etcd3gw===.*$||g' requirements/upper-constraints.txt
+{% endblock %}
+
 # See "neutron-server-additions-extra" section in kolla-build.conf
 {% block neutron_server_footer %}
 ADD additions-archive /
