@@ -70,4 +70,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Kolla Build
         run: |
-          ./run.sh python3 do_build.py
+          ./run.sh python3 build.py
