@@ -9,6 +9,13 @@ LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-c
 {% endblock %}
 
 #########
+# Fluentd
+#########
+{% block fluentd_footer %}
+RUN /usr/sbin/td-agent-gem install fluent-plugin-grafana-loki
+{% endblock %}
+
+#########
 # Blazar
 #########
 
