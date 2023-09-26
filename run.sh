@@ -18,13 +18,8 @@ FORCE_UPDATES="${FORCE_UPDATES:-no}"
 CHECK_UPDATES=yes
 
 if [[ ! -f "${VIRTUALENV}"/bin/activate ]]; then
-	if [[ "$(python -V | cut -d' ' -f2)" != "3."* ]]; then
-		echo "Python 3.x is required."
-		exit 1
-	fi
-
   echo "Creating virtualenv at ${VIRTUALENV} ..."
-  python -m venv "${VIRTUALENV}" --system-site-packages
+  python3 -m venv "${VIRTUALENV}" --system-site-packages
   "${VIRTUALENV}"/bin/pip install --upgrade pip
   FORCE_UPDATES=yes
 fi
