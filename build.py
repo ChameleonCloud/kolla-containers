@@ -35,10 +35,10 @@ def main():
     if environ.get("KOLLA_CACHE", None):
         kolla_argv.append("--cache")
 
-    if environ.get("PULL", None) == 1:
+    if environ.get("PULL", None) == "1":
         kolla_argv.append("--pull")
 
-    if environ.get("SHOULD_PUSH", None) == 1:
+    if environ.get("SHOULD_PUSH", None) == "1":
         kolla_argv.append("--push")
 
     build_tag = environ.get("DOCKER_TAG", None)

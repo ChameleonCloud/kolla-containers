@@ -8,16 +8,28 @@ on:
       kolla_build_pattern:
         description: "Kolla image build pattern (e.g., '^ironic-')"
       push:
-        type: boolean
+        type: choice
         description: "Push images to registry? (true/false)"
         required: true
-        default: false
+        default: 'false'
+        options:
+          - 'true'
+          - 'false'
       tag:
         description: "Override default tag"
       cache:
-        type: boolean
+        type: choice
+        default: 'false'
+        options:
+          - 'true'
+          - 'false'
       pull:
-        type: boolean
+        description: "Should kolla-build pull the OS bas image before build"
+        type: choice
+        default: 'false'
+        options:
+          - 'true'
+          - 'false'
 
 env:
   DOCKER_REGISTRY: ghcr.io
@@ -36,13 +48,13 @@ jobs:
         if: github.event.inputs.kolla_build_pattern != ''
         run: echo "KOLLA_BUILD_PATTERN=${{ github.event.inputs.kolla_build_pattern }}" >> $GITHUB_ENV
       - name: Set push argument from workflow inputs
-        if: github.event.inputs.push == true
+        if: github.event.inputs.push == 'true'
         run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
       - name: Set Cache argument from workflow inputs
-        if: github.event.inputs.cache == true
+        if: github.event.inputs.cache == 'true'
         run: echo "KOLLA_CACHE=1" >> $GITHUB_ENV
       - name: Set Pull argument from workflow inputs
-        if: github.event.inputs.pull == true
+        if: github.event.inputs.pull == 'true'
         run: echo "PULL=1" >> $GITHUB_ENV
       - name: Set tag argument from workflow inputs
         if: github.event.inputs.tag != ''
