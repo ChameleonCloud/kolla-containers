@@ -36,12 +36,10 @@ RUN cp -R /additions/extra/* /etc/blazar/ \
 #########
 # Doni
 #########
-
-{% block doni_worker_header %}
-# Force upgrade PyJWT so that balena-sdk dependencies can be satisfied.
-# The requirements repo has a constraint on PyJWT so we have to install both
-# separately to avoid getting downgraded.
-RUN pip --no-cache-dir install --upgrade PyJWT>=2.0.0 balena-sdk
+{% block doni_base_header %}
+# After converting from poetry to setuptools with pyproject.toml
+# we need a newer version of pip to correctly get the package name
+RUN pip install --upgrade pip
 {% endblock %}
 
 #########
