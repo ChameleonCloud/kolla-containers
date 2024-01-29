@@ -27,6 +27,7 @@ RUN cp -R /additions/extra/* /etc/blazar/ \
 {% endblock %}
 
 # TODO [jca 2018-01-24]:
+# TODO [msh 2024-01-29]: (still the case in version 2023.1)
 # - remove blazarclient when we add blazarclient to the base packages
 #   on kolla upstream. There is no reason not to have it there.
 {% set openstack_base_pip_packages_append = [
@@ -36,11 +37,11 @@ RUN cp -R /additions/extra/* /etc/blazar/ \
 #########
 # Doni
 #########
-{% block doni_base_header %}
-# After converting from poetry to setuptools with pyproject.toml
-# we need a newer version of pip to correctly get the package name
-RUN pip install --upgrade pip
-{% endblock %}
+#{% block doni_base_header %}
+## After converting from poetry to setuptools with pyproject.toml
+## we need a newer version of pip to correctly get the package name
+#RUN pip install --upgrade pip
+#{% endblock %}
 
 #########
 # Heat
@@ -59,8 +60,10 @@ RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
   && chown -R horizon: /etc/openstack-dashboard/themes
 
 # Override with our fork, which includes support for device resources amongst other things
-RUN pip --no-cache-dir install --upgrade \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/xena#egg=python-blazarclient
+{% set openstack_horizon_pip_packages_append = [
+  'git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2023.1'
+] %}
+
 {% endblock %}
 
 ##########
@@ -74,19 +77,6 @@ RUN pip --no-cache-dir install --upgrade \
 ##########
 # Neutron
 ##########
-
-{% block neutron_base_header %}
-# version 1.0.0 doesn't work for python3, conflicts with xena upper-constraints
-RUN sed -i 's|^etcd3gw===.*$||g' requirements/upper-constraints.txt
-{% endblock %}
-
-# See "neutron-server-additions-extra" section in kolla-build.conf
-{% block neutron_server_footer %}
-ADD additions-archive /
-RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
-  && (cd /var/lib/kolla/venv/lib/python{{ distro_python_version }}/site-packages/netmiko \
-      && git apply -p2 /etc/neutron/patches/netmiko/*.patch)
-{% endblock %}
 
 ##########
 # Nova
@@ -104,8 +94,3 @@ RUN cp -R /additions/extra/neutron-server/* /etc/neutron/ \
 ######
 # Zun
 ######
-
-# NOTE(jason): Remove this past Victoria; kubernetes 12.x is needed for zun-compute-k8s
-{% block zun_compute_k8s_footer %}
-RUN pip --no-cache-dir install --upgrade kubernetes==12.0.0
-{% endblock %}

@@ -15,3 +15,4 @@ kolla-build.conf
 # Python build files
 __pycache__/
 *.pyc
+workdir
