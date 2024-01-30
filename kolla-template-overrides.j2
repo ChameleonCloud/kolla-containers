@@ -60,10 +60,8 @@ RUN mkdir -p /etc/openstack-dashboard/themes/chameleoncloud \
   && chown -R horizon: /etc/openstack-dashboard/themes
 
 # Override with our fork, which includes support for device resources amongst other things
-{% set openstack_horizon_pip_packages_append = [
-  'git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2023.1'
-] %}
-
+RUN pip --no-cache-dir install --upgrade \
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2023.1#egg=python-blazarclient
 {% endblock %}
 
 ##########

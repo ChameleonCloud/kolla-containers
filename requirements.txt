@@ -1,1 +1,2 @@
-git+https://github.com/openstack/kolla@stable/2023.1
+# git+https://github.com/openstack/kolla@stable/2023.1
+git+https://github.com/chameleoncloud/kolla@chameleoncloud/2023.1
