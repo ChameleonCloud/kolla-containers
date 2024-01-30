@@ -4,10 +4,11 @@ set -e -u -o pipefail
 
 clone_branch_to_dir () {
 
+    echo "checking ${2}"
     # if directory exists, ensure it's at the correct checkout
     if [ -d ${3} ]
     then
-        (cd ${3}; git checkout ${1})
+        ( cd ${3}; git checkout ${1} )
     else
         # otherwise, clone it to the correct branch
         git clone \
@@ -39,9 +40,19 @@ kolla-build \
     --threads 40 \
     --profile infra \
     --profile blazar \
+    --profile cinder \
+    --profile glance \
     --profile heat \
     --profile horizon \
     --profile ironic \
     --profile keystone \
+    --profile manila \
     --profile neutron \
-    --profile nova
+    --profile nova \
+    --profile placement \
+    --profile prometheus
+    # --profile doni \
+    # --profile tunelo \
+    # --profile cyborg \
+    # --profile zun \
+    # --list-images
