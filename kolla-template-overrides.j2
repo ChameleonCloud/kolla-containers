@@ -9,6 +9,15 @@ LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-c
 {% endblock %}
 
 #########
+# Base
+#########
+# Pin apt packages to static versions
+{% block base_ubuntu_package_sources_list %}
+COPY sources.list /etc/apt/sources.list.d/kolla-custom.list
+{% endblock %}
+
+
+#########
 # Fluentd
 #########
 {% block fluentd_footer %}

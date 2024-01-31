@@ -1,0 +1,17 @@
+# For non-x86 architectures we use sources.list.ubuntu.<arch>
+
+# Pin package versions to 20240111T140646Z for reproducibility
+deb [check-valid-until=no] http://snapshot.ubuntu.com/ubuntu/20240111T140646Z jammy main universe
+deb [check-valid-until=no] http://snapshot.ubuntu.com/ubuntu/20240111T140646Z jammy-updates main universe
+deb [check-valid-until=no] http://snapshot.ubuntu.com/ubuntu/20240111T140646Z jammy-security main universe
+
+# Backports have a lower priority and must be explicitly installed to be used
+deb [check-valid-until=no] http://snapshot.ubuntu.com/ubuntu/20240111T140646Z jammy-backports main universe
+
+# We need to add the repo for the updated packages they provide. The main ones
+# are qemu, libvirt, and openvswitch.
+deb http://ubuntu-cloud.archive.canonical.com/ubuntu jammy-updates/antelope main
+
+# NOTE(hrw): extra repositories are added into image when they are needed as
+# separate files in /etc/apt/sources.list.d/ directory. For that purpose they
+# are defined in kolla/template/repos.yaml file.
