@@ -9,7 +9,7 @@ from kolla.image import build as kolla_build
 
 PROFILES= [
     "base",
-    # "blazar",
+    "blazar",
     # "cinder",
     # "doni",
     # "glance",

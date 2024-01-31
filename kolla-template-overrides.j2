@@ -30,7 +30,7 @@ RUN /usr/sbin/td-agent-gem install fluent-plugin-grafana-loki
 
 {% block blazar_manager_footer %}
 ADD additions-archive /
-RUN cp -R /additions/extra/* /etc/blazar/ \
+RUN cp -R /additions/* /etc/blazar/ \
   && chown -R blazar: /etc/blazar \
   && ln -s /etc/blazar/blazar-manager/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
 {% endblock %}
