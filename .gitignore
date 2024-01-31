@@ -6,7 +6,7 @@
 # Local sources (tarballs) for inclusion
 /sources/
 # Local Kolla checkouts
-/kolla/
+/tools/kolla/
 # Virtualenv for tox bootstrapping
 /venv/
 .venv

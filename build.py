@@ -3,28 +3,31 @@
 
 import sys
 from os import environ
+from pathlib import Path
 
 from kolla.image import build as kolla_build
 
 PROFILES= [
     "base",
-    "blazar",
-    "cinder",
-    "doni",
-    "glance",
-    "gnocchi",
-    "heat",
-    "horizon",
-    "ironic",
-    "keystone",
-    "manila",
-    "neutron",
-    "nova",
-    "placement",
-    "tunelo",
-    "zun",
+    # "blazar",
+    # "cinder",
+    # "doni",
+    # "glance",
+    # "gnocchi",
+    # "heat",
+    # "horizon",
+    # "ironic",
+    # "keystone",
+    # "manila",
+    # "neutron",
+    # "nova",
+    # "placement",
+    # "tunelo",
+    # "zun",
 ]
 
+LOCALS_BASE=Path.cwd().joinpath("sources")
+WORKDIR=Path.cwd().joinpath("build")
 
 def main():
     kolla_argv = []
@@ -32,34 +35,22 @@ def main():
     kolla_argv.extend( ["--config-file", "kolla-build.conf"] )
     kolla_argv.extend( ["--template-override", "kolla-template-overrides.j2"])
 
-    if environ.get("KOLLA_CACHE", None):
-        kolla_argv.append("--cache")
+    kolla_argv.extend( ["--locals-base", LOCALS_BASE.as_posix()])
+    kolla_argv.extend( ["--work-dir", WORKDIR.as_posix()])
+    kolla_argv.extend( ["--threads", "1"] )
 
-    if environ.get("PULL", None) == "1":
-        kolla_argv.append("--pull")
+    # don't re-pull our custom base image if present
+    # kolla_argv.extend( ["--nopull"] )
 
-    if environ.get("SHOULD_PUSH", None) == "1":
-        kolla_argv.append("--push")
 
-    build_tag = environ.get("DOCKER_TAG", None)
-    if build_tag:
-        kolla_argv.extend( ["--tag", build_tag])
+    for profile in PROFILES:
+        kolla_argv.extend( ["--profile", profile])
 
-    # allow selecting images to build via profile or pattern.
-    # If unset, build all images with a known profile
-    build_profile = environ.get("KOLLA_BUILD_PROFILE", None)
-    build_pattern = environ.get("KOLLA_BUILD_PATTERN", None)
-    if build_profile:
-        kolla_argv.extend( ["--profile", build_profile])
-    elif build_pattern:
-        kolla_argv.append(build_pattern)
-    else:
-        for profile in PROFILES:
-            kolla_argv.extend( ["--profile", profile])
-
+    # kolla_argv.extend( ["^base$"] )
+    # kolla_argv.extend( ["--profile", "base"] )
 
     print("kolla-build \\")
-    print("  " + " \\\n  ".join(kolla_argv))
+    print("  ".join(kolla_argv))
     print()
 
     # Kolla reads its input straight from sys.argv
