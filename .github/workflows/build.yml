@@ -17,24 +17,9 @@ on:
           - 'false'
       tag:
         description: "Override default tag"
-      cache:
-        type: choice
-        default: 'false'
-        options:
-          - 'true'
-          - 'false'
-      pull:
-        description: "Should kolla-build pull the OS bas image before build"
-        type: choice
-        default: 'false'
-        options:
-          - 'true'
-          - 'false'
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  KOLLA_NAMESPACE_DEV: chameleoncloud/kolla-dev
-  KOLLA_NAMESPACE_PROD: chameleoncloud/kolla
 
 jobs:
   build-containers:
@@ -50,12 +35,6 @@ jobs:
       - name: Set push argument from workflow inputs
         if: github.event.inputs.push == 'true'
         run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
-      - name: Set Cache argument from workflow inputs
-        if: github.event.inputs.cache == 'true'
-        run: echo "KOLLA_CACHE=1" >> $GITHUB_ENV
-      - name: Set Pull argument from workflow inputs
-        if: github.event.inputs.pull == 'true'
-        run: echo "PULL=1" >> $GITHUB_ENV
       - name: Set tag argument from workflow inputs
         if: github.event.inputs.tag != ''
         run: echo "DOCKER_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
