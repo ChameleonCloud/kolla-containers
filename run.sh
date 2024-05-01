@@ -34,7 +34,18 @@ fi
 
 # Set these _after_ sourcing a possible .env file, so it can be defaulted there.
 KOLLA_BRANCH="${KOLLA_BRANCH:-chameleoncloud/xena}"
-DOCKER_TAG="${DOCKER_TAG:-xena}"
+
+# by default, tag containers with the git sha for kolla-containers repo
+GIT_REF="$(git rev-parse --abbrev-ref HEAD)"
+
+# replace '/' with '-' since container tags cannot contain '/'
+GIT_REF_DASH=${GIT_REF//'/'/"-"}
+if [[ -n $(git status --porcelain) ]]; then
+  GIT_REF_DASH="${GIT_REF_DASH}-dirty"
+fi
+
+# if DOCKER_TAG env var is set, use that, otherwise use git ref as tag
+export DOCKER_TAG="${DOCKER_TAG:-$GIT_REF_DASH}"
 
 # Automatically update dependencies
 if [[ "${CHECK_UPDATES}" == "yes" || "${FORCE_UPDATES}" == "yes" ]]; then
