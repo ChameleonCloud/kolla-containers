@@ -6,7 +6,6 @@ Email user about the expiration datetime of the lease.
 """
 import argparse
 import configparser
-import os
 import sys
 import smtplib
 from datetime import datetime
