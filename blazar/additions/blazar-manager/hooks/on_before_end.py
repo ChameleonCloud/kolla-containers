@@ -73,7 +73,7 @@ def render_template(**kwargs):
     return templ.render(**kwargs)
 
 
-def send_email(email_host, email_port, email_tls, email_user, email_password, to, sender, cc=None, bcc=None, subject=None, body=None):
+def send_email(email_host, email_port, email_ssl, email_user, email_password, to, sender, cc=None, bcc=None, subject=None, body=None):
     # convert TO into list if string
     if type(to) is not list:
         to = to.split()
@@ -85,9 +85,9 @@ def send_email(email_host, email_port, email_tls, email_user, email_password, to
         sys.exit(1)
 
     try:
-        email_tls = bool(email_tls)
+        email_ssl = bool(email_ssl)
     except ValueError:
-        print(f"Invalid value for smtp tls, expected bool: {email_tls}")
+        print(f"Invalid value for smtp ssl, expected bool: {email_ssl}")
         sys.exit(1)
 
     to_list = [addr for addr in (to + [cc] + [bcc]) if addr is not None]
@@ -101,11 +101,12 @@ def send_email(email_host, email_port, email_tls, email_user, email_password, to
     msg.attach(MIMEText(body, "html"))
 
     # send email
-    server = smtplib.SMTP(email_host, email_port, timeout=30)
-    if email_tls:
-        server.starttls()
+    if email_ssl:
+        server = smtplib.SMTP_SSL(email_host, email_port, timeout=30)
+    else:
+        server = smtplib.SMTP(email_host, email_port, timeout=30)
     if email_user and email_password:
-        server.login(username, password)
+        server.login(email_user, email_password)
     server.sendmail(sender, to_list, msg.as_string())
     server.quit()
 
@@ -162,23 +163,19 @@ def main(argv):
     html = render_template(vars=template_vars)
 
     # read email host from blazar.conf
-    email_host = os.environ.get("SMTP_HOST", "127.0.0.1")
-    # smtplib's default is 0, defaults to OS implementation
-    email_port = os.environ.get("SMTP_PORT", "0")
-    email_tls = os.environ.get("SMTP_TLS")
-    email_user = os.environ.get("SMTP_USER")
-    email_password = os.environ.get("SMTP_PASSWORD")
+    email_host = "127.0.0.1"
     blazar_config = configparser.ConfigParser()
     try:
         blazar_config.read("/etc/blazar/blazar.conf")
         email_host = blazar_config["physical:host"]["email_relay"]
+        # smtplib's default is 0, defaults to OS implementation
         email_port = blazar_config["physical:host"].get("email_port", 0)
-        email_tls = blazar_config["physical:host"].get("email_tls")
+        email_ssl = blazar_config["physical:host"].get("email_ssl", False)
         email_user = blazar_config["physical:host"].get("email_user")
         email_password = blazar_config["physical:host"].get("email_password")
     except Exception:
         pass
-    send_email(email_host, email_port, email_tls, email_user, email_password, args.to, args.sender, args.cc, args.bcc, subject, html)
+    send_email(email_host, email_port, email_ssl, email_user, email_password, args.to, args.sender, args.cc, args.bcc, subject, html)
 
 
 if __name__ == "__main__":
