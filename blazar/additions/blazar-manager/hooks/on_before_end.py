@@ -163,6 +163,11 @@ def main(argv):
 
     # read email host from blazar.conf
     email_host = "127.0.0.1"
+    # smtplib's default is 0, defaults to OS implementation
+    email_port = 0
+    email_ssl = False
+    email_user = None
+    email_password = None
     blazar_config = configparser.ConfigParser()
     try:
         blazar_config.read("/etc/blazar/blazar.conf")
