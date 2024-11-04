@@ -2,23 +2,43 @@
 
 A central repository of build customizations for [Kolla](https://docs.openstack.org/kolla/latest/) containers specific to Chameleon, and automated triggers for rebuilding pieces of Kolla's image tree when sources change.
 
-## Setup
+To build images, we invoke kolla's `kolla-build` tool, with config files and arguments packaged in this repo.
 
-Using the build utilities requires having Python 3 and the `venv` module installed:
+## Installation
 
-```
-# e.g., for Ubuntu/Debian
-apt-get install python3-venv
-```
 
-## Configuration sets
+1. Using the build utilities requires having Python 3 and the `venv` module installed:
+   ```
+   apt-get install python3-venv
+   ```
+1. Create the virtualenv:
+   ```
+   python3 -m venv .venv
+   ```
+1. Ensure the kolla version is present under `src/kolla`:
+   ```
+   git submodule update --init`
+   ```
+1. Finally, install into the venv:
+   ```
+   .venv/bin/pip install src/kolla
+   ```
 
-Each Kolla service requires at minimum either its own configuration set defined in the `build_config.yaml`, or being added to an existing configuration set.
-To add a service's images to the list of images that will be built for a given configuration set, update the regex in the `[profiles]` section of the `kolla-build.conf`; one or more configuration sets will reference one of these build profiles.
+## Configuration
 
-Configuration sets can also be used to override specific Kolla build flags, such as the target base distro, tag, or architecture/platform.
+The kolla-build tool's documentation can be found here: https://docs.openstack.org/kolla/latest/admin/image-building.html#building-kolla-images
 
-### Adding support for a new service fork
+Fundamentally, kolla can take 3 different sources of configuration: arguments passed to the commandline, 1 or more configuration file, and 1 or more template files.
+
+Commandline arguments can also be entered in the `[Default]` section of the kolla-build.conf file, which also supports overrides for specific services, such as `--registry` becoming `registry`.
+
+### Profiles
+
+Specifying a profile in the config file allows a specific list of containers to be built, by matching a regex against the container names. For example if we add `ironic = ^ironic(?!-neutron),dnsmasq`, invoking `kolla-build --profile ironic` will build all containers starting with `ironic`, excluding `ironic-neutron-agent`, and finally also include `dnsmasq`. 
+
+This is most often useful to rebuild just the containers needed to support one service, without wasting time rebuilding all the others.
+
+### Specifying a service fork
 
 By default all Kolla images build from tarballs published by OpenStack. Many of Chameleon's forks are by contrast built via local Git clones. When forking a service, add an entry for the service's base image in the `kolla-build.conf` and have it use Git as the source; there are several examples in the configuration already.
 
@@ -34,17 +54,25 @@ Additional notes:
 
 ## Building a container
 
-The supported services can be build using the `build.py` script and passing the name of a configuration set
-and a profile name. The configuration sets are defined in the `build_config.yaml` file and set things
-like the platform/architecture and base distro for the build.
+Containers can be built by invoking the `run.sh` script. This is a simple wrapper around kolla-build, specifying our default `kolla-build.conf` and `kolla-template-overrides.j2` files, and otherwise passing all remaining arguments directly to `kolla-build.`
 
 ```
 # Build container for Horizon
-./run.sh python build.py --config-set x86_ubuntu --profile horizon
+./run.sh  --profile horizon
 
 # Build containers for Nova
-./run.sh python build.py --config-set x86_ubuntu --profile nova
+./run.sh  --profile nova
 ```
+
+By default, all containers will be tagged with the git short-sha of this repo. If there are un-committed modifications, the tag will include `-dirty`.
+
+Assuming the git-sha for HEAD is `ee83055d89bf48a920723881c4ce2d007d41c1d8`, 
+Building with a clean repo will tag containers with: `ee83055`, from `git rev-parse --short HEAD`. If you have local changes, it will instead tag with `ee83055-dirty`.
+
+If you push the containers, this will allow deploying them at a site for testing without overriding `latest` and so on.
+
+CI in github-actions is responsible for tagging containers with more human-readable names, such as `stable/2023.1`, `latest`, and so on.
+
 
 ### Bypassing cache
 
@@ -60,7 +88,7 @@ If you wish to force a rebuild of all parent images, you can do so by passing in
 The `--push` flag can be used to instruct Kolla to push the images up to a registry once they are built:
 
 ```
-./run.sh python build.py --config-set x86_ubuntu --profile horizon --push
+./run.sh --profile horizon --push
 ```
 
 ### Cross-compiling
