@@ -4,9 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       kolla_build_profile:
-        description: "Kolla profile(s) to build (e.g., 'base', 'ironic'), comma-separated"
+        description: "Kolla profile to invoke (e.g., 'ironic')"
+        type: string
       kolla_build_pattern:
         description: "Kolla image build pattern (e.g., '^ironic-')"
+        type: string
       push:
         type: choice
         description: "Push images to registry? (true/false)"
@@ -16,49 +18,44 @@ on:
           - 'true'
           - 'false'
       tag:
-        description: "Override default tag"
-
+        type: string
+        description: "Docker tag for built images, overrides default of git-sha"
 env:
-  DOCKER_REGISTRY: ghcr.io
+  REGISTRY: ghcr.io
 
 jobs:
   build-containers:
-    environment: Chameleon CI
     runs-on: ubuntu-latest
     steps:
-      - name: Set profile argument from workflow inputs
-        if: github.event.inputs.kolla_build_profile != ''
-        run: echo "KOLLA_BUILD_PROFILE=${{ github.event.inputs.kolla_build_profile }}" >> $GITHUB_ENV
-      - name: Set pattern argument from workflow inputs
-        if: github.event.inputs.kolla_build_pattern != ''
-        run: echo "KOLLA_BUILD_PATTERN=${{ github.event.inputs.kolla_build_pattern }}" >> $GITHUB_ENV
-      - name: Set push argument from workflow inputs
-        if: github.event.inputs.push == 'true'
-        run: echo "SHOULD_PUSH=1" >> $GITHUB_ENV
-      - name: Set tag argument from workflow inputs
-        if: github.event.inputs.tag != ''
-        run: echo "DOCKER_TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
-
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.10"
           cache: 'pip' # caching pip dependencies
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          install: true
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install src/kolla
+
       - name: Login to Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
-          registry: ${{ env.DOCKER_REGISTRY }}
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run Kolla Build
+        env:
+          BUILD_PROFILE: ${{ inputs.kolla_build_profile }}
+          BUILD_PATTERN: ${{ inputs.kolla_build_pattern }}
+          BUILD_TAG: ${{ inputs.tag }}
+          PUSH: ${{ inputs.push }}
         run: |
-          ./run.sh python3 build.py
+          ./run.sh
+        
