@@ -36,6 +36,19 @@ RUN pip --no-cache-dir install \
   git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2023.1#egg=python-blazarclient
 {% endblock %}
 
+#########
+# Ironic
+#########
+
+# We need an arm64 ipxe binary to support fugaku nodes at tacc, and arm thunder x2 at ncar.
+# we build them ourselves to ensure that support for gzip compressed images is enabled.
+
+{% set ironic_pxe_packages_append = ['unzip'] %}
+{% block ironic_pxe_footer %}
+ADD https://github.com/ChameleonCloud/ipxe/releases/download/v2022-09-30-chameleon/bin-arm64-efi.zip /opt/ipxe_efi.zip
+RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ipxe_efi.zip)
+{% endblock %}
+
 
 ##########
 # Keystone
