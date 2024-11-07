@@ -33,7 +33,7 @@ RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
 {% block horizon_footer %}
 # [blazar-dashboard] Override with our fork of blazarclient, which includes support for device resources
 RUN pip --no-cache-dir install \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2023.1#egg=python-blazarclient
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2024.1#egg=python-blazarclient
 {% endblock %}
 
 #########

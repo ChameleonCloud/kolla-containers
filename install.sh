@@ -7,5 +7,5 @@ git submodule update --init
 
 # create venv for tool installation
 python3 -m venv .venv
+.venv/bin/pip install docker
 .venv/bin/pip install -e src/kolla
-
