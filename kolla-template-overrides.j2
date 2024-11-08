@@ -65,10 +65,9 @@ RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ip
 # Neutron
 ##########
 
-# See "neutron-server-additions-extra" section in kolla-build.conf
-{% block neutron_server_footer %}
-ADD additions-archive /
-RUN cp -R /additions/neutron-server/* /etc/neutron/ \
-  && (cd /var/lib/kolla/venv/lib/python{{ distro_python_version }}/site-packages/netmiko \
-      && git apply -p2 /etc/neutron/patches/netmiko/*.patch)
-{% endblock %}
+### Install our fork of netmiko. Along with NGS changes, it adds support for Dell FN IO aggregator switches in the fx2 chassis
+### 2023.1 and 2024.1 target netmiko 4.1.2 via upper-constraints
+{% set neutron_server_pip_packages_remove = ['netmiko'] %}
+{% set neutron_server_pip_packages_append = [
+  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2#egg=netmiko'
+]%}
