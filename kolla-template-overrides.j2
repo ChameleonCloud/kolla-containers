@@ -8,6 +8,14 @@ LABEL maintainer="{{ maintainer }}" name="{{ image_name }}" build-date="{{ build
 LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-containers"
 {% endblock %}
 
+################
+# Openstack-Base
+################
+
+{% block openstack_base_footer %}
+RUN {{ macros.upper_constraints_remove("netmiko") }}
+{% endblock %}
+
 #########
 # Fluentd
 #########
@@ -65,9 +73,18 @@ RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ip
 # Neutron
 ##########
 
-{% block neutron_server_footer %}
-# Install our fork of netmiko. Along with NGS changes, it adds support for Dell FN IO aggregator switches in the fx2 chassis
-# 2023.1 and 2024.1 target netmiko 4.1.2 via upper-constraints
-RUN pip --no-cache-dir install --force-reinstall \
-  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2#egg=netmiko'
-{% endblock %}
+
+{% set neutron_base_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
+{% set neutron_server_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
+
+# we do this twice because kolla is installing neutron plugins twice, 
+# and upper-constraints undoes our install
+#{% block neutron_base_footer %}
+#RUN SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip --no-cache-dir install --upgrade \
+#  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'
+#{% endblock %}
+#
+#{% block neutron_server_footer %}
+#RUN SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip --no-cache-dir install --upgrade \
+#  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'
+#{% endblock %}
