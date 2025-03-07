@@ -14,3 +14,14 @@ LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-c
 {% block fluentd_footer %}
 RUN /usr/sbin/td-agent-gem install fluent-plugin-grafana-loki
 {% endblock %}
+
+#########
+# Blazar
+#########
+
+{% block blazar_manager_footer %}
+ADD additions-archive /
+RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
+  && chown -R blazar: /etc/blazar \
+  && ln -s /etc/blazar/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
+{% endblock %}
