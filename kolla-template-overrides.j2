@@ -14,3 +14,16 @@ LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-c
 {% block fluentd_footer %}
 RUN /usr/sbin/td-agent-gem install fluent-plugin-grafana-loki
 {% endblock %}
+
+##########
+# Keystone
+##########
+
+{% set keystone_base_packages_remove = ['libapache2-mod-auth-openidc'] %}
+{% set keystone_base_packages_append = [
+  'https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.13.1/libapache2-mod-auth-openidc_2.4.13.1-1.bionic_amd64.deb',
+  'libpcre2-8-0',
+  'libcjose0',
+  'libhiredis0.13',
+  'libjansson4'
+  ] %}
