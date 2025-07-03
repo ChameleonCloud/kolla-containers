@@ -49,13 +49,14 @@ a:hover { color: #B40057; background-color:#C4FFF9; text-decoration: underline }
 <p>We're sending this email to inform you that your lease {{ vars['leasename'] }} (ID: {{ vars['leaseid'] }}) under project {{ vars['projectname'] }} on {{ vars['site'] }}
 will expire on {{ vars['enddatetime_utc'] }} UTC / {{ vars['enddatetime_ct'] }} Central Time.</p>
 
-
+{% if vars['servers']  %}
 <p>The following instances are provisioned on nodes in this lease, and will be deleted if when the lease ends:</p>
 <ul>
   {% for server in vars['servers'] %}
     <li>{{ server.name }} ({{ server.id }})</li>
   {% endfor %}
 </ul>
+{% endif %}
 
 <p>You can extend your lease using
 either the Chameleon <a href='https://chameleoncloud.readthedocs.io/en/latest/technical/reservations.html#extending-a-lease' target='_blank'>web interface</a>
@@ -195,10 +196,10 @@ def main(argv):
         conn = openstack.connection.Connection(session=sess)
         for server in conn.compute.servers(project_id=args.project_id, all_tenants=True):
             if server.hypervisor_hostname in hosts_in_lease:
-                print(server.name)
                 servers_in_lease.append(server)
     except Exception as e:
         # Ignore errors
+        print("Error getting server info")
         print(e)
         pass
 
