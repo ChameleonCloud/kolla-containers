@@ -170,19 +170,21 @@ def main(argv):
     blazar_config.read("/etc/blazar/blazar.conf")
     servers_in_lease = []
     try:
-        if args.site != 'KVM@TACC':
-            auth_config = blazar_config['keystone_authtoken']
-            auth = v3.Password(
-                auth_url=auth_config.get('auth_url'),
-                username=auth_config.get('username'),
-                password=auth_config.get('password'),
-                user_domain_name=auth_config.get('user_domain_name', 'Default'),
-                project_name=auth_config.get('project_name'),
-                project_domain_name=auth_config.get('project_domain_name', 'Default')
-            )
-            sess = session.Session(auth=auth)
+        auth_config = blazar_config['keystone_authtoken']
+        auth = v3.Password(
+            auth_url=auth_config.get('auth_url'),
+            username=auth_config.get('username'),
+            password=auth_config.get('password'),
+            user_domain_name=auth_config.get('user_domain_name', 'Default'),
+            project_name=auth_config.get('project_name'),
+            project_domain_name=auth_config.get('project_domain_name', 'Default')
+        )
+        sess = session.Session(auth=auth)
 
-            bc = BlazarClient("1", service_type="reservation", session=(sess))
+        bc = BlazarClient("1", service_type="reservation", session=(sess))
+
+        conn = openstack.connection.Connection(session=sess)
+        if args.site != 'KVM@TACC':
             hosts_by_id = {}
             for host in bc.host.list():
                 hosts_by_id[host["id"]] = host["hypervisor_hostname"]
@@ -194,10 +196,20 @@ def main(argv):
                             hosts_by_id[resource["resource_id"]]
                         )
 
-            conn = openstack.connection.Connection(session=sess)
             for server in conn.compute.servers(project_id=args.project_id, all_tenants=True):
                 if server.hypervisor_hostname in hosts_in_lease:
                     servers_in_lease.append(server)
+        else:
+            # For KVM, find servers based on flavor
+            lease = bc.lease.get(args.lease_id)
+            for reservation in lease["reservations"]:
+                if reservation["resource_type"] == "flavor:instance":
+                    for server in conn.compute.servers(
+                        project_id=args.project_id,
+                        flavor_id=reservation["id"],
+                        all_tenants=True
+                    ):
+                        servers_in_lease.append(server)
     except Exception as e:
         # Ignore errors
         print("Error getting server info")
