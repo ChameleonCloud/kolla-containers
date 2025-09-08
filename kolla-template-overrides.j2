@@ -8,14 +8,6 @@ LABEL maintainer="{{ maintainer }}" name="{{ image_name }}" build-date="{{ build
 LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-containers"
 {% endblock %}
 
-################
-# Openstack-Base
-################
-
-{% block openstack_base_footer %}
-RUN {{ macros.upper_constraints_remove("netmiko") }}
-{% endblock %}
-
 #########
 # Fluentd
 #########
@@ -48,46 +40,12 @@ RUN pip --no-cache-dir install \
 {% endblock %}
 
 #########
-# Ironic
+# Blazar
 #########
 
-# We need an arm64 ipxe binary to support fugaku nodes at tacc, and arm thunder x2 at ncar.
-# we build them ourselves to ensure that support for gzip compressed images is enabled.
-
-{% set ironic_pxe_packages_append = ['unzip'] %}
-{% block ironic_pxe_footer %}
-ADD https://github.com/ChameleonCloud/ipxe/releases/download/v2022-09-30-chameleon/bin-arm64-efi.zip /opt/ipxe_efi.zip
-RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ipxe_efi.zip)
+{% block blazar_manager_footer %}
+ADD additions-archive /
+RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
+  && chown -R blazar: /etc/blazar \
+  && ln -s /etc/blazar/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
 {% endblock %}
-
-
-##########
-# Keystone
-##########
-
-{% set keystone_base_packages_remove = ['libapache2-mod-auth-openidc'] %}
-{% set keystone_base_packages_append = [
-  'https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.15.7/libapache2-mod-auth-openidc_2.4.15.7-1.jammy_amd64.deb',
-  'libcjose0',
-  'libhiredis0.14'
-  ] %}
-
-##########
-# Neutron
-##########
-
-
-{% set neutron_base_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
-{% set neutron_server_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
-
-# we do this twice because kolla is installing neutron plugins twice, 
-# and upper-constraints undoes our install
-#{% block neutron_base_footer %}
-#RUN SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip --no-cache-dir install --upgrade \
-#  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'
-#{% endblock %}
-#
-#{% block neutron_server_footer %}
-#RUN SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip --no-cache-dir install --upgrade \
-#  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'
-#{% endblock %}
