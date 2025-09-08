@@ -206,10 +206,11 @@ def main(argv):
                 if reservation["resource_type"] == "flavor:instance":
                     for server in conn.compute.servers(
                         project_id=args.project_id,
-                        flavor_id=reservation["id"],
                         all_tenants=True
                     ):
-                        servers_in_lease.append(server)
+                        server_res_id = server.flavor.extra_specs.get("aggregate_instance_extra_specs:reservation")
+                        if server_res_id == reservation["id"]:
+                            servers_in_lease.append(server)
     except Exception as e:
         # Ignore errors
         print("Error getting server info")
