@@ -19,15 +19,14 @@ RUN /usr/sbin/td-agent-gem install fluent-plugin-grafana-loki
 # Horizon
 #########
 
-{% block horizon_footer %}
 # [blazar-dashboard] Override with our fork of blazarclient, which includes support for device resources
-RUN pip --no-cache-dir install \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2023.1
-{% endblock %}
+{% set horizon_pip_packages_append = ['chameleon-blazarclient'] %}
 
 #########
 # Blazar
 #########
+
+{% set blazar_base_pip_packages_append = ['chameleon-blazarclient'] %}
 
 {% block blazar_manager_footer %}
 ADD additions-archive /
