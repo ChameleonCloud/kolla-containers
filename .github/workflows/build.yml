@@ -57,5 +57,6 @@ jobs:
           BUILD_TAG: ${{ inputs.tag }}
           PUSH: ${{ inputs.push }}
         run: |
-          ./run.sh
+          ./run.sh \
+          --work-dir $RUNNER_TEMP
         
