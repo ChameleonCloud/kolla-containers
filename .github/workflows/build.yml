@@ -58,5 +58,5 @@ jobs:
           PUSH: ${{ inputs.push }}
         run: |
           ./run.sh \
-          --work-dir $RUNNER_TEMP
-        
+          --work-dir $RUNNER_TEMP \
+          --threads $(nproc)
