@@ -78,18 +78,5 @@ RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ip
 # Neutron
 ##########
 
-
 {% set neutron_base_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
 {% set neutron_server_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
-
-# we do this twice because kolla is installing neutron plugins twice, 
-# and upper-constraints undoes our install
-#{% block neutron_base_footer %}
-#RUN SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip --no-cache-dir install --upgrade \
-#  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'
-#{% endblock %}
-#
-#{% block neutron_server_footer %}
-#RUN SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip --no-cache-dir install --upgrade \
-#  'git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'
-#{% endblock %}
