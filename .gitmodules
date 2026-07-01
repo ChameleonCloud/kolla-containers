@@ -1,4 +1,5 @@
 [submodule "src/kolla"]
 	path = src/kolla
 	url = https://github.com/ChameleonCloud/kolla
-	branch = chameleoncloud/2023.1
+	# branch = chameleoncloud/2024.1
+	branch = wip/chameleoncloud/2024.1
