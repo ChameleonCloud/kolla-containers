@@ -3,10 +3,12 @@
 ########
 # Labels
 ########
-{% block labels %}
+
+# commented out, overriding labels globally breaks fluentd binary image label.
+{# {% block labels %}
 LABEL maintainer="{{ maintainer }}" name="{{ image_name }}"
 LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-containers"
-{% endblock %}
+{% endblock %} #}
 
 ################
 # Openstack-Base
