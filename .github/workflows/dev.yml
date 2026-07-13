@@ -35,7 +35,9 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m venv .venv
-          .venv/bin/pip install src/kolla
+          .venv/bin/pip install \
+            src/kolla \
+            docker
 
       - name: Run Kolla Build
         env:
