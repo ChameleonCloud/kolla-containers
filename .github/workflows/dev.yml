@@ -12,6 +12,7 @@ env:
 
 jobs:
   build_matrix:
+    runs-on: [self-hosted, Linux, X64]
     strategy:
       fail-fast: false
       matrix:
@@ -20,9 +21,6 @@ jobs:
             tag: "2024.1-ubuntu-jammy"
           - base_tag: "24.04"
             tag: "2024.1-ubuntu-noble"
-        
-  run-build:
-    runs-on: [self-hosted, Linux, X64]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,19 +31,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: 'pip'
 
       - name: Install dependencies
         run: |
           python3 -m venv .venv
           .venv/bin/pip install src/kolla
-
-      - name: Login to Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Kolla Build
         env:
