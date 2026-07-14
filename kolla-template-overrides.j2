@@ -69,12 +69,24 @@ RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ip
 # Keystone
 ##########
 
+# 18.04 default: 2.3.3
+# 20.04 default: 2.4.1
+# Need >= 2.4.3:    OIDCRedirectURLsAllowed
+# 22.04 default: 2.4.11
+# Need >= 2.4.12.3: OIDCOAuthVerifyCertFiles
+# 24.04 default: 2.4.15.1
+
+# Drop override in 24.04
+# can drop in 22.04 if we switch 
+# from OIDCOAuthVerifyCertFiles -> OIDCOAuthVerifyJwksUri
+{% if base_distro_tag.startswith('22.04') %}
 {% set keystone_base_packages_remove = ['libapache2-mod-auth-openidc'] %}
 {% set keystone_base_packages_append = [
   'https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.15.7/libapache2-mod-auth-openidc_2.4.15.7-1.jammy_amd64.deb',
   'libcjose0',
   'libhiredis0.14'
   ] %}
+{% endif %}
 
 ##########
 # Neutron
