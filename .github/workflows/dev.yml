@@ -1,0 +1,51 @@
+name: kolla-build-matrix
+on:
+  schedule:
+    - cron: "0 4 * * *"
+      timezone: "America/Chicago"
+  push:
+    branches:
+      - 'chameleoncloud/2024.1**'
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build_matrix:
+    runs-on: [self-hosted, Linux, X64]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - base_tag: "22.04"
+            tag: "2024.1-ubuntu-jammy"
+          - base_tag: "24.04"
+            tag: "2024.1-ubuntu-noble"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install \
+            src/kolla \
+            docker
+
+      - name: Run Kolla Build
+        env:
+          BASE_TAG: ${{matrix.base_tag}}
+          TAG: ${{ matrix.tag }}
+        run: |
+          .venv/bin/kolla-build \
+          --config-file kolla-build.conf \
+          --template-override kolla-template-overrides.j2 \
+          --work-dir $RUNNER_TEMP \
+          --threads $(nproc)
