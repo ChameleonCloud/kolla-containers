@@ -9,7 +9,7 @@ git submodule update --init
 python3 -m venv .venv
 PIP_BUILD_CONSTRAINT=build-constraints.txt \
 .venv/bin/pip install \
-    -c https://raw.githubusercontent.com/openstack/requirements/refs/heads/unmaintained/2024.1/upper-constraints.txt \
+    -c https://releases.openstack.org/constraints/upper/2025.1 \
     -c build-constraints.txt \
     -e src/kolla \
     docker
