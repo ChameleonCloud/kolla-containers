@@ -32,9 +32,8 @@ RUN /usr/sbin/fluent-gem install fluent-plugin-grafana-loki
 {% block blazar_manager_footer %}
 ADD additions-archive /
 # Install our fork of blazarclient to use in email hook
-# TODO: Update to 2024.1 once branch available
 RUN pip --no-cache-dir install \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@wip/chameleoncloud/2024.1
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@wip/chameleoncloud/2025.1
 RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
   && chown -R blazar: /etc/blazar \
   && ln -s /etc/blazar/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
@@ -46,9 +45,8 @@ RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
 
 {% block horizon_footer %}
 # [blazar-dashboard] Override with our fork of blazarclient, which includes support for device resources
-# TODO: Update to 2024.1 once branch available
 RUN pip --no-cache-dir install \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@wip/chameleoncloud/2024.1
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@wip/chameleoncloud/2025.1
 {% endblock %}
 
 #########
@@ -69,28 +67,9 @@ RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ip
 # Keystone
 ##########
 
-# 18.04 default: 2.3.3
-# 20.04 default: 2.4.1
-# Need >= 2.4.3:    OIDCRedirectURLsAllowed
-# 22.04 default: 2.4.11
-# Need >= 2.4.12.3: OIDCOAuthVerifyCertFiles
-# 24.04 default: 2.4.15.1
-
-# Drop override in 24.04
-# can drop in 22.04 if we switch 
-# from OIDCOAuthVerifyCertFiles -> OIDCOAuthVerifyJwksUri
-{% if base_distro_tag.startswith('22.04') %}
-{% set keystone_base_packages_remove = ['libapache2-mod-auth-openidc'] %}
-{% set keystone_base_packages_append = [
-  'https://github.com/OpenIDC/mod_auth_openidc/releases/download/v2.4.15.7/libapache2-mod-auth-openidc_2.4.15.7-1.jammy_amd64.deb',
-  'libcjose0',
-  'libhiredis0.14'
-  ] %}
-{% endif %}
-
 ##########
 # Neutron
 ##########
 
-{% set neutron_base_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
-{% set neutron_server_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
+{% set neutron_base_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.5.0'] %}
+{% set neutron_server_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.5.0'] %}
