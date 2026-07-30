@@ -16,6 +16,10 @@ LABEL org.opencontainers.image.source="https://github.com/chameleoncloud/kolla-c
 
 {% block openstack_base_footer %}
 RUN {{ macros.upper_constraints_remove("netmiko") }}
+
+# allows pin to 2024.1-eom for nova ironic serial console
+# revert in 2025.1
+RUN {{ macros.upper_constraints_remove("openstacksdk") }}
 {% endblock %}
 
 #########
@@ -94,3 +98,11 @@ RUN (mkdir -p /usr/lib/ipxe/aarch64 && cd /usr/lib/ipxe/aarch64 && unzip /opt/ip
 
 {% set neutron_base_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
 {% set neutron_server_pip_packages_append = ['git+https://github.com/ChameleonCloud/netmiko.git@chameleoncloud/v4.1.2'] %}
+
+##########
+# Nova
+##########
+
+# Workaround for bug https://bugs.launchpad.net/ironic/+bug/2099872
+# Revert after 2025.1
+{% set nova_base_pip_packages_append = ['git+https://opendev.org/openstack/openstacksdk@2024.1-eom'] %}
