@@ -26,23 +26,20 @@ env:
 jobs:
   build-containers:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: 'pip' # caching pip dependencies
-
       - name: Install dependencies
-        run: |
-          python3 -m venv .venv
-          .venv/bin/pip install src/kolla
-
+        run: ./install.sh
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
@@ -55,7 +52,6 @@ jobs:
           BUILD_PROFILE: ${{ inputs.kolla_build_profile }}
           BUILD_PATTERN: ${{ inputs.kolla_build_pattern }}
           BUILD_TAG: ${{ inputs.tag }}
-          PUSH: ${{ inputs.push }}
         run: |
           ./run.sh \
           --work-dir $RUNNER_TEMP \

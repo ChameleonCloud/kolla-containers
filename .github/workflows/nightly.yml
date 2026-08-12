@@ -1,0 +1,82 @@
+name: nightly
+
+# This lives on the repository's DEFAULT branch on purpose: GitHub only fires
+# `schedule` from the default branch, so the per-branch cron in the old dev.yml
+# never ran. Each job checks out its own variant's branch. If the default branch
+# moves, this file must move with it or the nightlies silently stop.
+
+on:
+  schedule:
+    # GitHub cron is UTC-only (there is no timezone key). 04:00 CST / 05:00 CDT.
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+    inputs:
+      kolla_build_profile:
+        type: string
+        description: "Kolla profile, e.g. 'ironic'. Blank builds all 215 images."
+      push:
+        type: choice
+        description: "Push images to registry?"
+        required: true
+        default: 'true'
+        options: ['true', 'false']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      # The two caracal legs share a branch and differ only by base distro; the
+      # codename suffix keeps their sha tags from overwriting each other.
+      matrix:
+        include:
+          - {name: antelope,      ref: stable/2023.1,         base_tag: "22.04", tag: 2023.1-ubuntu-jammy, codename: jammy}
+          - {name: caracal-jammy, ref: chameleoncloud/2024.1, base_tag: "22.04", tag: 2024.1-ubuntu-jammy, codename: jammy}
+          - {name: caracal-noble, ref: chameleoncloud/2024.1, base_tag: "24.04", tag: 2024.1-ubuntu-noble, codename: noble}
+          - {name: epoxy,         ref: chameleoncloud/2025.1, base_tag: "24.04", tag: 2025.1-ubuntu-noble, codename: noble}
+    name: ${{ matrix.name }}
+    concurrency:
+      group: nightly-${{ matrix.name }}
+    env:
+      PUSH: ${{ inputs.push || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          submodules: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # install deps
+      - run: ./install.sh
+
+      - uses: docker/login-action@v3
+        if: env.PUSH == 'true'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build the sha tag, then promote. kolla pushes each image as it finishes,
+      # so building with the release tag would mutate it incrementally and leave
+      # it half-updated if the build dies partway.
+      - run: echo "SHA_TAG=$(git rev-parse --short HEAD)-ubuntu-${{ matrix.codename }}" >> "$GITHUB_ENV"
+
+      - run: ./run.sh --work-dir "$RUNNER_TEMP" --threads "$(nproc)"
+        env:
+          # run.sh reads PUSH too, and would inherit the job-level value. Kolla
+          # pushes from inside the same try/except as the build, so a registry
+          # blip fails an image that built fine; keep the build local-only and
+          # let retag.sh own every push.
+          PUSH: ''
+          BUILD_TAG: ${{ env.SHA_TAG }}
+          BASE_TAG: ${{ matrix.base_tag }}
+          BUILD_PROFILE: ${{ inputs.kolla_build_profile }}
+
+      - run: ./retag.sh "$SHA_TAG" "${{ matrix.tag }}"
+        if: env.PUSH == 'true'
