@@ -33,7 +33,7 @@ RUN /usr/sbin/fluent-gem install fluent-plugin-grafana-loki
 ADD additions-archive /
 # Install our fork of blazarclient to use in email hook
 RUN pip --no-cache-dir install \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@wip/chameleoncloud/2025.1
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2025.1
 RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
   && chown -R blazar: /etc/blazar \
   && ln -s /etc/blazar/hooks/on_before_end.py /usr/local/bin/blazar_before_end_action_email
@@ -46,7 +46,7 @@ RUN cp -R /additions/blazar-manager/* /etc/blazar/ \
 {% block horizon_footer %}
 # [blazar-dashboard] Override with our fork of blazarclient, which includes support for device resources
 RUN pip --no-cache-dir install \
-  git+https://github.com/ChameleonCloud/python-blazarclient.git@wip/chameleoncloud/2025.1
+  git+https://github.com/ChameleonCloud/python-blazarclient.git@chameleoncloud/2025.1
 {% endblock %}
 
 #########
