@@ -12,7 +12,7 @@ env:
 
 jobs:
   build_matrix:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -42,10 +42,8 @@ jobs:
       - name: Run Kolla Build
         env:
           BASE_TAG: ${{matrix.base_tag}}
-          TAG: ${{ matrix.tag }}
+          BUILD_TAG: ${{ matrix.tag }}
         run: |
-          .venv/bin/kolla-build \
-          --config-file kolla-build.conf \
-          --template-override kolla-template-overrides.j2 \
+          ./run.sh \
           --work-dir $RUNNER_TEMP \
           --threads $(nproc)
