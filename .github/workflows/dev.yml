@@ -5,22 +5,20 @@ on:
       timezone: "America/Chicago"
   push:
     branches:
-      - 'chameleoncloud/2024.1**'
+      - 'chameleoncloud/2025.1**'
 
 env:
   REGISTRY: ghcr.io
 
 jobs:
   build_matrix:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - base_tag: "22.04"
-            tag: "2024.1-ubuntu-jammy"
           - base_tag: "24.04"
-            tag: "2024.1-ubuntu-noble"
+            tag: "2025.1-ubuntu-noble"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,10 +40,8 @@ jobs:
       - name: Run Kolla Build
         env:
           BASE_TAG: ${{matrix.base_tag}}
-          TAG: ${{ matrix.tag }}
+          BUILD_TAG: ${{ matrix.tag }}
         run: |
-          .venv/bin/kolla-build \
-          --config-file kolla-build.conf \
-          --template-override kolla-template-overrides.j2 \
+          ./run.sh \
           --work-dir $RUNNER_TEMP \
           --threads $(nproc)
