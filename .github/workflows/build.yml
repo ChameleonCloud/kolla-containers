@@ -40,8 +40,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m venv .venv
-          .venv/bin/pip install src/kolla
+          run: ./install.sh
 
       - name: Login to Registry
         uses: docker/login-action@v4
