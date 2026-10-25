@@ -39,8 +39,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
 
       - name: Install dependencies
-        run: |
-          run: ./install.sh
+        run: ./install.sh
 
       - name: Login to Registry
         uses: docker/login-action@v4
